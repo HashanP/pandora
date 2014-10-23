@@ -24,5 +24,5 @@ module.exports = {
 	 * have been set. Otherwise tries localhost. This is where to add an alternative 
 	 * MongoDB uri.
 	 */
-	db: process.env.MONGODB || process.env.MONGOLAB_URI || "mongodb://<BillsJ>:<ayeshalamb1>@ds063929.mongolab.com:63929/pandora"
+	db: process.env.MONGODB || process.env.MONGOLAB_URI || "mongodb://BillsJ:ayeshalamb1@ds063929.mongolab.com:63929/pandora"
 };
