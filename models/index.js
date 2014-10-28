@@ -2,8 +2,10 @@ var models = {};
 
 models.Content = require("./Content");
 models.Post = require("./Post");
-models.Question = require("./Question");
-models.Quiz = require("./Quiz");
+models.Question = require("./Quiz").Question;
+models.QuizAttempt = require("./Quiz").QuizAttempt;
+models.QuestionAttempt = require("./Quiz").QuestionAttempt;
+models.Quiz = require("./Quiz").Quiz;
 models.VocabQuiz = require("./VocabQuiz").VocabQuiz;
 models.VocabQuestion = require("./VocabQuiz").VocabQuestion;
 models.Course = require("./Course");

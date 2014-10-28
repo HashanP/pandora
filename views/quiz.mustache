@@ -1,0 +1,23 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">
+  Quizzes
+    <div class="pull-right">
+      <a href="/course/{{id}}/quizzes">
+      <i class="fa fa-times"></i>
+      </a>
+    </div>
+  </div>
+  <div class="panel-body">
+    {{#model}}
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <h1>{{title}}</h1>
+        </div>
+      </div>
+      <div class="questions"></div>
+    {{/model}}
+    {{^readOnly}}
+      <button type="button" class="btn btn-primary submit">Submit</button>
+    {{/readOnly}}
+  </div>
+</div>

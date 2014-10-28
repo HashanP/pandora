@@ -1,0 +1,45 @@
+{{#model}}
+  <div class="form-group">
+    <label>Question</label>
+    <div class="content"></div>
+  </div>
+  <div class="form-group">
+    <label>Answer Type</label>
+    <select class="form-control answer_type">
+      <option value="text">Text</option>
+      <option value="number">Number</option>
+      <option value="radio">Multiple Choice</option>
+      <option value="checkbox">Checkboxes</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Answer</label>
+    {{#isText}}
+      <input type="text" class="answer_text form-control">
+    {{/isText}}
+    {{#isNumber}}
+      <input type="number" class="answer_number form-control">
+    {{/isNumber}}
+    {{#isRadio}}
+      <div class="options"></div>
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" class="add-option del btn-default btn btn-sm">Add Option</button>
+        </div>
+      </div>
+    {{/isRadio}}
+    {{#isCheckbox}}
+      <div class="options"></div>
+      <div class="row">
+        <div class="col-md-12">
+          <button type="button" class="add-option del btn-default btn btn-sm">Add Option</button>
+        </div>
+      </div>
+    {{/isCheckbox}}
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <button type="button" class="remove btn-default btn btn-sm">Delete Question</button>
+    </div>
+  </div>
+{{/model}}

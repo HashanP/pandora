@@ -1,45 +1,42 @@
-{{#model}}
-  <div class="form-group">
-    <label>Question</label>
-    <div class="content"></div>
-  </div>
-  <div class="form-group">
-    <label>Answer Type</label>
-    <select class="form-control answer_type">
-      <option value="text">Text</option>
-      <option value="number">Number</option>
-      <option value="radio">Multiple Choice</option>
-      <option value="checkbox">Checkboxes</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label>Answer</label>
-    {{#isText}}
-      <input type="text" class="answer_text form-control">
-    {{/isText}}
-    {{#isNumber}}
-      <input type="number" class="answer_number form-control">
-    {{/isNumber}}
-    {{#isRadio}}
-      <div class="options"></div>
+<div class="row">
+  {{#model}}
+  <div class="col-md-12">
+    <h3>Question {{question.number}}</h3>
+    <p>
+      {{question.content.html}}
+    </p>
+    <div class="form-group {{#correct}}has-success{{/correct}}{{^correct}}has-error{{/correct}}">
+    {{#question.isText}}
+      <input class="form-control answer_text" value="{{answer_text}}" {{#readOnly}}readonly{{/readOnly}} type="text"/>
+    {{/question.isText}}
+    {{#question.isNumber}}
+      <input class="form-control answer_number" value="{{answer_number}}" {{#readOnly}}readonly{{/readOnly}} type="number"/>
+    {{/question.isNumber}}
+    {{#question.isRadio}}
       <div class="row">
-        <div class="col-md-12">
-          <button type="button" class="add-option del btn-default btn btn-sm">Add Option</button>
+        {{#question.options}}
+            <div class="col-md-2">
+              <input type="radio" value="{{title}}"/>
+            </div>
+            <div class="col-md-10">
+              {{title}}
+            </div>
+          {{/question.options}}
         </div>
-      </div>
-    {{/isRadio}}
-    {{#isCheckbox}}
-      <div class="options"></div>
+    {{/question.isRadio}}
+    {{#question.isCheckbox}}
       <div class="row">
-        <div class="col-md-12">
-          <button type="button" class="add-option del btn-default btn btn-sm">Add Option</button>
+        {{#question.options}}
+            <div class="col-md-2">
+              <input type="checkbox" value="{{title}}"/>
+            </div>
+            <div class="col-md-10">
+              {{title}}
+            </div>
+          {{/question.options}}
         </div>
-      </div>
-    {{/isCheckbox}}
+    {{/question.isCheckbox}}
   </div>
-  <div class="row">
-    <div class="col-md-12">
-      <button type="button" class="remove btn-default btn btn-sm">Delete Question</button>
-    </div>
   </div>
-{{/model}}
+  {{/model}}
+</div>

@@ -1,7 +1,7 @@
 var util = require("util");
 var achilles = require("achilles");
 var Post = require("./Post");
-var Quiz = require("./Quiz");
+var Quiz = require("./Quiz").Quiz;
 var Content = require("./Content");
 var VocabQuiz = require("./VocabQuiz").VocabQuiz;
 

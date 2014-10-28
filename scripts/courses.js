@@ -262,6 +262,7 @@ function Option(el) {
 	achilles.View.call(this, document.createElement("div"));
 	this.bind(".title", "title");
 	this.bind(".correct", "correct");
+	this.on("click .remove", this.remove.bind(this));
 }
 
 util.inherits(Option, achilles.View);
@@ -284,7 +285,7 @@ function Question(el, options) {
 
 util.inherits(Question, achilles.View);
 
-Question.prototype.templateSync = require("../views/question.mustache");
+Question.prototype.templateSync = require("../views/questionForm.mustache");
 
 Question.prototype.addOption = function() {
 		this.model.options.push(new models.Option());
@@ -358,6 +359,54 @@ function QuizDetails(el, options) {
 util.inherits(QuizDetails, achilles.View);
 
 QuizDetails.prototype.templateSync = require("../views/quizDetails.mustache");
+
+function QuestionAttempt(el, options) {
+	achilles.View.call(this, document.createElement("div"));
+	this.bind(".answer_text", "answer_text");
+	this.bind(".answer_number", "answer_number");
+}
+
+util.inherits(QuestionAttempt, achilles.View);
+
+QuestionAttempt.prototype.templateSync = require("../views/question.mustache");
+
+function QuizAttempt(el, options) {
+	achilles.View.call(this, el);
+	this.quiz = options.quiz;
+	this.model = options.model;
+	this.readOnly = options.readOnly;
+
+	if(!this.model.questions) {
+		options.quiz.questions.forEach(function(question) {
+			var q = new models.QuestionAttempt();
+			q.questionId = question._id;
+			q.question = question;
+			this.model.questions.push(q);
+		}.bind(this));
+	} else {
+		options.quiz.questions.forEach(function(question,i) {
+			this.model.questions[i].question = question;
+			this.model.questions[i].readOnly = true;
+		}.bind(this));
+	}
+
+	this.delegate(".questions", "questions", new achilles.Collection(QuestionAttempt));
+	this.on("click .submit", this.submit.bind(this));
+}
+
+util.inherits(QuizAttempt, achilles.View);
+
+QuizAttempt.prototype.templateSync = require("../views/quiz.mustache");
+
+QuizAttempt.prototype.submit = function() {
+	this.model.date = new Date(Date.now());
+	this.model.save(function(err) {
+		if(err) {
+			throw err;
+		}
+		page("/course/" + this.id + "/quizzes/" + this.quiz.index + "/attempt/" + this.model.index);
+	}.bind(this));
+}
 
 models.Course.connection = new achilles.Connection(window.location.protocol + "//" + window.location.host + "/courses");
 
@@ -440,6 +489,23 @@ window.onload = function() {
 	page("/course/:course/quizzes/:quiz", function(e) {
 		models.Course.getById(e.params.course, function(err, doc) {
 			new QuizDetails(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], id:doc._id});
+		});
+	});
+	page("/course/:course/quizzes/:quiz/edit", function(e) {
+		models.Course.getById(e.params.course, function(err, doc) {
+			new CreateQuiz(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], id:doc._id});
+		});
+	});
+	page("/course/:course/quizzes/:quiz/attempt", function(e) {
+		models.Course.getById(e.params.course, function(err, doc) {
+			var y = new models.QuizAttempt();
+			doc.quizzes[e.params.quiz].attempts.push(y);
+			new QuizAttempt(document.querySelector(".course"), {model: y, id:doc._id, quiz:doc.quizzes[e.params.quiz]});
+		});
+	});
+	page("/course/:course/quizzes/:quiz/attempts/:attempt", function(e) {
+		models.Course.getById(e.params.course, function(err, doc) {
+			new QuizAttempt(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz].attempts[e.params.attempt], id:doc._id, quiz:doc.quizzes[e.params.quiz], readOnly:true});
 		});
 	});
 	page();
