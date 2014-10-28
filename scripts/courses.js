@@ -267,7 +267,7 @@ function Option(el) {
 
 util.inherits(Option, achilles.View);
 
-Option.prototype.templateSync = require("../views/option.mustache")
+Option.prototype.templateSync = require("../views/optionForm.mustache")
 
 function Question(el, options) {
 		achilles.View.call(this, el);
@@ -281,6 +281,15 @@ function Question(el, options) {
 		this.on("click .remove", this.remove.bind(this));
 		this.delegate(".content", "content", new Editor());
 		this.delegate(".options", "options", new achilles.Collection(Option));
+
+		this.model.on("change:answer_text", function() {
+			this.answer_text = null;
+			this.answer_number = null;
+
+			if(this.answer_type !== undefined && this.answer_type !== "radio" || this.answer_type !== "checkbox") {
+				this.options = [];
+			}
+		});
 }
 
 util.inherits(Question, achilles.View);
@@ -341,6 +350,7 @@ CreateQuiz.prototype.addQuestion = function() {
 };
 
 CreateQuiz.prototype.submit = function() {
+	console.log(this.model);
 	this.model.save(function(err) {
 		if(err) {
 			throw err;
@@ -360,10 +370,22 @@ util.inherits(QuizDetails, achilles.View);
 
 QuizDetails.prototype.templateSync = require("../views/quizDetails.mustache");
 
-function QuestionAttempt(el, options) {
+function OptionAttempt() {
 	achilles.View.call(this, document.createElement("div"));
+
+	this.bind(".correct", "correct");
+}
+
+util.inherits(OptionAttempt, achilles.View);
+
+OptionAttempt.prototype.templateSync = require("../views/option.mustache");
+
+function QuestionAttempt() {
+	achilles.View.call(this, document.createElement("div"));
+	this.define("model", models.QuestionAttempt);
 	this.bind(".answer_text", "answer_text");
 	this.bind(".answer_number", "answer_number");
+	this.delegate(".options", "options", new achilles.Collection(OptionAttempt));
 }
 
 util.inherits(QuestionAttempt, achilles.View);
@@ -375,12 +397,22 @@ function QuizAttempt(el, options) {
 	this.quiz = options.quiz;
 	this.model = options.model;
 	this.readOnly = options.readOnly;
+	this.id = options.id;
 
-	if(!this.model.questions) {
+	if(!this.model.questions.length) {
 		options.quiz.questions.forEach(function(question) {
 			var q = new models.QuestionAttempt();
 			q.questionId = question._id;
 			q.question = question;
+
+			if(question.answer_type === "radio" || question.answer_type === "checkbox") {
+				q.options = [];
+				question.options.forEach(function(option) {
+					var y = new models.Option();
+					y.title = option.title;
+					q.options.push(y);
+				});
+			}
 			this.model.questions.push(q);
 		}.bind(this));
 	} else {
@@ -404,7 +436,7 @@ QuizAttempt.prototype.submit = function() {
 		if(err) {
 			throw err;
 		}
-		page("/course/" + this.id + "/quizzes/" + this.quiz.index + "/attempt/" + this.model.index);
+		page("/course/" + this.id + "/quizzes/" + this.quiz.index + "/attempts/" + this.model.index);
 	}.bind(this));
 }
 

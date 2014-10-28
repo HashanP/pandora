@@ -1,9 +1,6 @@
-<div class="row">
-  <div class="col-md-1">
-    <input type="{{model.container.container.answer_type}}" class="correct form-control">
+{{#model}}
+  <div class="col-md-12">
+    <input type="radio" class="correct" {{#correct}}selected{{/correct}}/>
+    {{title}}
   </div>
-  <div class="col-md-10">
-    <input type="text" class="form-control title">
-  </div>
-  <button type="button" class="remove btn btn-link col-md-1"><i class="fa fa-times"></i></button>
-</div>
+{{/model}}

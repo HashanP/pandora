@@ -45,19 +45,9 @@ function Question() {
 
 	this.answer_type = "text";
 	this.content = new Content();
-	this.on("change:answer_type", this.delAnswer.bind(this));
 }
 
 util.inherits(Question, achilles.Model);
-
-Question.prototype.delAnswer = function() {
-	this.answer_text = null;
-	this.answer_number = null;
-
-	if(this.answer_type !== "radio" || this.answer_type !== "checkbox") {
-		this.options = [];
-	}
-};
 
 module.exports.Question = Question;
 
@@ -67,15 +57,25 @@ function QuestionAttempt() {
 	this.define("questionId", String); // refers to question
 	this.define("answer_text", String);
 	this.define("answer_number", Number);
-	this.define("answer_radio", String);
-	this.define("answer_checkbox", [String]);
+	this.define("options", [Option]);
 
 	Object.defineProperty(this, "correct", {
 		get: function() {
 			if(this.question.answer_type === "text") {
 				return this.question.answer_text.toLowerCase() === this.answer_text.toLowerCase();
-			} else {
+			} else if(this.question.answer_type === "number"){
 				return this.question.answer_number === this.answer_number;
+			} else {
+				console.log(this.question.options);
+				console.log(this.options);
+				for(var i = 0; i < this.question.options.length; i++) {
+console.log(this.question.options[i].v);
+console.log(this.options[i]);
+					if(this.question.options[i].correct !== this.options[i].correct) {
+						return false;
+					}
+				}
+				return true;
 			}
 		}
 	});
