@@ -1,6 +1,10 @@
 body {
-	background-image: url(http://subtlepatterns.com/patterns/shattered.png);
 	padding-top:70px;
+	background-image: url(http://subtlepatterns.com/patterns/stardust.png);
+}
+
+body.loggedIn {
+	background-image: url(http://subtlepatterns.com/patterns/shattered.png);
 }
 
 .icon {
@@ -9,6 +13,14 @@ body {
 
 .icon img {
 	width:100%;
+}
+
+.logInForm {
+	background-image: url(http://subtlepatterns.com/patterns/notebook.png);
+}
+
+.logInForm input, .logInForm input:focus {
+border:1px solid #999;
 }
 
 .icon img:hover {

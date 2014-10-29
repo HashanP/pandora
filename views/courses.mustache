@@ -1,55 +1,32 @@
-<!DOCTYPE html>
-<html>
-  <head>
-	<title>Courses</title>
-	<link href="//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/sandstone/bootstrap.min.css" rel="stylesheet">
-	<script src="//polyfill.io"></script>
-	<link href="/home.css" rel="stylesheet">
-	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-	<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-	<script src="/scripts/courses.js"></script>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-  </head>
-  <body>
-	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-	  <div class="container">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container">
+  	<div class="navbar-header">
+    	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    	</button>
+      <a class="navbar-brand" href="#">Pandora 2.0</a>
+    </div>
 
-		<div class="navbar-header">
-		  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-			<span class="sr-only">Toggle navigation</span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-		  </button>
-		  <a class="navbar-brand" href="#">Pandora 2.0</a>
-		</div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+  	     <li class="active"><a href="#">Home</a></li>
+         <li><a href="#">Clubs</a></li>
+  	     <li><a href="#">Apps</a></li>
+  		</ul>
 
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-		  <ul class="nav navbar-nav">
-			<li class="active"><a href="#">Home</a></li>
-			<li><a href="#">Clubs</a></li>
-			<li><a href="#">Apps</a></li>
-		  </ul>
+  	  <form class="navbar-form navbar-left" role="search">
+  	     <div class="form-group">
+  			      <input type="search" class="form-control" placeholder="Search">
+  			</div>
+  	  </form>
 
-		  <form class="navbar-form navbar-left" role="search">
-			<div class="form-group">
-			  <input type="search" class="form-control" placeholder="Search">
-			</div>
-		  </form>
-
-		  <ul class="nav navbar-nav navbar-right">
-			<li><a href="/logout">Logout</a></li>
-		  </ul>
-		</div>
-
-	  </div>
-	</nav>
-	<main class="container">
-	  {{#courses}}
-		<a href="/courses/{{_id}}/blog" class="icon">
-		  <img src="/icons/{{icon}}.png" class="col-sm-6 col-md-4 col-lg-3 col-xl-2">
-		</a>
-	  {{/courses}}
-	</main>
-  </body>
-</html>
+  	 <ul class="nav navbar-nav navbar-right">
+  			<li><a href="/logout">Logout</a></li>
+  		</ul>
+    </div>
+  </div>
+</nav>
+<main class="container"></main>

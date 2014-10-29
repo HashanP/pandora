@@ -1,6 +1,6 @@
 {{#model}}
   <div class="col-md-12">
-    <input type="radio" class="correct" {{#correct}}selected{{/correct}}/>
+    <input type="{{container.container.question.answer_type}}" class="correct" {{#correct}}selected{{/correct}}/>
     {{title}}
   </div>
 {{/model}}

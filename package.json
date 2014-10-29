@@ -21,7 +21,7 @@
   "author": "Hashan Punchihewa <hashan.punchihewa@gmail.com>",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "achilles": "^0.23.60",
+    "achilles": "^0.23.61",
     "achilles-mongodb": "^0.2.9",
     "body-parser": "~1.5.2",
     "browserify-middleware": "~3.0.1",
@@ -33,9 +33,11 @@
     "hogan.js": "~3.0.2",
     "html-truncate": "^1.0.5",
     "morgan": "^1.4.1",
+    "node-oauth2-server": "^2.2.2",
     "page": "~1.3.7",
     "passport": "~0.2.0",
     "passport-local": "~1.0.0",
+    "request": "^2.37.0",
     "serve-static": "~1.6.3",
     "texzilla": "~0.9.8-pre"
   }

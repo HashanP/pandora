@@ -51,7 +51,6 @@ CreateView.prototype.submit = function(e) {
 	e.preventDefault();
 	this.error = null;
 	this.success = null;
-	console.log(this.model);
 	this.model.save(function(err) {
 		if(err) {
 			this.error = err;
@@ -78,7 +77,6 @@ function BlogView(el, options) {
 	achilles.View.call(this, el);
 	this.data = options.data;
 	this.id = options.id;
-	console.log(this.id);
 }
 
 util.inherits(BlogView, achilles.View);
@@ -121,7 +119,6 @@ util.inherits(CreatePostView, achilles.View);
 
 CreatePostView.prototype.submit = function(e) {
 	e.preventDefault();
-	console.log(this.model);
 	this.error = false;
 	if(!this.model.date) {
 		this.model.date = new Date(Date.now());
@@ -145,7 +142,6 @@ function ListQuizView(el, options) {
 	achilles.View.call(this, el, options);
 	this.title = options.title;
 	this.data = options.data;
-	console.log(this.data);
 	this.section = options.section;
 	this.id = options.id;
 }
@@ -190,9 +186,7 @@ CreateVocabQuizView.prototype.addQuestion = function() {
 CreateVocabQuizView.prototype.templateSync = require("../views/createVocabQuiz.mustache");
 
 CreateVocabQuizView.prototype.submit = function() {
-	console.log(this.model);
 	if(!this.model.container) {
-		console.log("here");
 		var nova = new models.Course();
 		nova._id = this.id;
 		nova.vocabQuizzes = [this.model];
@@ -336,7 +330,6 @@ CreateQuiz.prototype.showQuestion = function(e) {
 CreateQuiz.prototype.render = function() {
 	achilles.View.prototype.render.call(this);
 	if(this.currentQuestion) {
-		console.log("here");
 		new Question(this.el.querySelector(".current_question"), {model: this.currentQuestion});
 		this.el.querySelector(".button-" + this.currentQuestion.index).classList.add("active");
 	}
@@ -350,7 +343,6 @@ CreateQuiz.prototype.addQuestion = function() {
 };
 
 CreateQuiz.prototype.submit = function() {
-	console.log(this.model);
 	this.model.save(function(err) {
 		if(err) {
 			throw err;
@@ -440,14 +432,80 @@ QuizAttempt.prototype.submit = function() {
 	}.bind(this));
 }
 
-models.Course.connection = new achilles.Connection(window.location.protocol + "//" + window.location.host + "/courses");
+var HEADER = window.location.protocol + "//" + window.location.host;
+models.Course.connection = new achilles.Connection(HEADER + "/courses");
+
+function Login(el) {
+	achilles.View.call(this, el);
+	this.on("click .submit", this.submit.bind(this));
+}
+
+util.inherits(Login, achilles.View);
+
+Login.prototype.submit = function() {
+	var username = this.el.querySelector(".username").value;
+	var password = this.el.querySelector(".password").value;
+	request.post({url:HEADER + "/oauth/token", form:{
+		grant_type:"password",
+		client_id:"000000",
+		username:username,
+		password:password,
+		client_secret:"000000"
+	}}, function(err, res, body) {
+		if(err) {
+			throw err;
+		} else {
+			var accessToken = JSON.parse(body).access_token;
+			localStorage.setItem("access_token", accessToken);
+			page("/");
+		}
+	});
+};
+
+Login.prototype.templateSync = require("../views/login.mustache");
+
+var request = require("request");
+
+var m = require("../views/courses.mustache");
 
 window.onload = function() {
 	var main = document.querySelector("main");
+	page(function(e,next) {
+		if(process.env.USER) {
+			document.body.classList.add("loggedIn");
+			next();
+		} else if(localStorage.getItem("access_token")) {
+			/*request = request.defaults({
+				auth: {
+					bearer: localStorage.getItem("access_token")
+				}
+			});*/
+				var proxied = window.XMLHttpRequest.prototype.open;
+		    window.XMLHttpRequest.prototype.open = function() {
+		        var y = proxied.apply(this, [].slice.call(arguments));
+						this.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
+						return y;
+		    };
+				request.get({url:HEADER+"/userinfo", json:true}, function(err, res, body) {
+				if(err) {
+					throw err;
+				}
+				if(res.statusCode === 500) {
+					new Login(document.querySelector("body"));
+					window.XMLHttpRequest.prototype.open = proxied;
+				} else {
+					process.env.USER = new achilles.User(body);
+					document.body.classList.add("loggedIn");
+					document.body.innerHTML = m();
+					next();
+				}
+			});
+		} else {
+			new Login(document.querySelector("body"));
+		}
+	});
 	page("/", function() {
-		console.log("here");
 		models.Course.get(function(err, docs) {
-			console.log(docs);
 			new ListView(document.querySelector("main"), docs);
 		});
 	});
@@ -478,7 +536,6 @@ window.onload = function() {
 		});
 	});
 	page("/course/:course/blog/:post/edit", function(e) {
-		console.log("here");
 		models.Course.getById(e.params.course, function(err, doc) {
 			new CreatePostView(document.querySelector(".course"), {model: doc.posts[e.params.post], id:doc._id});
 		});
