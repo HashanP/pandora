@@ -52,6 +52,8 @@ var tokens = {};
 app.oauth = oauthserver({
   model: {
 		getAccessToken: function(bearerToken, cb) {
+			console.log(bearerToken);
+			console.log(tokens);
 			if(!(bearerToken in tokens)) {
 				cb(true);
 			} else {

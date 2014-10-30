@@ -43,11 +43,6 @@ EditorController.prototype.render = function() {
 		this.rich = this.model.type === "rich-text-editor";
 	}
 	achilles.View.prototype.render.call(this);
-	if(this.open_tab === "preview" && this.model.type === EditorModes.LaTeX) {
-		console.log("fsdfds");
-		console.log(this.model);
-		MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el.querySelector(".preview")]);
-	}
 };
 
 EditorController.prototype.updateFont = function(e) {
