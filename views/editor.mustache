@@ -37,8 +37,9 @@
 	{{/rich}}
 	<div class="col-md-3">
 	  <select class="editor-mode form-control">
-		<option value="rich-text-editor" {{#rich}}selected{{/rich}}>Rich Text Editor</option>
-		<option value="latex" {{^rich}}selected{{/rich}}>Latex</option>
+  		<option value="rich-text-editor">Rich Text Editor</option>
+  		<option value="latex">Latex</option>
+      <option value="youtube">YouTube</option>
 	  </select>
 	</div>
   </div>
@@ -51,7 +52,7 @@
 	{{#rich}}
 	  <div contenteditable="true" class="editor-rich">{{model.data}}</div>
 	{{/rich}}
-	{{^rich}}
+	{{#latex}}
 	  {{#editorOpen}}
 		<div contenteditable="true" class="editor-latex">{{model.data}}</div>
 	  {{/editorOpen}}
@@ -60,6 +61,10 @@
 		  <script type="math/tex">{{model.data}}</script>
 		</div>
 	  {{/editorOpen}}
-	{{/rich}}
+	{{/latex}}
+  {{#youtube}}
+    <label>URL</label>
+    <input type="text" class="editor-youtube form-control">
+  {{/youtube}}
   </div>
 </div>
