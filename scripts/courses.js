@@ -1,14 +1,36 @@
+/**
+	* @author Hashan Punchihewa
+	* This is the only JavaScript file of Pandora.
+	* Pandora is a Single Page Application (SPA).
+	* Why?
+	* This means that rather than rendering the whole navigation bar,
+	* CSS files, etc. on every page load only the new data is loaded.
+	* Moreover because of web cache, data is only requested if it needs
+	* to be requested http://en.wikipedia.org/wiki/Web_cache.
+	*/
+
 var models = require("../models");
 var achilles = require("achilles");
 var page = require("page");
 var util = require("util");
 var Editor = require("./Editor");
 
+/**
+	* MathJax is a JavaScript library by the American Mathematical Society
+	* that allows Mathematical equations to be rendered on HTML pages.
+	* It is included before this JavaScript in `index.html`. The following
+	* lines of code configure MathJax to the needs of Pandora.
+	* Please see http://www.mathjax.org.
+	*/
 MathJax.Hub.Config({
 	tex2jax: {
 		displayMath: [],
 		inlineMath: []
 	},
+	/**
+	 	* Disables MathJax's ugly context menu which pops up by default if you
+		* right click.
+		*/
 	showMathMenu:false,
 	"HTML-CSS": { linebreaks: { automatic: true } },
          SVG: { linebreaks: { automatic: true } }
@@ -97,7 +119,7 @@ PostView.prototype.templateSync = require("../views/post.mustache");
 
 PostView.prototype.del = function() {
 	this.data.del(function() {
-		page("/course/" + this.id + "/blog");
+		page("/courses/" + this.id + "/blog");
 	}.bind(this));
 };
 
@@ -132,7 +154,7 @@ CreatePostView.prototype.submit = function(e) {
 		if(err) {
 			this.error = err;
 		}
-		page("/course/" + this.id + "/blog");
+		page("/courses/" + this.id + "/blog");
 	}.bind(this));
 };
 
@@ -195,7 +217,7 @@ CreateVocabQuizView.prototype.submit = function() {
 		if(err) {
 			throw err;
 		}
-		page("/course/" + this.id + "/vocab_quizzes");
+		page("/courses/" + this.id + "/vocab_quizzes");
 	}.bind(this));
 };
 
@@ -215,7 +237,7 @@ VocabQuiz.prototype.templateSync = require("../views/vocabQuiz.mustache");
 
 VocabQuiz.prototype.del = function() {
 	this.data.del(function() {
-		page("/course/" + this.id + "/vocab_quizzes");
+		page("/courses/" + this.id + "/vocab_quizzes");
 	}.bind(this));
 };
 
@@ -347,7 +369,7 @@ CreateQuiz.prototype.submit = function() {
 		if(err) {
 			throw err;
 		}
-		page("/course/" + this.id + "/quizzes");
+		page("/courses/" + this.id + "/quizzes");
 	}.bind(this));
 };
 
@@ -428,12 +450,12 @@ QuizAttempt.prototype.submit = function() {
 		if(err) {
 			throw err;
 		}
-		page("/course/" + this.id + "/quizzes/" + this.quiz.index + "/attempts/" + this.model.index);
+		page("/courses/" + this.id + "/quizzes/" + this.quiz.index + "/attempts/" + this.model.index);
 	}.bind(this));
 }
 
 var HEADER = window.location.protocol + "//" + window.location.host;
-models.Course.connection = new achilles.Connection(HEADER + "/courses");
+models.Course.connection = new achilles.Connection(HEADER + "/api");
 
 function Login(el) {
 	achilles.View.call(this, el);
@@ -461,7 +483,7 @@ Login.prototype.submit = function() {
 		} else {
 			var accessToken = JSON.parse(body).access_token;
 			localStorage.setItem("access_token", accessToken);
-			page("/");
+			page(window.location.href || "/");
 		}
 	}.bind(this));
 };
@@ -474,144 +496,156 @@ var m = require("../views/courses.mustache");
 
 var proxied = window.XMLHttpRequest.prototype.open;
 
+/**
+	* This is where the routing starts. It uses the page module.
+	* See https://github.com/visionmedia/page.js
+	*/
+page(function(e,next) {
+	if(process.env.USER) {
+		document.body.classList.add("loggedIn");
+		next();
+	} else if(localStorage.getItem("access_token")) {
+		window.XMLHttpRequest.prototype.open = function() {
+				var y = proxied.apply(this, [].slice.call(arguments));
+				this.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
+				return y;
+		};
 
+		request.get({url:HEADER+"/userinfo", json:true}, function(err, res, body) {
+			if(err) {
+				throw err;
+			}
+			if(res.statusCode === 500) {
+				new Login(document.querySelector("body"));
+				window.XMLHttpRequest.prototype.open = proxied;
+			} else {
+				process.env.USER = new achilles.User(body);
+				document.body.classList.add("loggedIn");
+				document.body.innerHTML = m();
+				next();
+			}
+		});
+	} else {
+		new Login(document.querySelector("body"));
+	}
+});
 
-window.onload = function() {
-	var main = document.querySelector("main");
-	page(function(e,next) {
-		if(process.env.USER) {
-			document.body.classList.add("loggedIn");
-			next();
-		} else if(localStorage.getItem("access_token")) {
-			/*request = request.defaults({
-				auth: {
-					bearer: localStorage.getItem("access_token")
-				}
-			});*/
+page("/", function() {
+	models.Course.get(function(err, docs) {
+		new ListView(document.querySelector("main"), docs);
+	});
+});
 
-				window.XMLHttpRequest.prototype.open = function() {
-						var y = proxied.apply(this, [].slice.call(arguments));
-						this.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
-						return y;
-				};
+page("/create", function() {
+	new CreateView(document.querySelector("main"), models.Course);
+});
 
-				request.get({url:HEADER+"/userinfo", json:true}, function(err, res, body) {
-				if(err) {
-					throw err;
-				}
-				if(res.statusCode === 500) {
-					new Login(document.querySelector("body"));
-					window.XMLHttpRequest.prototype.open = proxied;
-				} else {
-					process.env.USER = new achilles.User(body);
-					document.body.classList.add("loggedIn");
-					document.body.innerHTML = m();
-					next();
-				}
-			});
-		} else {
-			new Login(document.querySelector("body"));
-		}
+page("/courses/:course/:section", function(e, next) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new CourseView(document.querySelector("main"), {data: doc, section: e.params.section});
+		next();
 	});
-	page("/", function() {
-		models.Course.get(function(err, docs) {
-			new ListView(document.querySelector("main"), docs);
-		});
+});
+
+page("/courses/:course/blog", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new BlogView(document.querySelector(".course"), {data: doc.posts, id:doc._id});
 	});
-	page("/create", function() {
-		new CreateView(document.querySelector("main"), models.Course);
+});
+
+page("/courses/:course/blog/create", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		var m = new models.Post();
+		doc.posts.push(m);
+		new CreatePostView(document.querySelector(".course"), {id:e.params.course, model: m});
 	});
-	page("/course/:course/:section", function(e, next) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new CourseView(document.querySelector("main"), {data: doc, section: e.params.section});
-			next();
-		});
+});
+
+page("/courses/:course/blog/:post", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new PostView(document.querySelector(".course"), {data: doc.posts[e.params.post], id:doc._id});
 	});
-	page("/course/:course/blog", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new BlogView(document.querySelector(".course"), {data: doc.posts, id:doc._id});
-		});
+});
+
+page("/courses/:course/blog/:post/edit", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new CreatePostView(document.querySelector(".course"), {model: doc.posts[e.params.post], id:doc._id});
 	});
-	page("/course/:course/blog/create", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			var m = new models.Post();
-			doc.posts.push(m);
-			new CreatePostView(document.querySelector(".course"), {id:e.params.course, model: m});
-		});
+});
+
+page("/courses/:course/vocab_quizzes", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new ListQuizView(document.querySelector(".course"), {data: doc.vocabQuizzes, id:doc._id, section:"vocab_quizzes", title:"Vocabulary Quizzes"});
 	});
-	page("/course/:course/blog/:post", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new PostView(document.querySelector(".course"), {data: doc.posts[e.params.post], id:doc._id});
-		});
+});
+
+page("/courses/:course/vocab_quizzes/create", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		var m = new models.VocabQuiz();
+		doc.vocabQuizzes.push(m);
+		new CreateVocabQuizView(document.querySelector(".course"), {id:doc._id, model:m});
 	});
-	page("/course/:course/blog/:post/edit", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new CreatePostView(document.querySelector(".course"), {model: doc.posts[e.params.post], id:doc._id});
-		});
+});
+
+page("/courses/:course/vocab_quizzes/:quiz", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new VocabQuiz(document.querySelector(".course"), {id:doc._id, data:doc.vocabQuizzes[e.params.quiz]});
 	});
-	page("/course/:course/vocab_quizzes", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new ListQuizView(document.querySelector(".course"), {data: doc.vocabQuizzes, id:doc._id, section:"vocab_quizzes", title:"Vocabulary Quizzes"});
-		});
+});
+
+page("/courses/:course/vocab_quizzes/:quiz/edit", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new CreateVocabQuizView(document.querySelector(".course"), {id:doc._id, model:doc.vocabQuizzes[e.params.quiz]});
 	});
-	page("/course/:course/vocab_quizzes/create", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			var m = new models.VocabQuiz();
-			doc.vocabQuizzes.push(m);
-			new CreateVocabQuizView(document.querySelector(".course"), {id:doc._id, model:m});
-		});
+});
+
+page("/courses/:course/quizzes", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new ListQuizView(document.querySelector(".course"), {data: doc.quizzes, id:doc._id, section:"quizzes", title:"Quizzes"});
 	});
-	page("/course/:course/vocab_quizzes/:quiz", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new VocabQuiz(document.querySelector(".course"), {id:doc._id, data:doc.vocabQuizzes[e.params.quiz]});
-		});
+});
+
+page("/courses/:course/quizzes/create", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		var m = new models.Quiz();
+		doc.quizzes.push(m);
+		m.questions.push(new models.Question());
+		new CreateQuiz(document.querySelector(".course"), {model:m, id:doc._id});
 	});
-	page("/course/:course/vocab_quizzes/:quiz/edit", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new CreateVocabQuizView(document.querySelector(".course"), {id:doc._id, model:doc.vocabQuizzes[e.params.quiz]});
-		});
+});
+
+page("/courses/:course/quizzes/:quiz", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new QuizDetails(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], id:doc._id});
 	});
-	page("/course/:course/quizzes", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new ListQuizView(document.querySelector(".course"), {data: doc.quizzes, id:doc._id, section:"quizzes", title:"Quizzes"});
-		});
+});
+
+page("/courses/:course/quizzes/:quiz/edit", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new CreateQuiz(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], id:doc._id});
 	});
-	page("/course/:course/quizzes/create", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			var m = new models.Quiz();
-			doc.quizzes.push(m);
-			m.questions.push(new models.Question());
-			new CreateQuiz(document.querySelector(".course"), {model:m, id:doc._id});
-		});
+});
+
+page("/courses/:course/quizzes/:quiz/attempt", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		var y = new models.QuizAttempt();
+		doc.quizzes[e.params.quiz].attempts.push(y);
+		new QuizAttempt(document.querySelector(".course"), {model: y, id:doc._id, quiz:doc.quizzes[e.params.quiz]});
 	});
-	page("/course/:course/quizzes/:quiz", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new QuizDetails(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], id:doc._id});
-		});
+});
+
+page("/courses/:course/quizzes/:quiz/attempts/:attempt", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new QuizAttempt(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz].attempts[e.params.attempt], id:doc._id, quiz:doc.quizzes[e.params.quiz], readOnly:true});
 	});
-	page("/course/:course/quizzes/:quiz/edit", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new CreateQuiz(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], id:doc._id});
-		});
-	});
-	page("/course/:course/quizzes/:quiz/attempt", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			var y = new models.QuizAttempt();
-			doc.quizzes[e.params.quiz].attempts.push(y);
-			new QuizAttempt(document.querySelector(".course"), {model: y, id:doc._id, quiz:doc.quizzes[e.params.quiz]});
-		});
-	});
-	page("/course/:course/quizzes/:quiz/attempts/:attempt", function(e) {
-		models.Course.getById(e.params.course, function(err, doc) {
-			new QuizAttempt(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz].attempts[e.params.attempt], id:doc._id, quiz:doc.quizzes[e.params.quiz], readOnly:true});
-		});
-	});
-	page("/logout", function(e) {
-		localStorage.removeItem("access_token");
-		delete process.env.USER;
-		document.body.classList.remove("loggedIn");
-		window.XMLHttpRequest.prototype.open = proxied;
-		page("/");
-	});
-	page();
-};
+});
+
+page("/logout", function(e) {
+	localStorage.removeItem("access_token");
+	delete process.env.USER;
+	document.body.classList.remove("loggedIn");
+	window.XMLHttpRequest.prototype.open = proxied;
+	page("/");
+});
+
+page();

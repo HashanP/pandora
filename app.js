@@ -97,6 +97,10 @@ app.oauth = oauthserver({
 	accessTokenLifetime:null
 });
 
+app.get("/courses(*)", function(req, res) {
+	res.sendfile("public/index.html");
+});
+
 app.all('/oauth/token', app.oauth.grant());
 app.use(app.oauth.authorise());
 
@@ -106,10 +110,10 @@ app.use(function(req, res, next) {
 });
 
 app.get("/userinfo", function(req, res) {
-	res.end(JSON.stringify(req.user.toJSON()));
+	res.json(req.user.toJSON());
 });
 
-app.use("/courses", new achilles.Service(models.Course));
+app.use("/api", new achilles.Service(models.Course));
 
 app.set("port", process.env.PORT || 5000);
 

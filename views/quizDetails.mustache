@@ -2,7 +2,7 @@
   <div class="panel-heading">
   Quizzes
     <div class="pull-right">
-      <a href="/course/{{id}}/quizzes">
+      <a href="/courses/{{id}}/quizzes">
       <i class="fa fa-times"></i>
       </a>
     </div>
@@ -16,7 +16,7 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <a href="/course/{{id}}/quizzes/{{index}}/edit" class="btn btn-warning btn-sm">Edit</a>
+          <a href="/courses/{{id}}/quizzes/{{index}}/edit" class="btn btn-warning btn-sm">Edit</a>
         </div>
       </div>
       <div class="row">
@@ -41,14 +41,14 @@
                 <tr>
                   <td>{{date}}</td>
                   <td>{{score}}</td>
-                  <td><a href="/course/{{id}}/quizzes/{{model.index}}/attempts/{{index}}" class="btn btn-info btn-sm">Review</a></td>
+                  <td><a href="/courses/{{id}}/quizzes/{{model.index}}/attempts/{{index}}" class="btn btn-info btn-sm">Review</a></td>
                 </tr>
               {{/attempts}}
             </table>
           {{/attempts.length}}
        </div>
        <div class="col-md-offset-5 col-md-2 text-center">
-         <a href="/course/{{id}}/quizzes/{{index}}/attempt" class="btn btn-success">Attempt Quiz</a>
+         <a href="/courses/{{id}}/quizzes/{{index}}/attempt" class="btn btn-success">Attempt Quiz</a>
         </div>
       </div>
     {{/model}}

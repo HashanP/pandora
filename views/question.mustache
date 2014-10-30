@@ -4,7 +4,7 @@
     <div class="form-group {{#_id}}{{#correct}}has-success{{/correct}}{{^correct}}has-error{{/correct}}{{/_id}}">
     <h3>Question {{question.number}}</h3>
     <label class="control-label">
-      {{question.content.html}}
+      {{& question.content.html}}
     </label>
     {{#question.isText}}
       <input class="form-control answer_text" value="{{answer_text}}" {{#readOnly}}readonly{{/readOnly}} type="text"/>
