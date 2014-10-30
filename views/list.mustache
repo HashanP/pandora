@@ -11,13 +11,16 @@
 </div>
 <div class="row">
   {{#grid}}
+  <div class="block-grid-xl-6 block-grid-lg-4 block-grid-sm-2">
+
 	{{#data}}
-	  <div class="icon col-sm-6 col-md-3">
-		<a href="/course/{{_id}}/blog">
-		  <img src="/icons/{{icon}}.png" alt="{{icon}}">
-		</a>
-	  </div>
+  	  <div class="block-grid-item icon">
+    		<a href="/course/{{_id}}/blog">
+    		  <img src="/icons/{{icon}}.png" alt="{{icon}}">
+    		</a>
+  	  </div>
 	{{/data}}
+</div>
 	{{^data}}
 	  <div class="col-md-12">
 		<div class="alert alert-info" role="alert">No courses have been allocated to you yet.</div>
@@ -25,6 +28,8 @@
 	{{/data}}
   {{/grid}}
   {{^grid}}
+  <div class="row">
+
 	<div class="col-sm-12 col-md-12">
 	  <ul class="list-group">
 		{{#data}}
@@ -32,5 +37,6 @@
 		{{/data}}
 	  </ul>
 	</div>
+</div>
   {{/grid}}
 </div>
