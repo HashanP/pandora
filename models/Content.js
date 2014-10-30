@@ -1,6 +1,7 @@
 var util = require("util");
 var achilles = require("achilles");
 var truncate = require('html-truncate');
+var getYoutubeId = require("get-youtube-id");
 
 function Content() {
 	achilles.Model.call(this);
@@ -14,6 +15,8 @@ function Content() {
 		get: function() {
 			if(this.type === "rich-text-editor") {
 				return this.data;
+			} else if(this.type === "youtube") {
+				return "<iframe src=\"//www.youtube.com/embed/" + getYoutubeId(this.data) +  "\" frameborder=\"0\" allowfullscreen></iframe>";
 			} else {
 				return '<script type="math/tex">' + this.data + '</script>';
 			}
@@ -28,6 +31,8 @@ function Content() {
 			}
 			if(this.type === "rich-text-editor") {
 				return truncate(this.data, 100);
+			} else if(this.type === "youtube") {
+				return "<i class=\"fa fa-youtube-play\"></i> Video";
 			} else {
 				return '<script type="math/tex">' + this.data + '</script>';
 			}

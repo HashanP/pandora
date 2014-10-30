@@ -11,6 +11,7 @@ var models = require("./models");
 var browserify = require("browserify-middleware");
 var morgan = require("morgan");
 var oauthserver = require('node-oauth2-server');
+var compression = require('compression');
 
 require.extensions[".mustache"] = function(module, filename) {
 	var template = hogan.compile(fs.readFileSync(filename).toString());
@@ -29,6 +30,7 @@ achilles.User.connection
 
 var app = new express();
 
+app.use(compression());
 app.use(morgan("short"));
 app.use(serveStatic("./public", {
 	extensions: ["html"]
@@ -52,6 +54,8 @@ var tokens = {};
 app.oauth = oauthserver({
   model: {
 		getAccessToken: function(bearerToken, cb) {
+			console.log(bearerToken);
+			console.log(tokens);
 			if(!(bearerToken in tokens)) {
 				cb(true);
 			} else {

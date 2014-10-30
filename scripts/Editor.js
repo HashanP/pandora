@@ -24,6 +24,7 @@ var EditorController = function(el) {
 	this.on("change:model", this.setupModel.bind(this));
 
 	this.bind(".editor-rich", "data");
+	this.bind(".editor-youtube", "data");
 	this.bind(".editor-mode", "type");
 	this.codebox = new CodeBox(CodeBox.Modes.LaTeX);
 	this.delegate(".editor-latex", "data", this.codebox);
@@ -41,13 +42,10 @@ EditorController.prototype.render = function() {
 	this.editorOpen = this.open_tab === "editor";
 	if(this.model) {
 		this.rich = this.model.type === "rich-text-editor";
+		this.latex = this.model.type === "latex";
+		this.youtube = this.model.type === "youtube";
 	}
 	achilles.View.prototype.render.call(this);
-	if(this.open_tab === "preview" && this.model.type === EditorModes.LaTeX) {
-		console.log("fsdfds");
-		console.log(this.model);
-		MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el.querySelector(".preview")]);
-	}
 };
 
 EditorController.prototype.updateFont = function(e) {

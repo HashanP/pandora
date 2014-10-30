@@ -36,6 +36,19 @@ MathJax.Hub.Config({
          SVG: { linebreaks: { automatic: true } }
 });
 
+/**
+	* When the page loads MathJax automatically scans the code for Mathematical
+	* notation, however it doesn't when the page updates due to JavaScript by
+	* default. The following code manually calls MathJax's update function on
+	* the updated region.
+	*/
+var defaultRender = achilles.View.prototype.render;
+
+achilles.View.prototype.render = function() {
+	defaultRender.call(this);
+	MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el]);
+};
+
 function ListView(el, data) {
 	achilles.View.call(this, el);
 	this.define("data", [models.Course]);
@@ -123,10 +136,7 @@ PostView.prototype.del = function() {
 	}.bind(this));
 };
 
-BlogView.prototype.render = PostView.prototype.render = function() {
-	achilles.View.prototype.render.call(this);
-	MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el]);
-};
+
 
 function CreatePostView(el, options) {
 	achilles.View.call(this, el);
@@ -483,7 +493,7 @@ Login.prototype.submit = function() {
 		} else {
 			var accessToken = JSON.parse(body).access_token;
 			localStorage.setItem("access_token", accessToken);
-			page(window.location.href || "/");
+			page(window.location.pathname || "/");
 		}
 	}.bind(this));
 };
