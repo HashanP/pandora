@@ -52,9 +52,6 @@ var tokens = {};
 app.oauth = oauthserver({
   model: {
 		getAccessToken: function(bearerToken, cb) {
-			console.log("HERRERERESFDSDFSFDFSDFSDFSD");
-			console.log(bearerToken);
-			console.log(tokens);
 			if(!(bearerToken in tokens)) {
 				cb(true);
 			} else {
@@ -79,8 +76,6 @@ app.oauth = oauthserver({
 			}
 		},
 		saveAccessToken: function(accessToken, clientId, expires, user, cb) {
-			console.log("TERTRETERTRERETETRTRERET");
-			console.log(accessToken);
 			tokens[accessToken] = user;
 			cb();
 		},

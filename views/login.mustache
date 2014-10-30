@@ -4,6 +4,9 @@
  <section id="pandora's-box" class="text-center">
    <img src="/box.png"/>
  </section>
+    {{#error}}
+      <p class="text-danger">{{error}}</p>
+    {{/error}}
    <label>Username</label>
    <input type="text" class="form-control username" autofocus/>
    <br/>

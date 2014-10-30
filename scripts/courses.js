@@ -437,6 +437,8 @@ models.Course.connection = new achilles.Connection(HEADER + "/courses");
 
 function Login(el) {
 	achilles.View.call(this, el);
+	this.define("error", String);
+	this.on("change:error", this.render.bind(this));
 	this.on("click .submit", this.submit.bind(this));
 }
 
@@ -454,12 +456,14 @@ Login.prototype.submit = function() {
 	}}, function(err, res, body) {
 		if(err) {
 			throw err;
+		} else if(res.statusCode === 500) {
+			this.error = "Username or password is incorrect.";
 		} else {
 			var accessToken = JSON.parse(body).access_token;
 			localStorage.setItem("access_token", accessToken);
 			page("/");
 		}
-	});
+	}.bind(this));
 };
 
 Login.prototype.templateSync = require("../views/login.mustache");
