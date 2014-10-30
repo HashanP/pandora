@@ -7,7 +7,7 @@ body.loggedIn {
 	background-image: url(http://subtlepatterns.com/patterns/shattered.png);
 }
 
-.icon {
+.icon img {
 	padding:20px;
 }
 
@@ -24,7 +24,8 @@ border:1px solid #999;
 }
 
 .icon img:hover {
-	padding-top:15px;
+	padding-top:30px;
+	padding-bottom:30px;
 	padding-left:30px;
 	padding-right:30px;
 	-webkit-transition-property: padding;

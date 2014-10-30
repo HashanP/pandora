@@ -472,6 +472,10 @@ var request = require("request");
 
 var m = require("../views/courses.mustache");
 
+var proxied = window.XMLHttpRequest.prototype.open;
+
+
+
 window.onload = function() {
 	var main = document.querySelector("main");
 	page(function(e,next) {
@@ -484,12 +488,13 @@ window.onload = function() {
 					bearer: localStorage.getItem("access_token")
 				}
 			});*/
-				var proxied = window.XMLHttpRequest.prototype.open;
-		    window.XMLHttpRequest.prototype.open = function() {
-		        var y = proxied.apply(this, [].slice.call(arguments));
+
+				window.XMLHttpRequest.prototype.open = function() {
+						var y = proxied.apply(this, [].slice.call(arguments));
 						this.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
 						return y;
-		    };
+				};
+
 				request.get({url:HEADER+"/userinfo", json:true}, function(err, res, body) {
 				if(err) {
 					throw err;
@@ -600,6 +605,13 @@ window.onload = function() {
 		models.Course.getById(e.params.course, function(err, doc) {
 			new QuizAttempt(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz].attempts[e.params.attempt], id:doc._id, quiz:doc.quizzes[e.params.quiz], readOnly:true});
 		});
+	});
+	page("/logout", function(e) {
+		localStorage.removeItem("access_token");
+		delete process.env.USER;
+		document.body.classList.remove("loggedIn");
+		window.XMLHttpRequest.prototype.open = proxied;
+		page("/");
 	});
 	page();
 };
