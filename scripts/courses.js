@@ -479,7 +479,7 @@ Login.prototype.submit = function() {
 		if(err) {
 			throw err;
 		} else if(res.statusCode === 500) {
-			this.error = "Username or password is incorrect.";
+			this.error = "The username or password is incorrect.";
 		} else {
 			var accessToken = JSON.parse(body).access_token;
 			localStorage.setItem("access_token", accessToken);
