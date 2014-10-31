@@ -500,6 +500,27 @@ Login.prototype.submit = function() {
 
 Login.prototype.templateSync = require("../views/login.mustache");
 
+function ChangePasswordView(el) {
+	achilles.View.call(this, el);
+	this.on("click .submit", this.submit.bind(this));
+}
+
+util.inherits(ChangePasswordView, achilles.View);
+
+ChangePasswordView.prototype.submit = function() {
+	request.post({url:HEADER +"/userinfo/changePassword", json:{
+		oldPassword: this.el.querySelector(".old-password").value,
+		newPassword: this.el.querySelector(".new-password").value
+	}}, function(err, res, body) {
+		if(err) {
+			throw err;
+		}
+		page("/");
+	});
+};
+
+ChangePasswordView.prototype.templateSync = require("../views/changePassword.mustache");
+
 var request = require("request");
 
 var m = require("../views/courses.mustache");
@@ -515,6 +536,7 @@ page(function(e,next) {
 		document.body.classList.add("loggedIn");
 		next();
 	} else if(localStorage.getItem("access_token")) {
+		console.log("here");
 		window.XMLHttpRequest.prototype.open = function() {
 				var y = proxied.apply(this, [].slice.call(arguments));
 				this.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
@@ -529,9 +551,24 @@ page(function(e,next) {
 				new Login(document.querySelector("body"));
 				window.XMLHttpRequest.prototype.open = proxied;
 			} else {
-				process.env.USER = new achilles.User(body);
+				process.env.USER = achilles.User.parse(body);
 				document.body.classList.add("loggedIn");
-				document.body.innerHTML = m();
+				document.body.innerHTML = m({user:process.env.USER});
+				document.querySelector(".dropdown-toggle").addEventListener("click", function(e) {
+					e.stopPropagation();
+					var menu = document.querySelector(".dropdown-menu");
+					if(window.getComputedStyle(menu).display === "none") {
+						menu.style.display = "block";
+					} else {
+						menu.style.display = "none";
+					}
+				});
+				document.querySelector("body").addEventListener("click", function() {
+					var menu = document.querySelector(".dropdown-menu");
+					if(window.getComputedStyle(menu).display === "block") {
+						menu.style.display = "none";
+					}
+				});
 				next();
 			}
 		});
@@ -650,6 +687,11 @@ page("/courses/:course/quizzes/:quiz/attempts/:attempt", function(e) {
 	});
 });
 
+
+page("/changePassword", function(e) {
+	new ChangePasswordView(document.querySelector("main"));
+});
+
 page("/logout", function(e) {
 	localStorage.removeItem("access_token");
 	delete process.env.USER;
@@ -658,4 +700,4 @@ page("/logout", function(e) {
 	page("/");
 });
 
-page();
+window.addEventListener("load", page);

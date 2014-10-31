@@ -117,6 +117,22 @@ app.get("/userinfo", function(req, res) {
 	res.json(req.user.toJSON());
 });
 
+app.post("/userinfo/changePassword", function(req, res, next) {
+	req.user.comparePassword(req.body.oldPassword, function(err, isMatch) {
+		if(isMatch) {
+			req.user.password = req.body.newPassword;
+			req.user.save(function(err) {
+				if(err) {
+					return next(err);
+				}
+				res.end();
+			});
+		} else {
+			next(new Error("Incorrect old password."));
+		}
+	});
+});
+
 app.use("/api", new achilles.Service(models.Course));
 
 app.set("port", process.env.PORT || 5000);
