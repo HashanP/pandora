@@ -466,6 +466,7 @@ QuizAttempt.prototype.submit = function() {
 
 var HEADER = window.location.protocol + "//" + window.location.host;
 models.Course.connection = new achilles.Connection(HEADER + "/api");
+achilles.User.connection = new achilles.Connection(HEADER + "/users");
 
 function Login(el) {
 	achilles.View.call(this, el);
@@ -520,6 +521,50 @@ ChangePasswordView.prototype.submit = function() {
 };
 
 ChangePasswordView.prototype.templateSync = require("../views/changePassword.mustache");
+
+function UsersList(el, options) {
+	achilles.View.call(this, el);
+	this.data = options.data;
+}
+
+util.inherits(UsersList, achilles.View);
+
+UsersList.prototype.templateSync = require("../views/usersList.mustache");
+
+function UsersCreate(el, options) {
+	achilles.View.call(this, el);
+	this.courses = options.courses;
+	this.model = options.model;
+	this.bind(".name", "name")
+	this.on("click .submit", this.submit.bind(this));
+}
+
+util.inherits(UsersCreate, achilles.View);
+
+UsersCreate.prototype.templateSync = require("../views/usersCreate.mustache");
+
+UsersCreate.prototype.submit = function() {
+	this.model.password = this.model.name;
+	this.model.roles = [];
+	var status = this.el.querySelector(".status").value;
+	this.model.roles.push(status);
+	console.log(this.model);
+	Array.prototype.slice.call(this.el.querySelectorAll(".course")).forEach(function(el) {
+		if(el.checked) {
+			this.model.roles.push("Course:get:" + el.value);
+			if(status === "teacher") {
+				this.model.roles.push("Course:put:" + el.value);
+			}
+		}
+	}.bind(this));
+	this.model.save(function(err) {
+		if(err) {
+			throw err;
+		}
+		console.log("here");
+		page("/");
+	});
+};
 
 var request = require("request");
 
@@ -690,6 +735,19 @@ page("/courses/:course/quizzes/:quiz/attempts/:attempt", function(e) {
 
 page("/changePassword", function(e) {
 	new ChangePasswordView(document.querySelector("main"));
+});
+
+page("/users", function(e) {
+	achilles.User.get(function(err, docs) {
+		console.log(docs);
+		new UsersList(document.querySelector("main"), {data:docs});
+	});
+});
+
+page("/users/create", function(e) {
+	models.Course.get(function(err, courses) {
+		new UsersCreate(document.querySelector("main"), {courses:courses, model:new achilles.User()});
+	});
 });
 
 page("/logout", function(e) {

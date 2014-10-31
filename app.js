@@ -134,6 +134,7 @@ app.post("/userinfo/changePassword", function(req, res, next) {
 });
 
 app.use("/api", new achilles.Service(models.Course));
+app.use("/users", new achilles.Service(achilles.User));
 
 app.set("port", process.env.PORT || 5000);
 

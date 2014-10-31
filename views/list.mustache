@@ -10,6 +10,12 @@
   </div>
 </div>
 <div class="row">
+  {{^data}}
+
+    <div class="col-md-12">
+    <div class="alert alert-info" role="alert">No courses have been allocated to you yet.</div>
+    </div>
+  {{/data}}
   {{#grid}}
   <div class="block-grid-xl-6 block-grid-lg-4 block-grid-sm-2">
 
@@ -21,11 +27,7 @@
   	  </div>
 	{{/data}}
 </div>
-	{{^data}}
-	  <div class="col-md-12">
-		<div class="alert alert-info" role="alert">No courses have been allocated to you yet.</div>
-	  </div>
-	{{/data}}
+
   {{/grid}}
   {{^grid}}
   <div class="row">
