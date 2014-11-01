@@ -71,8 +71,7 @@ util.inherits(ListView, achilles.View);
 ListView.prototype.templateSync = require("../views/list.mustache");
 
 function CreateView(el) {
-	achilles.View.call(this, el.cloneNode(true));
-	el.parentNode.replaceChild(this.el, el);
+	achilles.View.call(this, el);
 	this.model = new models.Course();
 	this.bind(".field-title", "title");
 	this.bind(".field-icon", "icon");
