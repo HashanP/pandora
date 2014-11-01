@@ -560,8 +560,7 @@ UsersCreate.prototype.submit = function() {
 		if(err) {
 			throw err;
 		}
-		console.log("here");
-		page("/");
+		page("/users");
 	});
 };
 
