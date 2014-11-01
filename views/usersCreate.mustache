@@ -7,27 +7,33 @@
   </div>
   <div class="panel-body">
   <form>
+    <div class="row">
+      <div class="col-md-1 col-md-offset-11">
+        <button type="button" class="btn btn-danger del">Delete</button>
+      </div>
+    </div>
     <div class="form-group">
       <label>Username</label>
       <input type="username" class="form-control name">
     </div>
     <div class="form-group">
-      <label>Status</label>
-      <select class="form-control status">
-        <option value="admin">Admin</option>
-        <option value="teacher">Teacher</option>
-        <option value="pupil">Student</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Courses</label>
+      <label>Permissions</label>
       <div class="row">
-      {{#courses}}
-        <div class="col-md-12">
-          <input type="checkbox" class="course" value="{{_id}}">
-          {{title}}
-        </div>
-      {{/courses}}
+        <table class="table">
+          <tr>
+            <th>Course</th>
+            <th>Access</th>
+            <th>Edit</th>
+          </tr>
+          {{#courses}}
+            <tr>
+              <td>{{title}}</td>
+              <td><input type="checkbox" class="role" value="Course:get:{{_id}}"></td>
+              <td><input type="checkbox" class="role" value="Course:put:{{_id}}"></td>
+            </tr>
+          {{/courses}}
+        </table>
+      </div>
     </div>
     <button type="button" class="btn btn-primary submit">Submit</button>
     <button type="reset" class="btn reset">Reset</button>

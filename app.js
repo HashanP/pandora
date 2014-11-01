@@ -39,12 +39,6 @@ app.use(bodyParser.urlencoded({
 	extended:true
 }));
 app.use(bodyParser.json());
-/*app.use(cookieParser("fsfds"));
-app.use(session({
- cookie : {
-    maxAge: 3600000 // see below
-  }
-}));*/
 app.use("/scripts", browserify("./scripts", {
 	transform:["browserify-mustache"]
 }));
@@ -54,8 +48,6 @@ var tokens = {};
 app.oauth = oauthserver({
   model: {
 		getAccessToken: function(bearerToken, cb) {
-			console.log(bearerToken);
-			console.log(tokens);
 			if(!(bearerToken in tokens)) {
 				cb(true);
 			} else {

@@ -534,8 +534,10 @@ function UsersCreate(el, options) {
 	achilles.View.call(this, el);
 	this.courses = options.courses;
 	this.model = options.model;
-	this.bind(".name", "name")
+	this.bind(".name", "name");
+	this.bind(".role", "roles");
 	this.on("click .submit", this.submit.bind(this));
+	this.on("click .del", this.del.bind(this));
 }
 
 util.inherits(UsersCreate, achilles.View);
@@ -543,20 +545,21 @@ util.inherits(UsersCreate, achilles.View);
 UsersCreate.prototype.templateSync = require("../views/usersCreate.mustache");
 
 UsersCreate.prototype.submit = function() {
-	this.model.password = this.model.name;
-	this.model.roles = [];
-	var status = this.el.querySelector(".status").value;
-	this.model.roles.push(status);
 	console.log(this.model);
-	Array.prototype.slice.call(this.el.querySelectorAll(".course")).forEach(function(el) {
-		if(el.checked) {
-			this.model.roles.push("Course:get:" + el.value);
-			if(status === "teacher") {
-				this.model.roles.push("Course:put:" + el.value);
-			}
-		}
-	}.bind(this));
+	if(!this.model._id) {
+		this.model.password = this.model.name;
+	}
+
 	this.model.save(function(err) {
+		if(err) {
+			throw err;
+		}
+		page("/users");
+	});
+};
+
+UsersCreate.prototype.del = function() {
+	this.model.del(function(err) {
 		if(err) {
 			throw err;
 		}
@@ -745,6 +748,14 @@ page("/users", function(e) {
 page("/users/create", function(e) {
 	models.Course.get(function(err, courses) {
 		new UsersCreate(document.querySelector("main"), {courses:courses, model:new achilles.User()});
+	});
+});
+
+page("/users/:user", function(e) {
+	achilles.User.getById(e.params.user, function(err, user) {
+		models.Course.get(function(err, courses) {
+			new UsersCreate(document.querySelector("main"), {courses:courses, model:user});
+		});
 	});
 });
 
