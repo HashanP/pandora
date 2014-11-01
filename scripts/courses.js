@@ -573,6 +573,9 @@ var m = require("../views/courses.mustache");
 
 var proxied = window.XMLHttpRequest.prototype.open;
 
+var errorPage = require("../views/error.mustache");
+
+
 /**
 	* This is where the routing starts. It uses the page module.
 	* See https://github.com/visionmedia/page.js

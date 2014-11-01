@@ -1,6 +1,7 @@
 <div class="panel panel-default">
   <div class="panel-heading">
-  Create User
+  {{#model._id}}Edit User{{/model._id}}
+  {{^model._id}}Create User{{/model._id}}
   <div class="pull-right">
     <a href="/"><i class="fa fa-times"></i></a>
   </div>
@@ -8,8 +9,8 @@
   <div class="panel-body">
   <form>
     <div class="row">
-      <div class="col-md-1 col-md-offset-11">
-        <button type="button" class="btn btn-danger del">Delete</button>
+      <div class="col-md-2 col-md-offset-10">
+        <button type="button" class="btn btn-danger del pull-right">Delete</button>
       </div>
     </div>
     <div class="form-group">
