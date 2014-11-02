@@ -1,30 +1,30 @@
 <div class="row">
-	<div class="col-md-3">
-		<div class="panel panel-default">
-		<div class="panel-heading">{{data.title}}</div>
-		<ul class="list-group">
-			<li class="list-group-item {{#blog}}active{{/blog}}">
-				<a href="/courses/{{data._id}}/blog">Blog</a>
-			</li>
-			<li class="list-group-item {{#vocab_quizzes}}active{{/vocab_quizzes}}">
-				<a href="/courses/{{data._id}}/vocab_quizzes">Vocabulary Quizzes</a>
-			</li>
-			<li class="list-group-item {{#quizzes}}active{{/quizzes}}">
-				<a href="/courses/{{data._id}}/quizzes">Quizzes</a>
-			</li>
-			<li class="list-group-item {{#uploads}}active{{/uploads}}">
-				<a href="/courses/{{data._id}}/uploads">File Uploads</a>
-			</li>
-			<li class="list-group-item {{#downloads}}active{{/downloads}}">
-				<a href="/courses/{{data._id}}/downloads">File Downloads</a>
-			</li>
-			{{#can.put}}
-			<li class="list-group-item {{#settings}}active{{/settings}}">
-				<a href="/courses/{{data._id}}/settings">Settings</a>
-			</li>
-			{{/can.put}}
-		</ul>
-		</div>
-	</div>
-	<div class="col-md-9 course"></div>
+  <div class="col-md-3">
+    <div class="panel panel-default">
+    <div class="panel-heading">{{data.title}}</div>
+    <ul class="list-group">
+      <li class="list-group-item {{#blog}}active{{/blog}}">
+        <a href="/courses/{{data._id}}/blog">Blog</a>
+      </li>
+      <li class="list-group-item {{#vocab_quizzes}}active{{/vocab_quizzes}}">
+        <a href="/courses/{{data._id}}/vocab_quizzes">Vocabulary Quizzes</a>
+      </li>
+      <li class="list-group-item {{#quizzes}}active{{/quizzes}}">
+        <a href="/courses/{{data._id}}/quizzes">Quizzes</a>
+      </li>
+      <li class="list-group-item {{#uploads}}active{{/uploads}}">
+        <a href="/courses/{{data._id}}/uploads">File Uploads</a>
+      </li>
+      <li class="list-group-item {{#downloads}}active{{/downloads}}">
+        <a href="/courses/{{data._id}}/downloads">File Downloads</a>
+      </li>
+      {{#can.put}}
+      <li class="list-group-item {{#settings}}active{{/settings}}">
+        <a href="/courses/{{data._id}}/settings">Settings</a>
+      </li>
+      {{/can.put}}
+    </ul>
+    </div>
+  </div>
+  <div class="col-md-9 course"></div>
 </div>
