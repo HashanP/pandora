@@ -65,8 +65,8 @@ function QuestionAttempt() {
 				this.question = this.container.container.container.container.questions[this.index];
 			}
 			if(this.question.answer_type === "text") {
-				return this.question.answer_text.toLowerCase() === this.answer_text.toLowerCase();
-			} else if(this.question.answer_type === "number"){
+				return  this.answer_text && this.question.answer_text.toLowerCase() === this.answer_text.toLowerCase();
+			} else if(this.question.answer_type === "number") {
 				return this.question.answer_number === this.answer_number;
 			} else {
 				console.log(this.question.options);
