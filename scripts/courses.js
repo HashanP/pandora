@@ -317,7 +317,7 @@ function Question(el, options) {
 		this.delegate(".content", "content", new Editor());
 		this.delegate(".options", "options", new achilles.Collection(Option));
 
-		this.model.on("change:answer_text", function() {
+		this.model.on("change:answer_type", function() {
 			this.answer_text = null;
 			this.answer_number = null;
 
