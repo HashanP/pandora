@@ -478,7 +478,7 @@ QuizAttempt.prototype.submit = function() {
 
 var HEADER = window.location.protocol + "//" + window.location.host;
 models.Course.connection = new achilles.Connection(HEADER + "/api");
-achilles.User.connection = new achilles.Connection(HEADER + "/users");
+models.User.connection = new achilles.Connection(HEADER + "/users");
 
 function Login(el) {
 	achilles.View.call(this, el);

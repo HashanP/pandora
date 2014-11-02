@@ -11,5 +11,6 @@ models.VocabQuestion = require("./VocabQuiz").VocabQuestion;
 models.Course = require("./Course");
 models.Club = require("./Club");
 models.Option = require("./Option");
+models.User = require("./User");
 
 module.exports = models;
