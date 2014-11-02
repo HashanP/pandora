@@ -72,6 +72,7 @@ function ListView(el, data) {
 		this.render();
 	});
 	this.on("change grid", this.render.bind(this));
+	this.admin = process.env.USER.roles.indexOf("admin") !== -1;
 }
 
 util.inherits(ListView, achilles.View);
