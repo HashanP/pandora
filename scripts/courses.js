@@ -109,6 +109,7 @@ CreateView.prototype.templateSync = require("../views/create.mustache");
 function CourseView(el, options) {
 	achilles.View.call(this, el);
 	this.data = options.data;
+	this.id = options.id;
 	this[options.section] = true;
 }
 
@@ -677,6 +678,25 @@ PerformanceGraph.prototype.render = function() {
       .attr("height", function(d) { return height - y(d.value); });
 };
 
+function Settings(el, options) {
+	achilles.View.call(this, el);
+	this.model = options.model;
+	this.on("click .del", this.del.bind(this));
+}
+
+util.inherits(Settings, achilles.View);
+
+Settings.prototype.del = function() {
+	this.model.del(function(err) {
+		if(err) {
+			throw err;
+		}
+		page("/");
+	});
+};
+
+Settings.prototype.templateSync = require("../views/settings.mustache");
+
 var request = require("request");
 
 var m = require("../views/courses.mustache");
@@ -748,7 +768,7 @@ page("/create", function() {
 
 page("/courses/:course/:section", function(e, next) {
 	models.Course.getById(e.params.course, function(err, doc) {
-		new CourseView(document.querySelector("main"), {data: doc, section: e.params.section});
+		new CourseView(document.querySelector("main"), {data: doc, section: e.params.section, id:doc._id});
 		next();
 	});
 });
@@ -852,6 +872,12 @@ page("/courses/:course/quizzes/:quiz/attempts/:attempt", function(e, next) {
 page("/courses/:course/quizzes/:quiz/graph", function(e) {
 	models.Course.getById(e.params.course, function(err, doc) {
 		new PerformanceGraph(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], id:doc._id});
+	});
+});
+
+page("/courses/:course/settings", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new Settings(document.querySelector(".course"), {model: doc});
 	});
 });
 

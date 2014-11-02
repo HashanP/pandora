@@ -18,6 +18,11 @@
 		  <li class="list-group-item {{#downloads}}active{{/downloads}}">
 			<a href="/courses/{{data._id}}/downloads">File Downloads</a>
 		  </li>
+			{{#can.put}}
+			<li class="list-group-item {{#settings}}active{{/settings}}">
+			<a href="/courses/{{data._id}}/settings">Settings</a>
+			</li>
+			{{/can.put}}
 		</ul>
 	  </div>
 	</div>
