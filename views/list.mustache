@@ -5,7 +5,9 @@
 		<button type="button" class="grid btn btn-primary active">Grid</button>
 		<button type="button" class="list btn btn-primary">List</button>
 	  </div>
-	  <a href="/create" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+	  {{#admin}}
+	  	<a href="/create" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+	  {{/admin}}
 	</div>
   </div>
 </div>
