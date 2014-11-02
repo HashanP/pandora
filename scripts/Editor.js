@@ -22,6 +22,7 @@ var EditorController = function(el) {
 	this.on("keydown .editor-rich", this.reconfigure.bind(this)); // Reconfigure Editor Rich
 	this.on("click .open-tab", this.openTab.bind(this)); // Open Tab
 	this.on("change:model", this.setupModel.bind(this));
+	this.on("click .image", this.image.bind(this));
 
 	this.bind(".editor-rich", "data");
 	this.bind(".editor-youtube", "data");
@@ -50,6 +51,19 @@ EditorController.prototype.render = function() {
 
 EditorController.prototype.updateFont = function(e) {
 	document.execCommand("fontName", false, e.target.value);
+};
+
+EditorController.prototype.image = function() {
+	var fileEl = document.createElement("input");
+	fileEl.type = "file";
+  fileEl.addEventListener("change", function() {
+		var reader = new FileReader();
+		reader.addEventListener("load", function(e) {
+			document.execCommand("insertImage", true, e.target.result);
+		});
+		reader.readAsDataURL(fileEl.files[0]);
+	});
+  fileEl.click();
 };
 
 EditorController.prototype.updateFormat = function(e) {
