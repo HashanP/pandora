@@ -1,11 +1,13 @@
 <div class="panel panel-primary">
   <div class="panel-heading">
 	{{title}}
-	<div class="pull-right">
-	  <a href="/courses/{{id}}/{{section}}/create">
-		<i class="fa fa-plus"></i>
-	  </a>
-	</div>
+  {{#can.post}}
+  	<div class="pull-right">
+  	  <a href="/courses/{{id}}/{{section}}/create">
+  		<i class="fa fa-plus"></i>
+  	  </a>
+  	</div>
+  {{/can.post}}
   </div>
   <ul class="list-group">
 	{{#data}}

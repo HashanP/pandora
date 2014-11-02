@@ -14,11 +14,13 @@
           <h1>{{title}}</h1>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          <a href="/courses/{{id}}/quizzes/{{index}}/edit" class="btn btn-warning btn-sm">Edit</a>
+      {{#can.put}}
+        <div class="row">
+          <div class="col-md-12">
+            <a href="/courses/{{id}}/quizzes/{{index}}/edit" class="btn btn-warning btn-sm">Edit</a>
+          </div>
         </div>
-      </div>
+      {{/can.put}}
       <div class="row">
         <div class="col-md-12">
           Total Questions: {{questions.length}}

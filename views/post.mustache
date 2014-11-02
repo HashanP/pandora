@@ -10,12 +10,14 @@
   {{#data}}
 	<div class="panel-body">
 	  <div class="row">
-		<div class="col-md-offset-10 col-md-1">
-		  <button type="button" class="btn btn-sm btn-warning del">Delete</button>
-		</div>
-		<div class="col-md-1">
-		  <a href="/courses/{{id}}/blog/{{index}}/edit" class="btn btn-sm btn-info">Edit</a>
-		</div>
+    {{#can.put}}
+  		<div class="col-md-offset-10 col-md-1">
+  		  <button type="button" class="btn btn-sm btn-warning del">Delete</button>
+  		</div>
+  		<div class="col-md-1">
+  		  <a href="/courses/{{id}}/blog/{{index}}/edit" class="btn btn-sm btn-info">Edit</a>
+  		</div>
+    {{/can.put}}
 	  </div>
 	  <h1>{{title}}</h1>
 	  <div class="blog-post-meta">

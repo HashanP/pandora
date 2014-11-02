@@ -45,6 +45,14 @@ MathJax.Hub.Config({
 var defaultRender = achilles.View.prototype.render;
 
 achilles.View.prototype.render = function() {
+	if(this.id) {
+		this.can = {
+			get: process.env.USER.can(models.Course, "get", this.id),
+			post: process.env.USER.can(models.Course, "post", this.id),
+			put: process.env.USER.can(models.Course, "put", this.id),
+			del: process.env.USER.can(models.Course, "del", this.id)
+		}
+	}
 	defaultRender.call(this);
 	MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el]);
 };
@@ -606,7 +614,7 @@ page(function(e,next) {
 			} else {
 				process.env.USER = achilles.User.parse(body);
 				document.body.classList.add("loggedIn");
-				document.body.innerHTML = m({user:process.env.USER});
+				document.body.innerHTML = m({user:process.env.USER, admin: process.env.USER.roles.indexOf("admin") !== -1});
 				document.querySelector(".dropdown-toggle").addEventListener("click", function(e) {
 					e.stopPropagation();
 					var menu = document.querySelector(".dropdown-menu");

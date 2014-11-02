@@ -14,7 +14,9 @@
       <ul class="nav navbar-nav">
   	     <li class="active"><a href="/">Home</a></li>
          <li><a href="#">Clubs</a></li>
-  	     <li><a href="/users">Users</a></li>
+         {{#admin}}
+  	      <li><a href="/users">Users</a></li>
+         {{/admin}}
   		</ul>
 
   	  <form class="navbar-form navbar-left" role="search">
