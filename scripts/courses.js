@@ -395,6 +395,7 @@ CreateQuiz.prototype.submit = function() {
 function QuizDetails(el, options) {
 	achilles.View.call(this, el);
 
+	this.on("click .del", this.del.bind(this));
 	this.id = options.id;
 	this.model = options.model;
 	this.myAttempts = this.model.attempts.filter(function(attempt) {
@@ -405,6 +406,15 @@ function QuizDetails(el, options) {
 util.inherits(QuizDetails, achilles.View);
 
 QuizDetails.prototype.templateSync = require("../views/quizDetails.mustache");
+
+QuizDetails.prototype.del = function() {
+	this.model.del(function(err) {
+		if(err) {
+			throw err;
+		}
+		page("/courses/" + this.id + "/quizzes");
+	}.bind(this));
+}
 
 function OptionAttempt() {
 	achilles.View.call(this, document.createElement("div"));
