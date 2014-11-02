@@ -1,13 +1,13 @@
 <div class="panel panel-primary">
   <div class="panel-heading">
 	   Blog
-  {{#can.post}}
+  {{#can.put}}
   	<div class="pull-right">
   	  <a href="/courses/{{id}}/blog/create">
   		<i class="fa fa-plus"></i>
   	  </a>
   	</div>
-  {{/can.post}}
+  {{/can.put}}
   </div>
   {{^data}}
 	<div class="panel-body">
