@@ -27,25 +27,25 @@
       <div class="row">
         <div class="col-md-12">
           <h3>Previous Attempts</h3>
-          {{^attempts}}
+          {{^myAttempts}}
             You have not attempted this quiz yet.
-          {{/attempts}}
-          {{#attempts.length}}
+          {{/myAttempts}}
+          {{#myAttempts.length}}
             <table class="table">
               <tr>
                 <th>Previous Attempts</th>
                 <th>Score</th>
               </tr>
 
-              {{#attempts}}
+              {{#myAttempts}}
                 <tr>
                   <td>{{date}}</td>
                   <td>{{score}}</td>
                   <td><a href="/courses/{{id}}/quizzes/{{model.index}}/attempts/{{index}}" class="btn btn-info btn-sm">Review</a></td>
                 </tr>
-              {{/attempts}}
+              {{/myAttempts}}
             </table>
-          {{/attempts.length}}
+          {{/myAttempts.length}}
        </div>
        <div class="col-md-offset-5 col-md-2 text-center">
          <a href="/courses/{{id}}/quizzes/{{index}}/attempt" class="btn btn-success">Attempt Quiz</a>

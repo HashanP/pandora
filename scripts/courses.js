@@ -387,6 +387,9 @@ function QuizDetails(el, options) {
 
 	this.id = options.id;
 	this.model = options.model;
+	this.myAttempts = this.model.attempts.filter(function(attempt) {
+		return attempt.user === process.env.USER._id;
+	});
 }
 
 util.inherits(QuizDetails, achilles.View);
@@ -455,6 +458,7 @@ QuizAttempt.prototype.templateSync = require("../views/quiz.mustache");
 
 QuizAttempt.prototype.submit = function() {
 	this.model.date = new Date(Date.now());
+	this.model.user = process.env.USER._id;
 	this.model.save(function(err) {
 		if(err) {
 			throw err;
@@ -730,8 +734,11 @@ page("/courses/:course/quizzes/:quiz/attempt", function(e) {
 	});
 });
 
-page("/courses/:course/quizzes/:quiz/attempts/:attempt", function(e) {
+page("/courses/:course/quizzes/:quiz/attempts/:attempt", function(e, next) {
 	models.Course.getById(e.params.course, function(err, doc) {
+		if(doc.quizzes[e.params.quiz].attempts[e.params.attempt].user !== process.env.USER._id) {
+			return next();
+		}
 		new QuizAttempt(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz].attempts[e.params.attempt], id:doc._id, quiz:doc.quizzes[e.params.quiz], readOnly:true});
 	});
 });
