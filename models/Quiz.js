@@ -61,6 +61,9 @@ function QuestionAttempt() {
 
 	Object.defineProperty(this, "correct", {
 		get: function() {
+			if(!this.question) {
+				this.question = this.container.container.container.container.questions[this.index];
+			}
 			if(this.question.answer_type === "text") {
 				return this.question.answer_text.toLowerCase() === this.answer_text.toLowerCase();
 			} else if(this.question.answer_type === "number"){
@@ -97,7 +100,7 @@ function QuizAttempt() {
 	Object.defineProperty(this, "score", {
 		get: function() {
 			var i = 0;
-			this.container.container.questions.forEach(function(question) {
+			this.questions.forEach(function(question) {
 				if(question.correct) {
 					i++;
 				}

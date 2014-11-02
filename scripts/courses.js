@@ -579,6 +579,103 @@ UsersCreate.prototype.del = function() {
 	});
 };
 
+function PerformanceGraph(el, options) {
+	console.log(el);
+	achilles.View.call(this, el);
+	this.model = options.model;
+	this.id = options.id;
+
+	console.log(this.model.attempts);
+	var peopl = {};
+	this.model.attempts.forEach(function(attempt) {
+		if(!(attempt.user in peopl) || peopl[attempt.user] < attempt.score) {
+			peopl[attempt.user] = attempt.score;
+		}
+	});
+	console.log(peopl);
+	var people = [];
+	for(var key in peopl) {
+		people.push(peopl[key]);
+	}
+	this.lines = [];
+	for(var i = 0; i < 100; i += 10) {
+		this.lines.push({
+			label: "≥ " + i + "%",
+			value: people.filter(function(score) {
+				return score > (this.model.questions.length / 100 * i) && score < (this.model.questions.length / 100 * (i + 10));
+			}.bind(this)).length
+		});
+	}
+	if(this.model.questions.length) {
+		this.lines.push({
+			label: "100%",
+			value: people.filter(function(score) {
+				return score === this.model.questions.length;
+			}.bind(this)).length
+		});
+	}
+};
+
+util.inherits(PerformanceGraph, achilles.View);
+
+var d3 = require("d3");
+
+PerformanceGraph.prototype.templateSync = require("../views/graph.mustache");
+
+PerformanceGraph.prototype.render = function() {
+	achilles.View.prototype.render.call(this);
+	var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+	var x = d3.scale.ordinal()
+	    .rangeRoundBands([0, width], .1);
+
+	var y = d3.scale.linear()
+	    .range([height, 0]);
+
+	var xAxis = d3.svg.axis()
+	    .scale(x)
+	    .orient("bottom");
+
+	var yAxis = d3.svg.axis()
+	    .scale(y)
+	    .orient("left")
+	    .ticks(10, "%");
+
+	var svg = d3.select(this.el.querySelector(".svg")).append("svg")
+	    .attr("viewBox", "0 0 " + (width + margin.left + margin.right) + " " + (height + margin.top + margin.bottom))
+	  .append("g")
+	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			x.domain(this.lines.map(function(d) { return d.label; }));
+  y.domain([0, d3.max(this.lines, function(d) { return d.value; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Frequency");
+
+  svg.selectAll(".bar")
+      .data(this.lines)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.label); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); });
+};
+
 var request = require("request");
 
 var m = require("../views/courses.mustache");
@@ -751,6 +848,11 @@ page("/courses/:course/quizzes/:quiz/attempts/:attempt", function(e, next) {
 	});
 });
 
+page("/courses/:course/quizzes/:quiz/graph", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new PerformanceGraph(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], id:doc._id});
+	});
+});
 
 page("/changePassword", function(e) {
 	new ChangePasswordView(document.querySelector("main"));
