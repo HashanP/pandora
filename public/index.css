@@ -15,10 +15,6 @@ body.loggedIn {
 	background: linear-gradient(90deg, #5D4157 10%, #A8CABA 90%);
 }
 
-.navbar-default {
-	box-shadow: 0 0 5px 1px #3e3f3a;
-}
-
 .icon img {
 	width:100%;
 }
