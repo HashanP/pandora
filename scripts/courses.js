@@ -177,7 +177,7 @@ CreatePostView.prototype.submit = function(e) {
 	}.bind(this));
 };
 
-CreatePostView.prototype.templateSync = require("../views/createPost.mustache");
+CreatePostView.prototype.templateSync = require("../views/formPost.mustache");
 
 function ListQuizView(el, options) {
 	achilles.View.call(this, el, options);
@@ -224,7 +224,7 @@ CreateVocabQuizView.prototype.addQuestion = function() {
 	this.model.questions.push(new models.VocabQuestion());
 };
 
-CreateVocabQuizView.prototype.templateSync = require("../views/createVocabQuiz.mustache");
+CreateVocabQuizView.prototype.templateSync = require("../views/formVocabQuiz.mustache");
 
 CreateVocabQuizView.prototype.submit = function() {
 	if(!this.model.container) {
@@ -376,7 +376,7 @@ CreateQuiz.prototype.render = function() {
 	}
 };
 
-CreateQuiz.prototype.templateSync = require("../views/createQuiz.mustache")
+CreateQuiz.prototype.templateSync = require("../views/formQuiz.mustache")
 
 CreateQuiz.prototype.addQuestion = function() {
 	this.currentQuestionIndex = this.model.questions.length;
@@ -566,7 +566,7 @@ function UsersCreate(el, options) {
 
 util.inherits(UsersCreate, achilles.View);
 
-UsersCreate.prototype.templateSync = require("../views/usersCreate.mustache");
+UsersCreate.prototype.templateSync = require("../views/usersForm.mustache");
 
 UsersCreate.prototype.submit = function() {
 	console.log(this.model);
