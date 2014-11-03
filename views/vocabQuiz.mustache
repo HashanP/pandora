@@ -10,18 +10,12 @@
   <div class="panel-body">
 	{{#data}}
     <div class="row">
-      {{#can.put}}
-        <div class="col-md-offset-7 col-md-1">
-          <a href="/courses/{{id}}/vocab_quizzes/{{index}}/edit" class="btn btn-sm btn-warning pull-right">Edit</a>
-        </div>
-        <div class="col-md-1">
-          <button type="button" class="btn btn-sm btn-danger pull-right del">Delete</button>
-        </div>
-      {{/can.put}}
-      <div class="col-md-1">
+      <div class="col-md-12">
+        {{#can.put}}
+          <a href="/courses/{{id}}/vocab_quizzes/{{index}}/edit" class="btn btn-sm btn-warning">Edit</a>
+          <button type="button" class="btn btn-sm btn-danger del">Delete</button>
+        {{/can.put}}
         <button type="button" class="btn btn-sm btn-primary reset">Reset</button>
-      </div>
-      <div class="col-md-2">
         <button type="button" class="btn btn-sm btn-primary answers">Reveal Answers</button>
       </div>
     </div>
