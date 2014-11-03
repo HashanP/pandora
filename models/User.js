@@ -7,7 +7,7 @@ achilles.User.prototype.can = function(model, operation, id, part) {
   if(part === "quizzes.attempts") {
     return true;
   } else {
-    return b.call(this, arguments);
+    return b.apply(this, arguments);
   }
 }
 
