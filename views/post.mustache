@@ -12,10 +12,10 @@
 	  <div class="row">
     {{#can.put}}
   		<div class="col-md-offset-10 col-md-1">
-  		  <button type="button" class="btn btn-sm btn-warning pull-right">Edit</button>
+  			<a href="/courses/{{id}}/blog/{{index}}/edit" class="btn btn-sm btn-warning pull-right">Edit</a>
   		</div>
   		<div class="col-md-1">
-  		  <a href="/courses/{{id}}/blog/{{index}}/edit" class="btn btn-sm btn-danger pull-right del">Delete</a>
+  			<button type="button" class="btn btn-sm btn-danger pull-right del">Delete</a>
   		</div>
     {{/can.put}}
 	  </div>
