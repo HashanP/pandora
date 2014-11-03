@@ -14,7 +14,12 @@
 	  </div>
 	{{/error}}
 	<form>
-	  <h1>Create New Post</h1>
+    {{#model._id}}
+	  <h1>Edit Post</h1>
+    {{/model._id}}
+    {{^model._id}}
+    <h1>Create New Post</h1>
+    {{/model._id}}
 	  <div class="form-group">
 		<label>Title</label>
 		<input type="text" class="form-control title" placeholder="Amazing Blog Post Title">

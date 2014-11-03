@@ -23,6 +23,11 @@
         <a href="/courses/{{data._id}}/settings">Settings</a>
       </li>
       {{/can.del}}
+      {{#data.links}}
+      <li class="list-group-item">
+        <a href="{{url}}">{{title}}</a>
+      </li>
+      {{/data.links}}
     </ul>
     </div>
   </div>

@@ -26,6 +26,8 @@ function Link(title, url) {
 
 util.inherits(Link, achilles.Model);
 
+module.exports.Link = Link;
+
 function Course(title) {
 	achilles.Model.call(this);
 
@@ -48,4 +50,4 @@ function Course(title) {
 
 util.inherits(Course, achilles.Model);
 
-module.exports = Course;
+module.exports.Course = Course;

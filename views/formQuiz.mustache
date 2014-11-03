@@ -14,7 +14,12 @@
     </div>
   {{/error}}
   <form>
+    {{#model._id}}
+    <h1>Edit Quiz</h1>
+    {{/model._id}}
+    {{^model._id}}
     <h1>Create New Quiz</h1>
+    {{/model._id}}
     {{#model}}
       <div class="form-group">
         <label>Title</label>

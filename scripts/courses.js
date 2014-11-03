@@ -688,13 +688,31 @@ PerformanceGraph.prototype.render = function() {
       .attr("height", function(d) { return height - y(d.value); });
 };
 
+function Link(el, options) {
+	achilles.View.call(this, document.createElement("tr"));
+	this.bind(".title", "title");
+	this.bind(".url", "url");
+	this.on("click .remove", this.remove.bind(this));
+}
+
+util.inherits(Link, achilles.View);
+
+Link.prototype.templateSync = require("../views/link.mustache");
+
 function Settings(el, options) {
 	achilles.View.call(this, el);
 	this.model = options.model;
 	this.on("click .del", this.del.bind(this));
+	this.on("click .add-link", this.addLink.bind(this));
+	this.on("click .save-links", this.save.bind(this));
+	this.delegate(".links", "links", new achilles.Collection(Link));
 }
 
 util.inherits(Settings, achilles.View);
+
+Settings.prototype.addLink = function() {
+	this.model.links.push(new models.Link());
+};
 
 Settings.prototype.del = function() {
 	this.model.del(function(err) {
@@ -703,6 +721,15 @@ Settings.prototype.del = function() {
 		}
 		page("/");
 	});
+};
+
+Settings.prototype.save = function() {
+	this.model.save(function(err) {
+		if(err) {
+			throw err;
+		}
+		page("/courses/" + this.model._id + "/settings");
+	}.bind(this));
 };
 
 Settings.prototype.templateSync = require("../views/settings.mustache");
