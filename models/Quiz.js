@@ -57,6 +57,9 @@ function QuestionAttempt() {
 				this.question = this.container.container.container.container.questions[this.index];
 			}
 			if(this.question.answer_type === "text") {
+				if(this.answer_text === undefined) {
+					return false;
+				}
 				for(var i = 0; i < this.question.options.length; i++) {
 					console.log(this.question.options[i].title);
 					console.log(this.answer_text);
@@ -66,6 +69,9 @@ function QuestionAttempt() {
 				}
 				return false;
 			} else if(this.question.answer_type === "number") {
+				if(this.answer_number === undefined) {
+					return false;
+				}
 				for(var i = 0; i < this.question.options.length; i++) {
 					if(this.question.options[i].title === this.answer_number.toString()) {
 						return true;
@@ -73,10 +79,12 @@ function QuestionAttempt() {
 				}
 				return false;
 			} else {
-
+				if(this.options === undefined) {
+					return false;
+				}
+				console.log(this.options);
 				for(var i = 0; i < this.question.options.length; i++) {
-
-					if(this.question.options[i].correct !== this.options[i].correct) {
+					if(!this.question.options[i].correct !== !this.options[i].correct) {
 						return false;
 					}
 				}
