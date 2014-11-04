@@ -1,9 +1,13 @@
+{{#model.container.container}}
 <div class="row">
+  {{^isSimple}}
   <div class="col-md-1">
-    <input type="{{model.container.container.answer_type}}" name="option" class="correct form-control">
+    <input type="{{answer_type}}" name="option" class="correct form-control">
   </div>
+  {{/isSimple}}
   <div class="col-md-10">
-    <input type="text" class="form-control title">
+    <input type="{{#isSimple}}{{answer_type}}{{/isSimple}}{{^isSimple}}text{{/isSimple}}" class="form-control title">
   </div>
   <button type="button" class="remove btn btn-link col-md-1"><i class="fa fa-times"></i></button>
 </div>
+{{/model.container.container}}

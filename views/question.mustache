@@ -12,12 +12,9 @@
     {{#question.isNumber}}
       <input class="form-control answer_number" value="{{answer_number}}" {{#readOnly}}readonly{{/readOnly}} type="number"/>
     {{/question.isNumber}}
-    {{#question.isRadio}}
+    {{^question.isRadio}}
       <div class="row options"></div>
     {{/question.isRadio}}
-    {{#question.isCheckbox}}
-      <div class="row options"></div>
-    {{/question.isCheckbox}}
   </div>
   </div>
   {{/model}}

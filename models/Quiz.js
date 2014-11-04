@@ -8,14 +8,18 @@ function Question() {
 
 	this.define("content", Content);
 	this.define("answer_type", String); // "text", "number", "radio", "checkbox"
-	this.define("answer_text", String);
-	this.define("answer_number", Number);
 	this.define("options", [Option]);
 	this.options = [];
 
 	Object.defineProperty(this, "number", {
 		get: function() {
 			return this.index + 1;
+		}
+	});
+
+	Object.defineProperty(this, "isSimple", {
+		get: function() {
+			return this.answer_type === "text" || this.answer_type === "number";
 		}
 	});
 
@@ -28,18 +32,6 @@ function Question() {
 	Object.defineProperty(this, "isText", {
 		get: function() {
 			return this.answer_type === "text";
-		}
-	});
-
-	Object.defineProperty(this, "isRadio", {
-		get: function() {
-			return this.answer_type === "radio";
-		}
-	});
-
-	Object.defineProperty(this, "isCheckbox", {
-		get: function() {
-			return this.answer_type === "checkbox";
 		}
 	});
 
@@ -65,15 +57,25 @@ function QuestionAttempt() {
 				this.question = this.container.container.container.container.questions[this.index];
 			}
 			if(this.question.answer_type === "text") {
-				return  this.answer_text && this.question.answer_text.toLowerCase() === this.answer_text.toLowerCase();
-			} else if(this.question.answer_type === "number") {
-				return this.question.answer_number === this.answer_number;
-			} else {
-				console.log(this.question.options);
-				console.log(this.options);
 				for(var i = 0; i < this.question.options.length; i++) {
-console.log(this.question.options[i].v);
-console.log(this.options[i]);
+					console.log(this.question.options[i].title);
+					console.log(this.answer_text);
+					if(this.question.options[i].title.toLowerCase() === this.answer_text.toLowerCase()) {
+						return true;
+					}
+				}
+				return false;
+			} else if(this.question.answer_type === "number") {
+				for(var i = 0; i < this.question.options.length; i++) {
+					if(this.question.options[i].title === this.answer_number.toString()) {
+						return true;
+					}
+				}
+				return false;
+			} else {
+
+				for(var i = 0; i < this.question.options.length; i++) {
+
 					if(this.question.options[i].correct !== this.options[i].correct) {
 						return false;
 					}

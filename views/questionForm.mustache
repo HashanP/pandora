@@ -13,29 +13,18 @@
     </select>
   </div>
   <div class="form-group">
-    <label>Answer</label>
-    {{#isText}}
-      <input type="text" class="answer_text form-control">
-    {{/isText}}
-    {{#isNumber}}
-      <input type="number" class="answer_number form-control">
-    {{/isNumber}}
-    {{#isRadio}}
-      <div class="options"></div>
-      <div class="row">
-        <div class="col-md-12">
-          <button type="button" class="add-option del btn-default btn btn-sm">Add Option</button>
-        </div>
+    {{#isSimple}}
+      <label>All Valid Answers</label>
+    {{/isSimple}}
+    {{^isSimple}}
+      <label>Options to be Displayed</label>
+    {{/isSimple}}
+    <div class="options"></div>
+    <div class="row">
+      <div class="col-md-12">
+        <button type="button" class="add-option del btn-default btn btn-sm">Add Option</button>
       </div>
-    {{/isRadio}}
-    {{#isCheckbox}}
-      <div class="options"></div>
-      <div class="row">
-        <div class="col-md-12">
-          <button type="button" class="add-option del btn-default btn btn-sm">Add Option</button>
-        </div>
-      </div>
-    {{/isCheckbox}}
+    </div>
   </div>
   <div class="row">
     <div class="col-md-12">
