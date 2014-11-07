@@ -495,6 +495,7 @@ function Login(el) {
 	achilles.View.call(this, el);
 	this.define("error", String);
 	this.on("change:error", this.render.bind(this));
+	this.on("keyup .password", this.keyup.bind(this));
 	this.on("click .submit", this.submit.bind(this));
 }
 
@@ -520,6 +521,12 @@ Login.prototype.submit = function() {
 			page(window.location.pathname || "/");
 		}
 	}.bind(this));
+};
+
+Login.prototype.keyup = function(e) {
+	if(e.keyCode === 13) {
+		this.submit();
+	}
 };
 
 Login.prototype.templateSync = require("../views/login.mustache");
