@@ -1,13 +1,21 @@
-{{#model.container.container}}
-<div class="row">
-  {{^isSimple}}
-  <div class="col-md-1">
-    <input type="{{answer_type}}" name="option" class="correct form-control">
+  <div class="row">
+    <div class="col-md-12">
+    {{#model.container.container}}
+      <div class="input-group">
+      {{^isSimple}}
+          <span class="input-group-addon">
+            <input type="{{answer_type}}" name="option" class="correct">
+          </span>
+          <input type="text" class="form-control title">
+      {{/isSimple}}
+      {{#isSimple}}
+        <input type="{{answer_type}}" class="form-control title">
+      {{/isSimple}}
+        <span class="input-group-addon">
+          <a class="remove"><i class="fa fa-times"></i></a>
+        </span>
+      </div>
+    {{/model.container.container}}
   </div>
-  {{/isSimple}}
-  <div class="col-md-10">
-    <input type="{{#isSimple}}{{answer_type}}{{/isSimple}}{{^isSimple}}text{{/isSimple}}" class="form-control title">
-  </div>
-  <button type="button" class="remove btn btn-link col-md-1"><i class="fa fa-times"></i></button>
 </div>
-{{/model.container.container}}
+</div>
