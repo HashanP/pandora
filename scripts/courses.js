@@ -200,11 +200,6 @@ function VocabQuestion() {
 
 util.inherits(VocabQuestion, achilles.View);
 
-VocabQuestion.prototype.remove = function(e) {
-	e.preventDefault();
-	this.model.remove();
-};
-
 VocabQuestion.prototype.templateSync = require("../views/vocabQuestion.mustache");
 
 function CreateVocabQuizView(el, options) {
