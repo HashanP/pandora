@@ -2,8 +2,8 @@
   <div class="col-md-3 col-md-offset-9">
 	<div class="pull-right">
 	  <div class="btn-group">
-		<button type="button" class="grid btn btn-primary active">Grid</button>
-		<button type="button" class="list btn btn-primary">List</button>
+		<button type="button" class="grid btn btn-primary {{#grid}}active{{/grid}}">Grid</button>
+		<button type="button" class="list btn btn-primary {{^grid}}active{{/grid}}">List</button>
 	  </div>
 	  {{#admin}}
 	  	<a href="/create" class="btn btn-primary"><i class="fa fa-plus"></i></a>
