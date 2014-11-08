@@ -51,7 +51,7 @@ achilles.View.prototype.render = function() {
 			post: process.env.USER.can(models.Course, "post", this.id),
 			put: process.env.USER.can(models.Course, "put", this.id),
 			del: process.env.USER.can(models.Course, "del", this.id)
-		}
+		};
 	}
 	defaultRender.call(this);
 	MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el]);
@@ -295,7 +295,7 @@ function Option(el) {
 
 util.inherits(Option, achilles.View);
 
-Option.prototype.templateSync = require("../views/optionForm.mustache")
+Option.prototype.templateSync = require("../views/optionForm.mustache");
 
 function Question(el, options) {
 		achilles.View.call(this, el);
@@ -369,7 +369,7 @@ CreateQuiz.prototype.render = function() {
 	}
 };
 
-CreateQuiz.prototype.templateSync = require("../views/formQuiz.mustache")
+CreateQuiz.prototype.templateSync = require("../views/formQuiz.mustache");
 
 CreateQuiz.prototype.addQuestion = function() {
 	this.currentQuestionIndex = this.model.questions.length;
@@ -407,7 +407,7 @@ QuizDetails.prototype.del = function() {
 		}
 		page("/courses/" + this.id + "/quizzes");
 	}.bind(this));
-}
+};
 
 function OptionAttempt() {
 	achilles.View.call(this, document.createElement("div"));
@@ -478,7 +478,7 @@ QuizAttempt.prototype.submit = function() {
 		}
 		page("/courses/" + this.id + "/quizzes/" + this.quiz.index + "/attempts/" + this.model.index);
 	}.bind(this));
-}
+};
 
 var HEADER = window.location.protocol + "//" + window.location.host;
 models.Course.connection = new achilles.Connection(HEADER + "/api");
@@ -603,7 +603,9 @@ function PerformanceGraph(el, options) {
 	});
 	var people = [];
 	for(var key in peopl) {
-		people.push(peopl[key]);
+		if(peopl.hasOwnProperty(key)) {
+			people.push(peopl[key]);
+		}
 	}
 	this.lines = [];
 	for(var i = 0; i < 100; i += 10) {
@@ -622,7 +624,7 @@ function PerformanceGraph(el, options) {
 			}.bind(this)).length
 		});
 	}
-};
+}
 
 util.inherits(PerformanceGraph, achilles.View);
 
