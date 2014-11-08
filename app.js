@@ -5,8 +5,8 @@ var hogan = require("hogan.js");
 var fs = require("fs");
 var serveStatic = require("serve-static");
 var bodyParser = require("body-parser");
-var cookieParser = require("cookie-parser");
-var session = require("express-session");
+//var cookieParser = require("cookie-parser");
+//var session = require("express-session");
 var models = require("./models");
 var browserify = require("browserify-middleware");
 var morgan = require("morgan");
@@ -54,7 +54,7 @@ app.oauth = oauthserver({
 				cb(null, {
 					expires:null,
 					userId: tokens[bearerToken]
-				})
+				});
 			}
 		},
 		getClient: function(clientId, clientSecret, cb) {
