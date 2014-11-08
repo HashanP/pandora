@@ -20,6 +20,28 @@ require.extensions[".mustache"] = function(module, filename) {
 	};
 };
 
+models.Course.prototype.refresh = function(cb) {
+	achilles.Model.prototype.refresh.call(this, function(err) {
+		if(err) {
+			return cb(err);
+		}
+		models.User.get({where: {roles:{$in:["Course:get:" + this._id], $nin:["Course:put:" + this._id]}}, keys: "name"}, function(err, users) {
+			if(err) {
+				cb(err);
+			}
+			this.users2 = users;
+			cb(null, this);
+		}.bind(this));
+	}.bind(this));
+}
+
+models.Course.prototype.toJSON = function(cb) {
+	var y= achilles.Model.prototype.toJSON.call(this);
+	console.log(this);
+	y.users = this.users2;
+	return y;
+}
+
 var mongodb = require("achilles-mongodb");
 
 var secrets = require("./config/secrets");

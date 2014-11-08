@@ -571,7 +571,6 @@ util.inherits(UsersCreate, achilles.View);
 UsersCreate.prototype.templateSync = require("../views/usersForm.mustache");
 
 UsersCreate.prototype.submit = function() {
-	console.log(this.model);
 	if(!this.model._id) {
 		this.model.password = this.model.name;
 	}
@@ -594,19 +593,16 @@ UsersCreate.prototype.del = function() {
 };
 
 function PerformanceGraph(el, options) {
-	console.log(el);
 	achilles.View.call(this, el);
 	this.model = options.model;
 	this.id = options.id;
 
-	console.log(this.model.attempts);
 	var peopl = {};
 	this.model.attempts.forEach(function(attempt) {
 		if(!(attempt.user in peopl) || peopl[attempt.user] < attempt.score) {
 			peopl[attempt.user] = attempt.score;
 		}
 	});
-	console.log(peopl);
 	var people = [];
 	for(var key in peopl) {
 		people.push(peopl[key]);
@@ -701,6 +697,16 @@ util.inherits(Link, achilles.View);
 
 Link.prototype.templateSync = require("../views/link.mustache");
 
+function Students(el, options) {
+	achilles.View.call(this, el);
+	this.model = options.model._virtuals.users;
+	console.log(options.model);
+}
+
+util.inherits(Students, achilles.View);
+
+Students.prototype.templateSync = require("../views/students.mustache");
+
 function Settings(el, options) {
 	achilles.View.call(this, el);
 	this.model = options.model;
@@ -755,7 +761,6 @@ page(function(e,next) {
 		document.body.classList.add("loggedIn");
 		next();
 	} else if(localStorage.getItem("access_token")) {
-		console.log("here");
 		window.XMLHttpRequest.prototype.open = function() {
 				var y = proxied.apply(this, [].slice.call(arguments));
 				this.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("access_token"));
@@ -921,6 +926,12 @@ page("/courses/:course/quizzes/:quiz/graph", function(e) {
 	});
 });
 
+page("/courses/:course/students", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		new Students(document.querySelector(".course"), {model: doc});
+	});
+});
+
 page("/courses/:course/settings", function(e) {
 	models.Course.getById(e.params.course, function(err, doc) {
 		new Settings(document.querySelector(".course"), {model: doc});
@@ -933,7 +944,6 @@ page("/changePassword", function(e) {
 
 page("/users", function(e) {
 	achilles.User.get(function(err, docs) {
-		console.log(docs);
 		new UsersList(document.querySelector("main"), {data:docs});
 	});
 });

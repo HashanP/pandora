@@ -4,6 +4,7 @@ var Post = require("./Post");
 var Quiz = require("./Quiz").Quiz;
 var Content = require("./Content");
 var VocabQuiz = require("./VocabQuiz").VocabQuiz;
+var User = require("./User");
 
 function Page(title) {
 	achilles.Model.call(this);
@@ -38,6 +39,7 @@ function Course(title) {
 	this.define("vocabQuizzes", [VocabQuiz]);
 	this.define("links", [Link]);
 	this.define("pages", [Page]);
+	this.define("users", [User], {virtual:true});
 
 	this.posts = [];
 	this.quizzes = [];
