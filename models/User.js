@@ -8,6 +8,6 @@ achilles.User.prototype.can = function(model, operation, id, part) {
   } else {
     return b.apply(this, arguments);
   }
-}
+};
 
 module.exports = achilles.User;
