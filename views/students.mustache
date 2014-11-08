@@ -1,14 +1,8 @@
 <div class="panel panel-primary">
-  <div class="panel-heading">Students
-  <div class="pull-right">
-    <a href="/users/create">
-    <i class="fa fa-plus"></i>
-    </a>
-  </div>
-  </div>
-    <ul class="list-group">
-      {{#model}}
-        <li class="list-group-item"><a href="mailto:{{name}}@whsb.essex.sch.uk">{{name}}</a></li>
-      {{/model}}
-    </ul>
+  <div class="panel-heading">Students</div>
+  <ul class="list-group">
+    {{#model}}
+      <li class="list-group-item"><a href="mailto:{{name}}@whsb.essex.sch.uk">{{name}}</a></li>
+    {{/model}}
+  </ul>
 </div>
