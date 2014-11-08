@@ -749,6 +749,7 @@ var errorPage = require("../views/error.mustache");
 	* This is where the routing starts. It uses the page module.
 	* See https://github.com/visionmedia/page.js
 	*/
+
 page(function(e,next) {
 	if(process.env.USER) {
 		document.body.classList.add("loggedIn");
@@ -786,6 +787,12 @@ page(function(e,next) {
 					if(window.getComputedStyle(menu).display === "block") {
 						menu.style.display = "none";
 					}
+				});
+				document.querySelector(".logout").addEventListener("click", function() {
+					localStorage.removeItem("access_token");
+					delete process.env.USER;
+					document.body.classList.remove("loggedIn");
+					window.XMLHttpRequest.prototype.open = proxied;
 				});
 				next();
 			}
@@ -943,14 +950,6 @@ page("/users/:user", function(e) {
 			new UsersCreate(document.querySelector("main"), {courses:courses, model:user});
 		});
 	});
-});
-
-page("/logout", function(e) {
-	localStorage.removeItem("access_token");
-	delete process.env.USER;
-	document.body.classList.remove("loggedIn");
-	window.XMLHttpRequest.prototype.open = proxied;
-	page("/");
 });
 
 window.addEventListener("load", page);
