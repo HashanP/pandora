@@ -115,6 +115,10 @@ border:1px solid #999;
 	height: 0;
 }
 
+.post, .preview-rich-text-editor {
+	word-wrap:break-word;
+}
+
 .post iframe {
 	position: absolute;
 	top: 0;
