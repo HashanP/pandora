@@ -145,8 +145,6 @@ PostView.prototype.del = function() {
 	}.bind(this));
 };
 
-
-
 function CreatePostView(el, options) {
 	achilles.View.call(this, el);
 	this.model = options.model;
@@ -699,8 +697,7 @@ Link.prototype.templateSync = require("../views/link.mustache");
 
 function Students(el, options) {
 	achilles.View.call(this, el);
-	this.model = options.model._virtuals.users;
-	console.log(options.model);
+	this.model = options.model;
 }
 
 util.inherits(Students, achilles.View);
@@ -927,8 +924,9 @@ page("/courses/:course/quizzes/:quiz/graph", function(e) {
 });
 
 page("/courses/:course/students", function(e) {
-	models.Course.getById(e.params.course, function(err, doc) {
-		new Students(document.querySelector(".course"), {model: doc});
+	request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
+		console.log(body);
+		new Students(document.querySelector(".course"), {model: body});
 	});
 });
 

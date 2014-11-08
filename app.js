@@ -20,28 +20,6 @@ require.extensions[".mustache"] = function(module, filename) {
 	};
 };
 
-models.Course.prototype.refresh = function(cb) {
-	achilles.Model.prototype.refresh.call(this, function(err) {
-		if(err) {
-			return cb(err);
-		}
-		models.User.get({where: {roles:{$in:["Course:get:" + this._id], $nin:["Course:put:" + this._id]}}, keys: "name"}, function(err, users) {
-			if(err) {
-				cb(err);
-			}
-			this.users2 = users;
-			cb(null, this);
-		}.bind(this));
-	}.bind(this));
-}
-
-models.Course.prototype.toJSON = function(cb) {
-	var y= achilles.Model.prototype.toJSON.call(this);
-	console.log(this);
-	y.users = this.users2;
-	return y;
-}
-
 var mongodb = require("achilles-mongodb");
 
 var secrets = require("./config/secrets");
@@ -148,6 +126,17 @@ app.post("/userinfo/changePassword", function(req, res, next) {
 });
 
 app.use("/api", new achilles.Service(models.Course));
+
+app.get("/api/:id/students", function(req, res, next) {
+	models.User.get({where: {roles:{$in:["Course:get:" + req.params.id], $nin:["Course:put:" + req.params.id]}}, keys: "name"}, function(err, users) {
+		if(err) {
+			return next(err);
+		}
+		console.log(users);
+		res.end(JSON.stringify(users.map(function(e) {return e.toJSON()})));
+	}.bind(this));
+});
+
 app.use("/users", new achilles.Service(achilles.User));
 
 app.set("port", process.env.PORT || 5000);
