@@ -47,11 +47,19 @@ var defaultRender = achilles.View.prototype.render;
 achilles.View.prototype.render = function() {
 	if(this.id) {
 		this.can = {
+<<<<<<< HEAD
 			get: process.env.USER.can("Course", "get", this.id),
 			post: process.env.USER.can("Course", "post", this.id),
 			put: process.env.USER.can("Course", "put", this.id),
 			del: process.env.USER.can("Course", "del", this.id)
 		}
+=======
+			get: process.env.USER.can(models.Course, "get", this.id),
+			post: process.env.USER.can(models.Course, "post", this.id),
+			put: process.env.USER.can(models.Course, "put", this.id),
+			del: process.env.USER.can(models.Course, "del", this.id)
+		};
+>>>>>>> 615871b0e15837b56e34e0591a09de90e4c9a08a
 	}
 	defaultRender.call(this);
 	MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el]);
@@ -295,7 +303,7 @@ function Option(el) {
 
 util.inherits(Option, achilles.View);
 
-Option.prototype.templateSync = require("../views/optionForm.mustache")
+Option.prototype.templateSync = require("../views/optionForm.mustache");
 
 function Question(el, options) {
 		achilles.View.call(this, el);
@@ -369,7 +377,7 @@ CreateQuiz.prototype.render = function() {
 	}
 };
 
-CreateQuiz.prototype.templateSync = require("../views/formQuiz.mustache")
+CreateQuiz.prototype.templateSync = require("../views/formQuiz.mustache");
 
 CreateQuiz.prototype.addQuestion = function() {
 	this.currentQuestionIndex = this.model.questions.length;
@@ -407,7 +415,7 @@ QuizDetails.prototype.del = function() {
 		}
 		page("/courses/" + this.id + "/quizzes");
 	}.bind(this));
-}
+};
 
 function OptionAttempt() {
 	achilles.View.call(this, document.createElement("div"));
@@ -478,7 +486,7 @@ QuizAttempt.prototype.submit = function() {
 		}
 		page("/courses/" + this.id + "/quizzes/" + this.quiz.index + "/attempts/" + this.model.index);
 	}.bind(this));
-}
+};
 
 var HEADER = window.location.protocol + "//" + window.location.host;
 models.Course.connection = new achilles.Connection(HEADER + "/api");
@@ -603,7 +611,9 @@ function PerformanceGraph(el, options) {
 	});
 	var people = [];
 	for(var key in peopl) {
-		people.push(peopl[key]);
+		if(peopl.hasOwnProperty(key)) {
+			people.push(peopl[key]);
+		}
 	}
 	this.lines = [];
 	for(var i = 0; i < 100; i += 10) {
@@ -622,7 +632,7 @@ function PerformanceGraph(el, options) {
 			}.bind(this)).length
 		});
 	}
-};
+}
 
 util.inherits(PerformanceGraph, achilles.View);
 
