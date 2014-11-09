@@ -47,8 +47,8 @@ app.use("/scripts/courses.js", browserify("./scripts/courses.js", {
 
 var tokens = {};
 
-app.oauth = oauthserver({
-  model: {
+var oauthConfig = {
+	model: {
 		getAccessToken: function(bearerToken, cb) {
 			if(!(bearerToken in tokens)) {
 				cb(true);
@@ -90,10 +90,35 @@ app.oauth = oauthserver({
 			});
 		}
 	},
-  grants: ['password'],
-  debug: true,
+	grants: ['password'],
+	debug: true,
 	accessTokenLifetime:null
-});
+};
+
+if(process.env.REDISCLOUD_URL) {
+	var redis = require("redis-url");
+
+	var client = redis.connect(process.env.REDISCLOUD_URL);
+
+	oauthConfig.saveAccessToken = function(accessToken, clientId, expires, user, cb) {
+		client.setex("accessToken:" + accessToken, 3600, user.toJSON(), cb);
+	};
+
+	oauthConfig.getAccessToken = function(bearerToken, cb) {
+		client.get("accessToken:" + bearerToken, function(err, str) {
+			if(!str) {
+				cb(true);
+			} else {
+				cb(null, {
+					expires:null,
+					userId: JSON.parse(str)
+				});
+			}
+		});
+	};
+}
+
+app.oauth = oauthserver(oauthConfig);
 
 app.get("/courses(*)", function(req, res) {
 	res.sendfile("public/index.html");
