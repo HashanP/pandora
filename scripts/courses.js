@@ -47,10 +47,10 @@ var defaultRender = achilles.View.prototype.render;
 achilles.View.prototype.render = function() {
 	if(this.id) {
 		this.can = {
-			get: process.env.USER.can(models.Course, "get", this.id),
-			post: process.env.USER.can(models.Course, "post", this.id),
-			put: process.env.USER.can(models.Course, "put", this.id),
-			del: process.env.USER.can(models.Course, "del", this.id)
+			get: process.env.USER.can("Course", "get", this.id),
+			post: process.env.USER.can("Course", "post", this.id),
+			put: process.env.USER.can("Course", "put", this.id),
+			del: process.env.USER.can("Course", "del", this.id)
 		}
 	}
 	defaultRender.call(this);

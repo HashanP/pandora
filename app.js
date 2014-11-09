@@ -39,8 +39,9 @@ app.use(bodyParser.urlencoded({
 	extended:true
 }));
 app.use(bodyParser.json());
-app.use("/scripts", browserify("./scripts", {
-	transform:["browserify-mustache"]
+app.use("/scripts/courses.js", browserify("./scripts/courses.js", {
+	transform:["browserify-mustache"],
+	precompile:true
 }));
 
 var tokens = {};
