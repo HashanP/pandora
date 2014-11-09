@@ -12,6 +12,7 @@ var browserify = require("browserify-middleware");
 var morgan = require("morgan");
 var oauthserver = require('node-oauth2-server');
 var compression = require('compression');
+var xl = require("excel4node");
 
 require.extensions[".mustache"] = function(module, filename) {
 	var template = hogan.compile(fs.readFileSync(filename).toString());
@@ -135,6 +136,23 @@ app.get("/api/:id/students", function(req, res, next) {
 		}
 		console.log(users);
 		res.end(JSON.stringify(users.map(function(e) {return e.toJSON()})));
+	}.bind(this));
+});
+
+app.get("/api/:id/students.xlsx", function(req, res, next) {
+	models.User.get({where: {roles:{$in:["Course:get:" + req.params.id], $nin:["Course:put:" + req.params.id]}}, keys: "name"}, function(err, users) {
+		if(err) {
+			return next(err);
+		}
+		var wb = new xl.WorkBook();
+		var header = wb.Style();
+		header.Font.Bold();
+		var ws = wb.WorkSheet("Students");
+		ws.Cell(1,1).String("Username").Style(header);
+		users.forEach(function(user, i) {
+			ws.Cell(i + 2, 1).String(user.name);
+		});
+		wb.write("students.xlsx", res);
 	}.bind(this));
 });
 

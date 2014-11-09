@@ -53,6 +53,7 @@ achilles.View.prototype.render = function() {
 			del: process.env.USER.can("Course", "del", this.id)
 		}
 	}
+	this.api_key = localStorage.getItem("access_token");
 	defaultRender.call(this);
 	MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el]);
 };
@@ -698,6 +699,7 @@ Link.prototype.templateSync = require("../views/link.mustache");
 function Students(el, options) {
 	achilles.View.call(this, el);
 	this.model = options.model;
+	this.id = options.id;
 }
 
 util.inherits(Students, achilles.View);
@@ -954,7 +956,7 @@ page("/courses/:course/quizzes/:quiz/results", function(e) {
 page("/courses/:course/students", function(e) {
 	request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
 		console.log(body);
-		new Students(document.querySelector(".course"), {model: body});
+		new Students(document.querySelector(".course"), {model: body, id:e.params.course});
 	});
 });
 
