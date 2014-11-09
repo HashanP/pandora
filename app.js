@@ -14,13 +14,6 @@ var oauthserver = require('node-oauth2-server');
 var compression = require('compression');
 var xl = require("excel4node");
 
-require.extensions[".mustache"] = function(module, filename) {
-	var template = hogan.compile(fs.readFileSync(filename).toString());
-	module.exports = function(data) {
-		return template.render(data);
-	};
-};
-
 var mongodb = require("achilles-mongodb");
 
 var secrets = require("./config/secrets");
