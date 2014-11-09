@@ -149,3 +149,11 @@ border:1px solid #999;
 .x.axis path {
   display: none;
 }
+
+.text-lg {
+	font-size:36px;
+}
+
+.btn:focus, .btn:active:focus {
+	outline:none;
+}

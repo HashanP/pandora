@@ -768,6 +768,33 @@ util.inherits(QuizResults, achilles.View);
 
 QuizResults.prototype.templateSync = require("../views/quizResults.mustache")
 
+function RandomNameGenerator(el, options) {
+	achilles.View.call(this, el);
+	this.users = options.users;
+	this.i = 0;
+	this.on("click .start", this.start.bind(this));
+	this.on("click .stop", this.stop.bind(this));
+}
+
+util.inherits(RandomNameGenerator, achilles.View);
+
+RandomNameGenerator.prototype.start = function(e) {
+	this.x = window.setInterval(this.change.bind(this), 100);
+}
+
+RandomNameGenerator.prototype.change = function() {
+	this.i++;
+	this.i %= this.users.length;
+	this.activeUser = this.users[this.i];
+	this.el.querySelector(".name").innerHTML = this.activeUser.name;
+}
+
+RandomNameGenerator.prototype.stop = function(e) {
+	window.clearInterval(this.x);
+}
+
+RandomNameGenerator.prototype.templateSync = require("../views/randomNameGenerator.mustache");
+
 var request = require("request");
 
 var m = require("../views/courses.mustache");
@@ -962,8 +989,13 @@ page("/courses/:course/quizzes/:quiz/results", function(e) {
 
 page("/courses/:course/students", function(e) {
 	request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
-		console.log(body);
 		new Students(document.querySelector(".course"), {model: body, id:e.params.course});
+	});
+});
+
+page("/courses/:course/randomNameGenerator", function(e) {
+	request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
+		new RandomNameGenerator(document.querySelector(".course"), {users: body, id:e.params.course});
 	});
 });
 
