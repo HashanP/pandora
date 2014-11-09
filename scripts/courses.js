@@ -771,29 +771,13 @@ QuizResults.prototype.templateSync = require("../views/quizResults.mustache")
 function RandomNameGenerator(el, options) {
 	achilles.View.call(this, el);
 	this.users = options.users;
-	this.i = 0;
 	this.on("click .start", this.start.bind(this));
-	this.on("click .stop", this.stop.bind(this));
 }
 
 util.inherits(RandomNameGenerator, achilles.View);
 
 RandomNameGenerator.prototype.start = function(e) {
-	if(!this.x) {
-		this.x = window.setInterval(this.change.bind(this), 25);
-	}
-}
-
-RandomNameGenerator.prototype.change = function() {
-	this.i++;
-	this.i %= this.users.length;
-	this.activeUser = this.users[this.i];
-	this.el.querySelector(".name").innerHTML = this.activeUser.name;
-}
-
-RandomNameGenerator.prototype.stop = function(e) {
-	window.clearInterval(this.x);
-	delete this.x;
+	this.el.querySelector(".name").innerHTML = this.users[Math.floor(Math.random() * this.users.length - 1) + 1].name;
 }
 
 RandomNameGenerator.prototype.templateSync = require("../views/randomNameGenerator.mustache");
