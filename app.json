@@ -15,5 +15,8 @@
   "addons": [
     "mongolab",
     "rediscloud"
-  ]
+  ],
+  "env": {
+    "NODE_ENV":"production"
+  }
 }
