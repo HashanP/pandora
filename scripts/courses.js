@@ -779,7 +779,9 @@ function RandomNameGenerator(el, options) {
 util.inherits(RandomNameGenerator, achilles.View);
 
 RandomNameGenerator.prototype.start = function(e) {
-	this.x = window.setInterval(this.change.bind(this), 25);
+	if(!this.x) {
+		this.x = window.setInterval(this.change.bind(this), 25);
+	}
 }
 
 RandomNameGenerator.prototype.change = function() {
@@ -791,6 +793,7 @@ RandomNameGenerator.prototype.change = function() {
 
 RandomNameGenerator.prototype.stop = function(e) {
 	window.clearInterval(this.x);
+	delete this.x;
 }
 
 RandomNameGenerator.prototype.templateSync = require("../views/randomNameGenerator.mustache");
