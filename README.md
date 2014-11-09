@@ -5,6 +5,23 @@ pandora
 
 The world's most advanced V.L.E. - Version 2.0
 
+Features
+---
+- Flexible Content Editor
+ - Rich Text
+ - LaTeX
+ - Images
+ - YouTube
+- Quizzes
+ - Multiple Answers
+ - Multiple Choice 
+  - Radio buttons
+  - Checkboxes
+ - Performance Graphs
+ - Vocabulary Quizzes
+- Student Pane
+ - Random Name Generator 
+ 
 Deployment
 -------
 
