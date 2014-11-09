@@ -533,15 +533,22 @@ function ChangePasswordView(el) {
 util.inherits(ChangePasswordView, achilles.View);
 
 ChangePasswordView.prototype.submit = function() {
+	var oldPassword = this.el.querySelector(".old-password").value;
+	var newPassword = this.el.querySelector(".new-password").value;
+	if(!newPassword) {
+		this.error = "New password must not be empty.";
+		return this.render();
+	}
 	request.post({url:HEADER +"/userinfo/changePassword", json:{
-		oldPassword: this.el.querySelector(".old-password").value,
-		newPassword: this.el.querySelector(".new-password").value
+		oldPassword: oldPassword,
+		newPassword: newPassword
 	}}, function(err, res, body) {
-		if(err) {
-			throw err;
+		if(res.statusCode === 500) {
+			this.error = "Incorrect old password.";
+			return this.render();
 		}
 		page("/");
-	});
+	}.bind(this));
 };
 
 ChangePasswordView.prototype.templateSync = require("../views/changePassword.mustache");
