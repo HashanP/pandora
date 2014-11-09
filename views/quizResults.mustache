@@ -1,0 +1,23 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">
+  Quiz Results
+  </div>
+  <div class="panel-body">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Best Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#attempts}}
+          <tr>
+            <td>{{user}}</td>
+            <td>{{score}}</td>
+          </tr>
+        {{/attempts}}
+      </tbody>
+    </table>
+  </div>
+</div>

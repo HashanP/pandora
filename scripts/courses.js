@@ -739,6 +739,26 @@ Settings.prototype.save = function() {
 
 Settings.prototype.templateSync = require("../views/settings.mustache");
 
+function QuizResults(el, options) {
+	achilles.View.call(this,el);
+	var attempts = {};
+	options.model.attempts.forEach(function(attempt) {
+		options.users.forEach(function(user) {
+			if(user._id === attempt.user && (!(user.name in attempts) || attempt.score > attempts[user.name])) {
+				attempts[user.name] = attempt.score;
+			}
+		});
+	});
+	this.attempts = [];
+	for(var user in attempts) {
+		this.attempts.push({user: user, score:attempts[user]});
+	}
+}
+
+util.inherits(QuizResults, achilles.View);
+
+QuizResults.prototype.templateSync = require("../views/quizResults.mustache")
+
 var request = require("request");
 
 var m = require("../views/courses.mustache");
@@ -920,6 +940,14 @@ page("/courses/:course/quizzes/:quiz/attempts/:attempt", function(e, next) {
 page("/courses/:course/quizzes/:quiz/graph", function(e) {
 	models.Course.getById(e.params.course, function(err, doc) {
 		new PerformanceGraph(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], id:doc._id});
+	});
+});
+
+page("/courses/:course/quizzes/:quiz/results", function(e) {
+	models.Course.getById(e.params.course, function(err, doc) {
+		request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
+			new QuizResults(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], users:body});
+		});
 	});
 });
 
