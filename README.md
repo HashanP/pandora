@@ -15,11 +15,12 @@ Features
 - Quizzes
  - Multiple Answers
  - Multiple Choice 
-  - Radio buttons
-  - Checkboxes
+ - Radio buttons
+ - Checkboxes
  - Performance Graphs
  - Vocabulary Quizzes
 - Student Pane
+ - Email Students 
  - Random Name Generator 
  
 Deployment
