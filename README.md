@@ -5,6 +5,24 @@ pandora
 
 The world's most advanced V.L.E. - Version 2.0
 
+Features
+---
+- Flexible Content Editor
+ - Rich Text
+ - LaTeX
+ - Images
+ - YouTube
+- Quizzes
+ - Multiple Answers
+ - Multiple Choice 
+ - Radio buttons
+ - Checkboxes
+ - Performance Graphs
+ - Vocabulary Quizzes
+- Student Pane
+ - Email Students 
+ - Random Name Generator 
+ 
 Deployment
 -------
 
@@ -17,7 +35,7 @@ From my experience Heroku is the easiest platform to deploy to. Its standard pla
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/TheMuses/pandora)
 
-Sipmly by clicking the button above, you will be able to setup a live server on the web, including the database. An admin user is automatically created, with a username and password of "Admin".
+Simply by clicking the button above, you will be able to setup a live server on the web, including the database. An admin user is automatically created, with a username and password of "Admin".
 
 ---
 <img src="http://i.imgur.com/7KnCa5a.png" width="200">

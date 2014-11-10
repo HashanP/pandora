@@ -61,6 +61,7 @@ achilles.View.prototype.render = function() {
 		};
 >>>>>>> 615871b0e15837b56e34e0591a09de90e4c9a08a
 	}
+	this.api_key = localStorage.getItem("access_token");
 	defaultRender.call(this);
 	MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el]);
 };
@@ -540,15 +541,22 @@ function ChangePasswordView(el) {
 util.inherits(ChangePasswordView, achilles.View);
 
 ChangePasswordView.prototype.submit = function() {
+	var oldPassword = this.el.querySelector(".old-password").value;
+	var newPassword = this.el.querySelector(".new-password").value;
+	if(!newPassword) {
+		this.error = "New password must not be empty.";
+		return this.render();
+	}
 	request.post({url:HEADER +"/userinfo/changePassword", json:{
-		oldPassword: this.el.querySelector(".old-password").value,
-		newPassword: this.el.querySelector(".new-password").value
+		oldPassword: oldPassword,
+		newPassword: newPassword
 	}}, function(err, res, body) {
-		if(err) {
-			throw err;
+		if(res.statusCode === 500) {
+			this.error = "Incorrect old password.";
+			return this.render();
 		}
 		page("/");
-	});
+	}.bind(this));
 };
 
 ChangePasswordView.prototype.templateSync = require("../views/changePassword.mustache");
@@ -708,6 +716,7 @@ Link.prototype.templateSync = require("../views/link.mustache");
 function Students(el, options) {
 	achilles.View.call(this, el);
 	this.model = options.model;
+	this.id = options.id;
 }
 
 util.inherits(Students, achilles.View);
@@ -750,24 +759,74 @@ Settings.prototype.save = function() {
 Settings.prototype.templateSync = require("../views/settings.mustache");
 
 function QuizResults(el, options) {
-	achilles.View.call(this,el);
-	var attempts = {};
-	options.model.attempts.forEach(function(attempt) {
-		options.users.forEach(function(user) {
-			if(user._id === attempt.user && (!(user.name in attempts) || attempt.score > attempts[user.name])) {
-				attempts[user.name] = attempt.score;
-			}
-		});
-	});
-	this.attempts = [];
-	for(var user in attempts) {
-		this.attempts.push({user: user, score:attempts[user]});
-	}
+	achilles.View.call(this, el);
+	this.criterion = "best";
+	this.quiz = options.quiz;
+	this.users = options.users;
+	this.generate();
+	this.on("change .criterion", this.change.bind(this));
 }
 
 util.inherits(QuizResults, achilles.View);
 
 QuizResults.prototype.templateSync = require("../views/quizResults.mustache")
+
+QuizResults.prototype.render = function() {
+	this.best = false; this.average = false; this.first = false;
+	this[this.criterion] = true;
+	achilles.View.prototype.render.call(this);
+}
+
+QuizResults.prototype.generate = function() {
+	var attempts = {};
+	this.quiz.attempts.forEach(function(attempt) {
+		this.users.forEach(function(user) {
+			if(user._id === attempt.user) {
+				if(this.criterion === "average") {
+					if(!(user.name in attempts)) {
+						attempts[user.name] = [attempt.score];
+					} else {
+						attempts[user.name].push(attempt.score);
+					}
+				}
+				if(this.criterion === "best" && (!(user.name in attempts) || attempt.score > attempts[user.name].score)) {
+					attempts[user.name] = attempt;
+				}
+				if(this.criterion === "first" && (!(user.name in attempts) || attempt.date < attempts[user.name].date)) {
+					attempts[user.name] = attempt;
+				}
+			}
+		}.bind(this));
+	}.bind(this));
+	this.attempts = [];
+	for(var user in attempts) {
+		if(this.criterion === "average") {
+			this.attempts.push({user: user, score:attempts[user].reduce(function(a, b) {return a + b}) / attempts[user].length});
+		} else {
+			this.attempts.push({user: user, score:attempts[user].score});
+		}
+	}
+}
+
+QuizResults.prototype.change = function(e) {
+	this.criterion = e.target.value;
+	this.generate();
+	this.render();
+};
+
+function RandomNameGenerator(el, options) {
+	achilles.View.call(this, el);
+	this.users = options.users;
+	this.on("click .start", this.start.bind(this));
+}
+
+util.inherits(RandomNameGenerator, achilles.View);
+
+RandomNameGenerator.prototype.start = function(e) {
+	this.el.querySelector(".name").innerHTML = this.users[Math.floor(Math.random() * this.users.length - 1) + 1].name;
+}
+
+RandomNameGenerator.prototype.templateSync = require("../views/randomNameGenerator.mustache");
 
 var request = require("request");
 
@@ -956,15 +1015,20 @@ page("/courses/:course/quizzes/:quiz/graph", function(e) {
 page("/courses/:course/quizzes/:quiz/results", function(e) {
 	models.Course.getById(e.params.course, function(err, doc) {
 		request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
-			new QuizResults(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], users:body});
+			new QuizResults(document.querySelector(".course"), {quiz: doc.quizzes[e.params.quiz], users:body});
 		});
 	});
 });
 
 page("/courses/:course/students", function(e) {
 	request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
-		console.log(body);
-		new Students(document.querySelector(".course"), {model: body});
+		new Students(document.querySelector(".course"), {model: body, id:e.params.course});
+	});
+});
+
+page("/courses/:course/randomNameGenerator", function(e) {
+	request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
+		new RandomNameGenerator(document.querySelector(".course"), {users: body, id:e.params.course});
 	});
 });
 

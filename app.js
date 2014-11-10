@@ -12,13 +12,7 @@ var browserify = require("browserify-middleware");
 var morgan = require("morgan");
 var oauthserver = require('node-oauth2-server');
 var compression = require('compression');
-
-require.extensions[".mustache"] = function(module, filename) {
-	var template = hogan.compile(fs.readFileSync(filename).toString());
-	module.exports = function(data) {
-		return template.render(data);
-	};
-};
+var xl = require("excel4node");
 
 var mongodb = require("achilles-mongodb");
 
@@ -46,8 +40,8 @@ app.use("/scripts/courses.js", browserify("./scripts/courses.js", {
 
 var tokens = {};
 
-app.oauth = oauthserver({
-  model: {
+var oauthConfig = {
+	model: {
 		getAccessToken: function(bearerToken, cb) {
 			if(!(bearerToken in tokens)) {
 				cb(true);
@@ -89,10 +83,35 @@ app.oauth = oauthserver({
 			});
 		}
 	},
-  grants: ['password'],
-  debug: true,
+	grants: ['password'],
+	debug: true,
 	accessTokenLifetime:null
-});
+};
+
+if(process.env.REDISCLOUD_URL) {
+	var redis = require("redis-url");
+
+	var client = redis.connect(process.env.REDISCLOUD_URL);
+
+	oauthConfig.saveAccessToken = function(accessToken, clientId, expires, user, cb) {
+		client.setex("accessToken:" + accessToken, 3600, user.toJSON(), cb);
+	};
+
+	oauthConfig.getAccessToken = function(bearerToken, cb) {
+		client.get("accessToken:" + bearerToken, function(err, str) {
+			if(!str) {
+				cb(true);
+			} else {
+				cb(null, {
+					expires:null,
+					userId: JSON.parse(str)
+				});
+			}
+		});
+	};
+}
+
+app.oauth = oauthserver(oauthConfig);
 
 app.get("/courses(*)", function(req, res) {
 	res.sendfile("public/index.html");
@@ -135,6 +154,23 @@ app.get("/api/:id/students", function(req, res, next) {
 		}
 		console.log(users);
 		res.end(JSON.stringify(users.map(function(e) {return e.toJSON()})));
+	}.bind(this));
+});
+
+app.get("/api/:id/students.xlsx", function(req, res, next) {
+	models.User.get({where: {roles:{$in:["Course:get:" + req.params.id], $nin:["Course:put:" + req.params.id]}}, keys: "name"}, function(err, users) {
+		if(err) {
+			return next(err);
+		}
+		var wb = new xl.WorkBook();
+		var header = wb.Style();
+		header.Font.Bold();
+		var ws = wb.WorkSheet("Students");
+		ws.Cell(1,1).String("Username").Style(header);
+		users.forEach(function(user, i) {
+			ws.Cell(i + 2, 1).String(user.name);
+		});
+		wb.write("students.xlsx", res);
 	}.bind(this));
 });
 
