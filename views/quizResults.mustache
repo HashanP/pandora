@@ -3,6 +3,15 @@
   Quiz Results
   </div>
   <div class="panel-body">
+    <div class="row">
+      <div class="col-md-3 col-md-offset-9">
+        <select class="criterion form-control">
+          <option value="best" {{#best}}selected{{/best}}>Best Score</option>
+          <option value="average" {{#average}}selected{{/average}}>Average Score</option>
+          <option value="first" {{#first}}selected{{/first}}>First Score</option>
+        </select>
+      </div>
+    </div>
     <table class="table">
       <thead>
         <tr>

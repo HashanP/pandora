@@ -749,24 +749,60 @@ Settings.prototype.save = function() {
 Settings.prototype.templateSync = require("../views/settings.mustache");
 
 function QuizResults(el, options) {
-	achilles.View.call(this,el);
-	var attempts = {};
-	options.model.attempts.forEach(function(attempt) {
-		options.users.forEach(function(user) {
-			if(user._id === attempt.user && (!(user.name in attempts) || attempt.score > attempts[user.name])) {
-				attempts[user.name] = attempt.score;
-			}
-		});
-	});
-	this.attempts = [];
-	for(var user in attempts) {
-		this.attempts.push({user: user, score:attempts[user]});
-	}
+	achilles.View.call(this, el);
+	this.criterion = "best";
+	this.quiz = options.quiz;
+	this.users = options.users;
+	this.generate();
+	this.on("change .criterion", this.change.bind(this));
 }
 
 util.inherits(QuizResults, achilles.View);
 
 QuizResults.prototype.templateSync = require("../views/quizResults.mustache")
+
+QuizResults.prototype.render = function() {
+	this.best = false; this.average = false; this.first = false;
+	this[this.criterion] = true;
+	achilles.View.prototype.render.call(this);
+}
+
+QuizResults.prototype.generate = function() {
+	var attempts = {};
+	this.quiz.attempts.forEach(function(attempt) {
+		this.users.forEach(function(user) {
+			if(user._id === attempt.user) {
+				if(this.criterion === "average") {
+					if(!(user.name in attempts)) {
+						attempts[user.name] = [attempt.score];
+					} else {
+						attempts[user.name].push(attempt.score);
+					}
+				}
+				if(this.criterion === "best" && (!(user.name in attempts) || attempt.score > attempts[user.name].score)) {
+					attempts[user.name] = attempt;
+				}
+				if(this.criterion === "first" && (!(user.name in attempts) || attempt.date < attempts[user.name].date)) {
+					attempts[user.name] = attempt;
+				}
+			}
+		}.bind(this));
+	}.bind(this));
+	this.attempts = [];
+	for(var user in attempts) {
+		if(this.criterion === "average") {
+			this.attempts.push({user: user, score:attempts[user].reduce(function(a, b) {return a + b}) / attempts[user].length});
+		} else {
+			this.attempts.push({user: user, score:attempts[user].score});
+		}
+	}
+}
+
+QuizResults.prototype.change = function(e) {
+	this.criterion = e.target.value;
+	this.generate();
+	this.render();
+};
 
 function RandomNameGenerator(el, options) {
 	achilles.View.call(this, el);
@@ -969,7 +1005,7 @@ page("/courses/:course/quizzes/:quiz/graph", function(e) {
 page("/courses/:course/quizzes/:quiz/results", function(e) {
 	models.Course.getById(e.params.course, function(err, doc) {
 		request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
-			new QuizResults(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz], users:body});
+			new QuizResults(document.querySelector(".course"), {quiz: doc.quizzes[e.params.quiz], users:body});
 		});
 	});
 });
