@@ -47,19 +47,11 @@ var defaultRender = achilles.View.prototype.render;
 achilles.View.prototype.render = function() {
 	if(this.id) {
 		this.can = {
-<<<<<<< HEAD
 			get: process.env.USER.can("Course", "get", this.id),
 			post: process.env.USER.can("Course", "post", this.id),
 			put: process.env.USER.can("Course", "put", this.id),
 			del: process.env.USER.can("Course", "del", this.id)
 		}
-=======
-			get: process.env.USER.can(models.Course, "get", this.id),
-			post: process.env.USER.can(models.Course, "post", this.id),
-			put: process.env.USER.can(models.Course, "put", this.id),
-			del: process.env.USER.can(models.Course, "del", this.id)
-		};
->>>>>>> 615871b0e15837b56e34e0591a09de90e4c9a08a
 	}
 	this.api_key = localStorage.getItem("access_token");
 	defaultRender.call(this);
