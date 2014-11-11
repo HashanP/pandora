@@ -15,7 +15,7 @@ body.loggedIn {
 	background: linear-gradient(90deg, #5D4157 10%, #A8CABA 90%);
 }
 
-.icon img {
+.icon img, .course-icon {
 	width:100%;
 }
 
