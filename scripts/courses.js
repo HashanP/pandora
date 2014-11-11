@@ -776,7 +776,7 @@ QuizResults.prototype.render = function() {
 
 	var canvas = d3.select(this.el.querySelector(".svg"))
 						.append('svg')
-						.attr({viewBox:"0 0 900 " + (HEIGHT + 30)});
+						.attr({viewBox:"0 0 900 " + (HEIGHT + 50)});
 
 	console.log(this.quiz.questions.length);
 
@@ -800,7 +800,18 @@ QuizResults.prototype.render = function() {
 				.tickFormat(function(d,i){ return this.attempts[i].user; }.bind(this))
 				.tickValues(d3.range(this.attempts.length));
 
+	var	xAxis = d3.svg.axis();
+			xAxis
+				.orient('bottom')
+				.scale(xscale)
+				.tickSize(4)
+				.tickFormat(function(d,i){return d.toString()} )
+				.tickValues([0].concat(this.quiz.questions.map(function(d,i){return i +1})));
 
+		var x_xis = canvas.append('g')
+						  .attr("transform", "translate(148,"+ (HEIGHT + 16) +")")
+						  .attr('id','xaxis')
+						  .call(xAxis);
 
 	var y_xis = canvas.append('g')
 						  .attr("transform", "translate(150,15)")
