@@ -763,10 +763,64 @@ util.inherits(QuizResults, achilles.View);
 
 QuizResults.prototype.templateSync = require("../views/quizResults.mustache")
 
+var colorbrewer = require("colorbrewer");
+
 QuizResults.prototype.render = function() {
 	this.best = false; this.average = false; this.first = false;
 	this[this.criterion] = true;
 	achilles.View.prototype.render.call(this);
+
+	var HEIGHT = this.attempts.length * 30;
+
+	console.log(this.attempts);
+
+	var canvas = d3.select(this.el.querySelector(".svg"))
+						.append('svg')
+						.attr({viewBox:"0 0 900 " + (HEIGHT + 30)});
+
+	console.log(this.quiz.questions.length);
+
+	var color = d3.scale.threshold()
+		.domain([0, this.quiz.questions.length])
+		.range(colorbrewer.RdYlGn[6]);
+
+	var xscale = d3.scale.linear()
+		.domain([0,this.quiz.questions.length])
+		.range([0,722]);
+
+	var yscale = d3.scale.linear()
+						.domain([0,this.attempts.length])
+						.range([0, HEIGHT]);
+
+	var	yAxis = d3.svg.axis();
+			yAxis
+				.orient('left')
+				.scale(yscale)
+				.tickSize(2)
+				.tickFormat(function(d,i){ return this.attempts[i].user; }.bind(this))
+				.tickValues(d3.range(this.attempts.length));
+
+
+
+	var y_xis = canvas.append('g')
+						  .attr("transform", "translate(150,15)")
+						  .attr('id','yaxis')
+						  .call(yAxis);
+
+	y_xis.selectAll("text").attr("dy", "1em");
+
+	var chart = canvas.append('g')
+							.attr("transform", "translate(150,0)")
+							.attr('id','bars')
+							.selectAll('rect')
+							.data(this.attempts)
+							.enter()
+							.append('rect')
+							.attr('height',19)
+							.attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
+							.style('fill',function(d,i){ return color(d.score); })
+							.attr('width',function(d){ return xscale(d.score); });
+
 }
 
 QuizResults.prototype.generate = function() {

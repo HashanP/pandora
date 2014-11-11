@@ -157,3 +157,12 @@ border:1px solid #999;
 .btn:focus, .btn:active:focus {
 	outline:none;
 }
+
+	#xaxis .domain {
+		fill:none;
+		stroke:#000;
+	}
+	#xaxis text, #yaxis text {
+		font-size: 20px;
+		padding-top:10px;
+	}
