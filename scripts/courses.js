@@ -821,7 +821,7 @@ QuizResults.prototype.render = function() {
 	y_xis.selectAll("text").attr("dy", "1.1em");
 
 	var chart = canvas.append('g')
-							.attr("transform", "translate(150,0)")
+							.attr("transform", "translate(149,0)")
 							.attr('id','bars')
 							.selectAll('rect')
 							.data(this.attempts)

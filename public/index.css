@@ -157,6 +157,10 @@ border:1px solid #999;
 .btn:focus, .btn:active:focus {
 	outline:none;
 }
+.svg svg rect {
+	stroke:#000;
+	stroke-width:1px;
+}
 
 	#xaxis .domain {
 		fill:none;
