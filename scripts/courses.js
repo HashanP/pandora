@@ -753,6 +753,7 @@ Settings.prototype.templateSync = require("../views/settings.mustache");
 function QuizResults(el, options) {
 	achilles.View.call(this, el);
 	this.criterion = "best";
+	this.id = options.id;
 	this.quiz = options.quiz;
 	this.users = options.users;
 	this.generate();
@@ -804,12 +805,11 @@ QuizResults.prototype.render = function() {
 			xAxis
 				.orient('bottom')
 				.scale(xscale)
-				.tickSize(4)
 				.tickFormat(function(d,i){return d.toString()} )
 				.tickValues([0].concat(this.quiz.questions.map(function(d,i){return i +1})));
 
 		var x_xis = canvas.append('g')
-						  .attr("transform", "translate(149,"+ (HEIGHT + 16) +")")
+						  .attr("transform", "translate(149,"+ (HEIGHT + 16.5) +")")
 						  .attr('id','xaxis')
 						  .call(xAxis);
 
@@ -828,6 +828,15 @@ QuizResults.prototype.render = function() {
 							.enter()
 							.append('rect')
 							.attr('height',19)
+							  .on('mouseover', function(d){
+        d3.select(this).style({fill:d3.rgb(color(d.score)).darker(0.35)})
+								})
+								.on('mouseout', function(d){
+				d3.select(this).style({fill:color(d.score)})
+								})
+								.on('click', function(d) {
+									page("/courses/" + this.id + "/quizzes/" + this.quiz.index + "/attempts/" + d.index)
+								}.bind(this))
 							.attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
 							.style('fill',function(d,i){ return color(d.score); })
 							.attr('width',function(d){ return xscale(d.score); });
@@ -860,7 +869,7 @@ QuizResults.prototype.generate = function() {
 		if(this.criterion === "average") {
 			this.attempts.push({user: user, score:attempts[user].reduce(function(a, b) {return a + b}) / attempts[user].length});
 		} else {
-			this.attempts.push({user: user, score:attempts[user].score});
+			this.attempts.push({user: user, score:attempts[user].score, index: attempts[user].index});
 		}
 	}
 }
@@ -1056,7 +1065,7 @@ page("/courses/:course/quizzes/:quiz/attempt", function(e) {
 
 page("/courses/:course/quizzes/:quiz/attempts/:attempt", function(e, next) {
 	models.Course.getById(e.params.course, function(err, doc) {
-		if(doc.quizzes[e.params.quiz].attempts[e.params.attempt].user !== process.env.USER._id) {
+		if(doc.quizzes[e.params.quiz].attempts[e.params.attempt].user !== process.env.USER._id && !process.env.USER.can("Course:put:" + doc._id)) {
 			return next();
 		}
 		new QuizAttempt(document.querySelector(".course"), {model: doc.quizzes[e.params.quiz].attempts[e.params.attempt], id:doc._id, quiz:doc.quizzes[e.params.quiz], readOnly:true});
@@ -1072,7 +1081,7 @@ page("/courses/:course/quizzes/:quiz/graph", function(e) {
 page("/courses/:course/quizzes/:quiz/results", function(e) {
 	models.Course.getById(e.params.course, function(err, doc) {
 		request.get({url:HEADER+ "/api/" + e.params.course + "/students", json:true}, function(err, res, body) {
-			new QuizResults(document.querySelector(".course"), {quiz: doc.quizzes[e.params.quiz], users:body});
+			new QuizResults(document.querySelector(".course"), {quiz: doc.quizzes[e.params.quiz], users:body, id:doc._id});
 		});
 	});
 });

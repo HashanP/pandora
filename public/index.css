@@ -165,6 +165,7 @@ border:1px solid #999;
 	#xaxis .domain {
 		fill:none;
 		stroke:#000;
+		stroke-width:2px;
 	}
 	#xaxis text, #yaxis text {
 		font-size: 18px;
