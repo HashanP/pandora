@@ -780,9 +780,9 @@ QuizResults.prototype.render = function() {
 
 	console.log(this.quiz.questions.length);
 
-	var color = d3.scale.threshold()
+	var color = d3.scale.quantize()
 		.domain([0, this.quiz.questions.length])
-		.range(colorbrewer.RdYlGn[6]);
+		.range(colorbrewer.RdYlGn[9]);
 
 	var xscale = d3.scale.linear()
 		.domain([0,this.quiz.questions.length])
