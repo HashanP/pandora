@@ -776,7 +776,7 @@ QuizResults.prototype.render = function() {
 
 	var canvas = d3.select(this.el.querySelector(".svg"))
 						.append('svg')
-						.attr({viewBox:"0 0 900 " + (HEIGHT + 50)});
+						.attr({viewBox:"0 0 907 " + (HEIGHT + 70)});
 
 	console.log(this.quiz.questions.length);
 
@@ -809,7 +809,7 @@ QuizResults.prototype.render = function() {
 				.tickValues([0].concat(this.quiz.questions.map(function(d,i){return i +1})));
 
 		var x_xis = canvas.append('g')
-						  .attr("transform", "translate(148,"+ (HEIGHT + 16) +")")
+						  .attr("transform", "translate(149,"+ (HEIGHT + 16) +")")
 						  .attr('id','xaxis')
 						  .call(xAxis);
 
@@ -818,7 +818,7 @@ QuizResults.prototype.render = function() {
 						  .attr('id','yaxis')
 						  .call(yAxis);
 
-	y_xis.selectAll("text").attr("dy", "1em");
+	y_xis.selectAll("text").attr("dy", "1.1em");
 
 	var chart = canvas.append('g')
 							.attr("transform", "translate(150,0)")
