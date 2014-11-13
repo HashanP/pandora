@@ -206,6 +206,7 @@ function CreateVocabQuizView(el, options) {
 	this.id = options.id;
 	this.model = options.model;
 	this.bind(".title", "title");
+	this.bind(".long", "long");
 	this.on("click .create-question", this.addQuestion.bind(this));
 	this.on("click .submit", this.submit.bind(this));
 
@@ -1012,6 +1013,7 @@ page("/courses/:course/vocab_quizzes/create", function(e) {
 	models.Course.getById(e.params.course, function(err, doc) {
 		var m = new models.VocabQuiz();
 		doc.vocabQuizzes.push(m);
+		m.questions.push(new models.VocabQuestion());
 		new CreateVocabQuizView(document.querySelector(".course"), {id:doc._id, model:m});
 	});
 });

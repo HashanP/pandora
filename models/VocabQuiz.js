@@ -14,6 +14,7 @@ function VocabQuiz() {
 	this.define("title", String);
 	this.define("questions", [VocabQuestion]);
 	this.define("randomise_questions", Boolean);
+	this.define("long", Boolean);
 
 	this.questions = [];
 }

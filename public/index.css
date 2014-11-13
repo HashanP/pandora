@@ -76,6 +76,14 @@ border:1px solid #999;
 	height:30px;
 }
 
+.vocab-quiz-long *:nth-child(n+3), .vocab-quiz-long *:nth-child(n+3):focus {
+	border-top:0 !important;
+}
+
+.vocab-quiz-long input, .vocab-quiz-long input:focus {
+	border-right:0;
+}
+
 .vocab-quiz input {
 	outline:none;
 }
@@ -170,3 +178,7 @@ border:1px solid #999;
 	#xaxis text, #yaxis text {
 		font-size: 18px;
 	}
+
+.create-question {
+	padding-bottom:0px;
+}

@@ -20,10 +20,10 @@
       </div>
     </div>
 	  <h1>{{title}}</h1>
-	  <div class="row vocab-quiz">
+	  <div class="row vocab-quiz {{#long}}vocab-quiz-long{{/long}}">
 		{{#questions}}
-		  <div class="col-md-2">{{question}}</div>
-		  <input type="text" class="col-md-2" data-answer="{{answer}}">
+		  <div class="{{#long}}col-md-6{{/long}}{{^long}}col-md-2{{/long}}">{{question}}</div>
+		  <input type="text" class="{{#long}}col-md-6{{/long}}{{^long}}col-md-2{{/long}}" data-answer="{{answer}}">
 		{{/questions}}
 	  </div>
 	{{/data}}

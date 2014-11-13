@@ -21,23 +21,31 @@
      <h1>Create New Vocabulary Quiz</h1>
     {{/model._id}}
 	  <div class="form-group">
-		<label>Title</label>
-		<input type="text" class="form-control title" placeholder="Amazing Vocabulary Quiz Title">
+  		<label>Title</label>
+  		<input type="text" class="form-control title" placeholder="Amazing Vocabulary Quiz Title">
 	  </div>
+    <div class="form-group">
+      <label>Long Format</label>
+      <input type="checkbox" class="long">
+    </div>
 	  <div class="form-group">
-		<p>N.B. If there is more that one possible answer, seperate all possible answers  by commas.</p>
-		<table class="table">
+		<table class="table table-condensed">
 		  <thead>
 			<tr>
 			  <th>Question</th>
 			  <th>Answer</th>
+        <th><a class="btn btn-sm btn-link create-question"><i class="fa fa-plus"></i></a></th>
 			</tr>
 		  </thead>
 		  <tbody class="questions">
 		  </tbody>
 		</table>
-		<button class="btn btn-sm create-question" type="button">Add Question</button>
-	  </div>
+  </div>
+
+    <div>
+      <p class="text-info">ProTip: Use long format when there will be long questions.</p>
+      <p class="text-info">ProTip: If there is more that one possible answer, seperate all possible answers by commas.</p>
+    </div>
 	  <button class="btn btn-primary submit" type="button">Submit</button>
 	  <button type="reset" class="btn reset">Reset</button>
 	</form>
