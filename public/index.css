@@ -179,6 +179,7 @@ border:1px solid #999;
 		font-size: 18px;
 	}
 
-.create-question {
+.create-question, .table-condensed {
 	padding-bottom:0px;
+	margin-bottom:0px;
 }
