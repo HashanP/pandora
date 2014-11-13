@@ -256,12 +256,14 @@ VocabQuiz.prototype.del = function() {
 };
 
 VocabQuiz.prototype.changeInput = function(e) {
-	if(e.target.dataset.answer.toLowerCase().split(",").indexOf(e.target.value.toLowerCase()) !== -1) {
-		e.target.classList.add("correct");
-		e.target.classList.remove("incorrect");
-		e.target.blur();
-		if(e.target.nextSibling && e.target.nextSibling.nextSibling) {
-			e.target.nextElementSibling.nextElementSibling.focus();
+	if(e.target.dataset.answer.toLowerCase().split(",").map(function(str) {return str.trim()}).indexOf(e.target.value.toLowerCase().trim()) !== -1) {
+		if(!e.target.classList.contains("correct")) {
+			e.target.classList.add("correct");
+			e.target.classList.remove("incorrect");
+			e.target.blur();
+			if(e.target.nextSibling && e.target.nextSibling.nextSibling) {
+				e.target.nextElementSibling.nextElementSibling.focus();
+			}
 		}
 	} else if(e.target.value !== "") {
 		e.target.classList.add("incorrect");
