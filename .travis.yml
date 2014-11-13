@@ -6,7 +6,7 @@ deploy:
   provider: heroku
   api_key:
     secure: bmFy54eNzCab/goHszDjxBrCAJmBqShuvaBun425hCw4YjS4DDqby8W8e0elEwjKQ1MtgCv4q7iCqQJqYp2ypUbVNMpaXA6dJ6crWSFzG+q5RodJXClbGT+zXiWmSb30bm74qT6lIljMGs87MxS6pAWdJ7P0k06J7pDIuUZF8WA=
-  app: whsb
+  app: nightingale
   strategy: git
   on:
     all_branches: true
