@@ -7,34 +7,34 @@
         <img class="course-icon" src="/icons/{{data.icon}}.png">
       </li>-->
       <li class="list-group-item {{#blog}}active{{/blog}}">
-        <a href="/courses/{{data._id}}/blog">Blog</a>
+        <a href="/courses/{{data._id}}/blog"><i class="fa fa-comment fa-fw"></i>&nbsp; Blog</a>
       </li>
       <li class="list-group-item {{#vocab_quizzes}}active{{/vocab_quizzes}}">
-        <a href="/courses/{{data._id}}/vocab_quizzes">Vocabulary Quizzes</a>
+        <a href="/courses/{{data._id}}/vocab_quizzes"><i class="fa fa-question fa-fw"></i>&nbsp; Vocabulary Quizzes</a>
       </li>
       <li class="list-group-item {{#quizzes}}active{{/quizzes}}">
-        <a href="/courses/{{data._id}}/quizzes">Quizzes</a>
+        <a href="/courses/{{data._id}}/quizzes"><i class="fa fa-trophy fa-fw"></i>&nbsp; Quizzes</a>
       </li>
       <li class="list-group-item {{#uploads}}active{{/uploads}}">
-        <a href="/courses/{{data._id}}/uploads">File Uploads</a>
+        <a href="/courses/{{data._id}}/uploads"><i class="fa fa-upload fa-fw"></i>&nbsp; File Uploads</a>
       </li>
       <li class="list-group-item {{#downloads}}active{{/downloads}}">
-        <a href="/courses/{{data._id}}/downloads">File Downloads</a>
+        <a href="/courses/{{data._id}}/downloads"><i class="fa fa-download fa-fw"></i>&nbsp; File Downloads</a>
       </li>
       <li class="list-group-item {{#students}}active{{/students}}">
-        <a href="/courses/{{data._id}}/students">Students</a>
+        <a href="/courses/{{data._id}}/students"><i class="fa fa-graduation-cap fa-fw"></i>&nbsp; Students</a>
       </li>
       <li class="list-group-item {{#randomNameGenerator}}active{{/randomNameGenerator}}">
-        <a href="/courses/{{data._id}}/randomNameGenerator">Random Name Generator</a>
+        <a href="/courses/{{data._id}}/randomNameGenerator"><i class="fa fa-sort fa-fw"></i>&nbsp; Random Name Generator</a>
       </li>
       {{#can.del}}
       <li class="list-group-item {{#settings}}active{{/settings}}">
-        <a href="/courses/{{data._id}}/settings">Settings</a>
+        <a href="/courses/{{data._id}}/settings"><i class="fa fa-cog fa-fw"></i>&nbsp; Settings</a>
       </li>
       {{/can.del}}
       {{#data.links}}
       <li class="list-group-item">
-        <a href="{{url}}" target="_blank">{{title}}</a>
+        <a href="{{url}}" target="_blank"><i class="fa fa-external-link fa-w"></i>&nbsp; {{title}}</a>
       </li>
       {{/data.links}}
     </ul>
