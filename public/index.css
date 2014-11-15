@@ -194,7 +194,7 @@ border:1px solid #999;
 	}
 }
 
-@media screen and (max-width:969px) {
+@media screen and (max-width:1024px) {
 	.subbar li {
 		padding:12px 18px;
 	}
