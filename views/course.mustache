@@ -1,8 +1,8 @@
 <div class="row">
-  <div class="col-md-3 col-sm-3 col-xs-12">
+  <div class="col-md-3 col-sm-2 col-xs-12">
     <div class="panel panel-default">
     <div class="panel-heading">{{data.title}}</div>
-    <ul class="list-group">
+    <ul class="list-group subbar">
       <!--<li>
         <img class="course-icon" src="/icons/{{data.icon}}.png">
       </li>-->
@@ -10,7 +10,7 @@
         <a href="/courses/{{data._id}}/blog"><i class="fa fa-comment fa-fw"></i>&nbsp; Blog</a>
       </li>
       <li class="list-group-item {{#vocab_quizzes}}active{{/vocab_quizzes}}">
-        <a href="/courses/{{data._id}}/vocab_quizzes"><i class="fa fa-question fa-fw"></i>&nbsp; Vocabulary Quizzes</a>
+        <a href="/courses/{{data._id}}/vocab_quizzes"><i class="fa fa-question fa-fw"></i> Vocabulary Quizzes</a>
       </li>
       <li class="list-group-item {{#quizzes}}active{{/quizzes}}">
         <a href="/courses/{{data._id}}/quizzes"><i class="fa fa-trophy fa-fw"></i>&nbsp; Quizzes</a>
@@ -40,5 +40,5 @@
     </ul>
     </div>
   </div>
-  <div class="col-md-9 course col-sm-9 col-xs-12"></div>
+  <div class="col-md-9 course col-sm-10 col-xs-12"></div>
 </div>

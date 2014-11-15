@@ -184,12 +184,18 @@ border:1px solid #999;
 	margin-bottom:0px;
 }
 
-@media screen and (max-width:1169px) {
+@media screen and (max-width:1200px) {
 	.container {
 		width:100% !important;
 	}
 	.courses {
 		padding-left:10px;
 		padding-right:10px;
+	}
+}
+
+@media screen and (max-width:969px) {
+	.subbar li {
+		padding:12px 18px;
 	}
 }
