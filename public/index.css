@@ -187,7 +187,19 @@ border:1px solid #999;
 	}
 }
 
-@media screen and (max-width:1200px) {
+@media screen and (max-width:970px) {
+	.vocab-quiz *:nth-child(2n) {
+		border-right-width: 0px;
+	}
+	.vocab-quiz *:nth-child(-n+2), .vocab-quiz *:nth-child(-n+2):focus {
+		border-top:1px solid black;
+	}
+	.vocab-quiz-long *:nth-child(n+2), .vocab-quiz-long *:nth-child(n+2):focus {
+		border-top:0 !important;
+	}
+}
+
+@media screen and (min-width:970px) and (max-width:1200px) {
 	.vocab-quiz *:nth-child(4n) {
 		border-right-width: 0px;
 	}
