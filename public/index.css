@@ -188,4 +188,8 @@ border:1px solid #999;
 	.container {
 		width:100% !important;
 	}
+	.courses {
+		padding-left:10px;
+		padding-right:10px;
+	}
 }
