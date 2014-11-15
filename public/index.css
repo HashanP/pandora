@@ -183,3 +183,9 @@ border:1px solid #999;
 	padding-bottom:0px;
 	margin-bottom:0px;
 }
+
+@media screen and (max-width:1169px) {
+	.container {
+		width:100% !important;
+	}
+}
