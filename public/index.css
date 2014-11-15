@@ -88,7 +88,7 @@ border:1px solid #999;
 	outline:none;
 }
 
-.vocab-quiz *:nth-child(-n+6), .vocab-quiz *:nth-child(-n+6):focus {
+.vocab-quiz *:nth-child(-n+4), .vocab-quiz *:nth-child(-n+4):focus {
 	border-top:1px solid black;
 }
 
@@ -97,7 +97,7 @@ border:1px solid #999;
 	background-color:goldenrod;
 }
 
-.vocab-quiz *:nth-child(6n) {
+.vocab-quiz *:nth-child(4n) {
 	border-right-width: 0px;
 }
 
@@ -191,11 +191,5 @@ border:1px solid #999;
 	.courses {
 		padding-left:10px;
 		padding-right:10px;
-	}
-}
-
-@media screen and (max-width:1024px) {
-	.subbar li {
-		padding:12px 18px;
 	}
 }
