@@ -184,11 +184,16 @@ function ListQuizView(el, options) {
 	this.data = options.data;
 	this.section = options.section;
 	this.id = options.id;
+	this.on("click .random", this.random.bind(this));
 }
 
 util.inherits(ListQuizView, achilles.View);
 
 ListQuizView.prototype.templateSync = require("../views/listQuiz.mustache");
+
+ListQuizView.prototype.random = function() {
+	page("/courses/" + this.id + "/" + this.section + "/" + Math.floor(Math.random() * this.data.length));
+};
 
 function VocabQuestion() {
 	achilles.View.call(this, document.createElement("tr"));

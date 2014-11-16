@@ -223,3 +223,7 @@ border:1px solid #999;
 		border-top:0 !important;
 	}
 }
+
+.pull-right ~ .pull-right {
+	margin-right:5px;
+}
