@@ -6,7 +6,9 @@ pandora
 The world's most advanced V.L.E. - Version 2.0
 
 Hashan Punchihewa - Programmer
+
 Joseph Bills - Tester
+
 Oliver Croysdill - Icons
 
 Features
