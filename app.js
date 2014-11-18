@@ -112,7 +112,7 @@ if(process.env.REDISCLOUD_URL) {
 app.oauth = oauthserver(oauthConfig);
 
 app.get("/courses(*)", function(req, res) {
-	res.sendFile("public/index.html");
+	res.sendFile("public/index.html", {root:__dirname});
 });
 
 app.all('/oauth/token', app.oauth.grant());
