@@ -977,7 +977,7 @@ page("/create", function() {
 	new CreateView(document.querySelector("main"), models.Course);
 });
 
-page("/courses/:course/:section", function(e, next) {
+page("/courses/:course/:section(*)", function(e, next) {
 	models.Course.getById(e.params.course, function(err, doc) {
 		new CourseView(document.querySelector("main"), {data: doc, section: e.params.section, id:doc._id});
 		next();
