@@ -188,15 +188,13 @@ border:1px solid #999;
 	}
 }
 
-@media screen and (max-width:970px) {
+.vocab-quiz *:nth-child(-n+2), .vocab-quiz *:nth-child(-n+2):focus {
+	border-top:1px solid black;
+}
+
+@media screen and (max-width:969px) {
 	.vocab-quiz *:nth-child(2n) {
 		border-right-width: 0px;
-	}
-	.vocab-quiz *:nth-child(-n+2), .vocab-quiz *:nth-child(-n+2):focus {
-		border-top:1px solid black;
-	}
-	.vocab-quiz-long *:nth-child(n+2), .vocab-quiz-long *:nth-child(n+2):focus {
-		border-top:0 !important;
 	}
 }
 
@@ -204,11 +202,8 @@ border:1px solid #999;
 	.vocab-quiz *:nth-child(4n) {
 		border-right-width: 0px;
 	}
-	.vocab-quiz *:nth-child(-n+4), .vocab-quiz *:nth-child(-n+4):focus {
+	.vocab-quiz:not(.vocab-quiz-long) *:nth-child(-n+4), .vocab-quiz:not(.vocab-quiz-long) *:nth-child(-n+4):focus {
 		border-top:1px solid black;
-	}
-	.vocab-quiz-long *:nth-child(n+4), .vocab-quiz-long *:nth-child(n+4):focus {
-		border-top:0 !important;
 	}
 }
 
@@ -216,11 +211,8 @@ border:1px solid #999;
 	.vocab-quiz *:nth-child(6n) {
 		border-right-width: 0px;
 	}
-	.vocab-quiz *:nth-child(-n+6), .vocab-quiz *:nth-child(-n+6):focus {
+	.vocab-quiz:not(.vocab-quiz-long) *:nth-child(-n+6), .vocab-quiz:not(.vocab-quiz-long) *:nth-child(-n+6):focus {
 		border-top:1px solid black;
-	}
-	.vocab-quiz-long *:nth-child(n+6), .vocab-quiz-long *:nth-child(n+6):focus {
-		border-top:0 !important;
 	}
 }
 

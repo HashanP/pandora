@@ -22,8 +22,8 @@
 	  <h1>{{title}}</h1>
 	  <div class="row vocab-quiz {{#long}}vocab-quiz-long{{/long}}">
 		{{#questions}}
-		  <div class="{{#long}}col-md-6{{/long}}{{^long}}col-sm-6 col-md-3 col-lg-2{{/long}}">{{question}}</div>
-		  <input type="text" class="{{#long}}col-md-6{{/long}}{{^long}}col-sm-6 col-md-3 col-lg-2{{/long}}" data-answer="{{answer}}">
+		  <div class="col-xs-6 col-sm-6{{^long}} col-md-3 col-lg-2{{/long}}">{{question}}</div>
+		  <input type="text" class="col-xs-6 col-sm-6{{^long}} col-md-3 col-lg-2{{/long}}" data-answer="{{answer}}">
 		{{/questions}}
 	  </div>
 	{{/data}}
