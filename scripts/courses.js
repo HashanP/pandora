@@ -265,9 +265,10 @@ VocabQuiz.prototype.changeInput = function(e) {
 		if(!e.target.classList.contains("correct")) {
 			e.target.classList.add("correct");
 			e.target.classList.remove("incorrect");
-			e.target.blur();
 			if(e.target.nextSibling && e.target.nextSibling.nextSibling) {
 				e.target.nextElementSibling.nextElementSibling.focus();
+			} else {
+				e.target.blur();
 			}
 		}
 	} else if(e.target.value !== "") {
