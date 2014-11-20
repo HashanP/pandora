@@ -25,7 +25,7 @@
     "achilles-mongodb": "^0.3.0",
     "body-parser": "~1.5.2",
     "browserify-middleware": "~3.0.1",
-    "browserify-mustache": "0.0.3",
+    "browserify-mustache": "0.0.4",
     "colorbrewer": "0.0.2",
     "compression": "^1.2.0",
     "cookie-session": "~1.0.2",
