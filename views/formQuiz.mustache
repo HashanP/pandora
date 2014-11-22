@@ -25,7 +25,8 @@
         <label>Title</label>
         <input type="text" class="form-control title" placeholder="Amazing Quiz Title">
       </div>
-        <ul class="pagination">
+      <div role="tabpanel">
+        <ul class="nav nav-tabs" role="tablist">
           {{#questions}}
             <li class="question button-{{index}}">
               <a data-index="{{index}}">{{number}}</a>
@@ -33,9 +34,10 @@
           {{/questions}}
           <li class="add-question"><a><i class="fa fa-plus"></i></a></li>
         </ul>
+        <div class="tab-content current_question"></div>
+      </div>
       {{/model}}
 
-      <div class="current_question"></div>
       <button class="btn btn-primary submit" type="button">Submit</button>
       <button type="reset" class="btn reset">Reset</button>
   </form>
