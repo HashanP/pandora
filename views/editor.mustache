@@ -1,9 +1,9 @@
 <div class="row">
   <div class="editor-toolbar">
-	{{#rich}}
-      <div class=" col-md-9" role="toolbar">
-        <div class="row">
-          <div class="col-md-9 col-lg-8 btn-toolbar">
+      <div class="col-md-12" role="toolbar">
+
+            {{#rich}}
+
             <div class="btn-toolbar">
           		<div class="btn-group editor-formatting">
           		  <button class="btn btn-default" type="button" value="bold"><i class="fa fa-bold"></i></button>
@@ -22,8 +22,6 @@
                 <button class="btn btn-default image" type="button"><i class="fa fa-file-image-o"></i></button>
               </div>
             </div>
-          </div>
-          <div class="col-md-3 col-md-4">
             <select class="font-control form-control">
               <option value="Helvetica Neue" selected>Helvetica Neue</option>
               <option value="Arial">Arial</option>
@@ -34,23 +32,18 @@
               <option value="Verdana">Verdana</option>
               <option value="Courier New">Courier New</option>
             </select>
+            {{/rich}}
+{{^rich}}
+  <button type="button" class="btn btn-default open-tab {{#editorOpen}}active{{/editorOpen}}" value="editor">Editor</button>
+  <button type="button" class="btn btn-default open-tab {{^editorOpen}}active{{/editorOpen}}" value="preview">Preview</button>
+{{/rich}}
+<select class="editor-mode form-control">
+  <option value="rich-text-editor">Rich Text Editor</option>
+  <option value="latex">Latex</option>
+  <option value="youtube">YouTube</option>
+</select>
           </div>
-        </div>
-      </div>
-	{{/rich}}
-	{{^rich}}
-	  <div class="btn-group col-md-9">
-		<button type="button" class="btn btn-default open-tab {{#editorOpen}}active{{/editorOpen}}" value="editor">Editor</button>
-		<button type="button" class="btn btn-default open-tab {{^editorOpen}}active{{/editorOpen}}" value="preview">Preview</button>
-      </div>
-	{{/rich}}
-	<div class="col-md-3">
-	  <select class="editor-mode form-control">
-  		<option value="rich-text-editor">Rich Text Editor</option>
-  		<option value="latex">Latex</option>
-      <option value="youtube">YouTube</option>
-	  </select>
-	</div>
+
   </div>
 
   <br/>

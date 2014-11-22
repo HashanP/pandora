@@ -219,3 +219,21 @@ border:1px solid #999;
 .pull-right ~ .pull-right {
 	margin-right:5px;
 }
+
+.content select {
+	width:200px;
+	display:inline-block;
+	vertical-align:top;
+}
+
+.tab-content {
+	border-left:1px solid #dfd7ca;
+	border-right:1px solid #dfd7ca;
+	border-bottom:1px solid #dfd7ca;
+	padding:5px;
+	margin-bottom:10px;
+}
+
+.btn-toolbar {
+	display:inline-block;
+}
