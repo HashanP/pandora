@@ -109,7 +109,7 @@ border:1px solid #999;
 	height:30px;
 }
 
-.post {
+.post-youtube {
 	position: relative;
 	padding-bottom: 56.25%; /* 16:9 */
 	padding-top: 25px;
@@ -120,7 +120,15 @@ border:1px solid #999;
 	word-wrap:break-word;
 }
 
-.post iframe {
+.preview {
+	background-color:white;
+	padding:15px;
+	border-left:1px solid #dfd7ca;
+	border-right:1px solid #dfd7ca;
+	border-bottom:1px solid #dfd7ca;
+}
+
+.post-youtube iframe {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -223,6 +231,8 @@ border:1px solid #999;
 	width:150px;
 	display:inline-block;
 	vertical-align:top;
+	height:34px;
+	margin:6px;
 }
 
 .tab-content {
@@ -235,4 +245,17 @@ border:1px solid #999;
 
 .btn-toolbar {
 	display:inline-block;
+}
+
+.content {
+	background:#3e3f3a;
+}
+
+.editor-youtube {
+	border-radius:0px;
+}
+
+[role="toolbar"] {
+	margin-bottom:-5px;
+	height:51px;
 }

@@ -37,7 +37,7 @@
   <button type="button" class="btn btn-default open-tab {{#editorOpen}}active{{/editorOpen}}" value="editor">Editor</button>
   <button type="button" class="btn btn-default open-tab {{^editorOpen}}active{{/editorOpen}}" value="preview">Preview</button>
 {{/rich}}
-<select class="editor-mode form-control">
+<select class="editor-mode form-control pull-right">
   <option value="rich-text-editor">Rich Text Editor</option>
   <option value="latex">Latex</option>
   <option value="youtube">YouTube</option>
@@ -45,11 +45,6 @@
           </div>
 
   </div>
-
-  <br/>
-  <br/>
-  <br/>
-
   <div class="col-md-12">
 	{{#rich}}
 	  <div contenteditable="true" class="editor-rich">{{model.data}}</div>
@@ -65,8 +60,14 @@
 	  {{/editorOpen}}
 	{{/latex}}
   {{#youtube}}
-    <label>URL</label>
-    <input type="text" class="editor-youtube form-control">
+    {{#editorOpen}}
+      <input placeholder="URL" type="text" class="editor-youtube form-control">
+    {{/editorOpen}}
+    {{^editorOpen}}
+      <div class="post-youtube">
+        {{& model.html}}
+      </div>
+    {{/editorOpen}}
   {{/youtube}}
   </div>
 </div>
