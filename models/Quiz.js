@@ -35,6 +35,22 @@ function Question() {
 		}
 	});
 
+	Object.defineProperty(this, "answer", {
+		get: function() {
+				if(this.isSimple) {
+					return this.options.map(function(option) {
+						return option.title;
+					}).join(", ");
+				} else {
+					return this.options.filter(function(option) {
+						return option.correct;
+					}).map(function(option) {
+						return option.title;
+					}).join(", ");
+				}
+		}
+	});
+
 	this.answer_type = "text";
 	this.content = new Content();
 }

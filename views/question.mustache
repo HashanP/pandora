@@ -15,7 +15,12 @@
     {{^question.isSimple}}
       <div class="row options"></div>
     {{/question.isSimple}}
-  </div>
+    {{#_id}}
+      {{^correct}}
+        <p class="text-danger">The correct answer is: {{question.answer}}.</p>
+      {{/correct}}
+    {{/_id}}
+    </div>
   </div>
   {{/model}}
 </div>
