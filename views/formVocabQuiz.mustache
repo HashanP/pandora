@@ -6,6 +6,8 @@
 		<i class="fa fa-times"></i>
 	  </a>
 	</div>
+  <a class="btn btn-info btn-xs import pull-right">Import from Hot Potatoes</a>
+
   </div>
   <div class="panel-body">
 	{{#error}}
@@ -25,8 +27,12 @@
   		<input type="text" class="form-control title" placeholder="Amazing Vocabulary Quiz Title">
 	  </div>
     <div class="form-group">
-      <label>Long Format</label>
-      <input type="checkbox" class="long">
+      <label>Format</label>
+      <select class="form-control type">
+        <option value="short">Short</option>
+        <option value="long">Long</option>
+        <option value="crossword">Crossword</option>
+      </select>
     </div>
 	  <div class="form-group">
 		<table class="table table-condensed">

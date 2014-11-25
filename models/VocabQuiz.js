@@ -12,9 +12,15 @@ util.inherits(VocabQuestion, achilles.Model);
 function VocabQuiz() {
 	achilles.Model.call(this);
 	this.define("title", String);
+	this.define("type", String); // short, long, crossword
 	this.define("questions", [VocabQuestion]);
 	this.define("randomise_questions", Boolean);
-	this.define("long", Boolean);
+
+	Object.defineProperty(this, "long", {
+		get: function() {
+			return this.type === "long";
+		}
+	});
 
 	this.questions = [];
 }

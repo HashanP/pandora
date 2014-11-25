@@ -46,6 +46,7 @@ function Course(title) {
 	this.vocabQuizzes = [];
 	this.links = [];
 	this.pages = [];
+	this.crosswords = [];
 
 	this.title = title;
 }

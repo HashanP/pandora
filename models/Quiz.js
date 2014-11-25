@@ -7,7 +7,8 @@ function Question() {
 	achilles.Model.call(this);
 
 	this.define("content", Content);
-	this.define("answer_type", String); // "text", "number", "radio", "checkbox"
+	this.define("answer_type", String); // "text", "number", "radio", "checkbox", "fill_the_gaps"
+	this.define("answer_fill", String); // "text", "number", "radio", "checkbox", "fill_the_gaps"
 	this.define("options", [Option]);
 	this.options = [];
 
@@ -32,6 +33,20 @@ function Question() {
 	Object.defineProperty(this, "isText", {
 		get: function() {
 			return this.answer_type === "text";
+		}
+	});
+
+	Object.defineProperty(this, "isFill", {
+		get: function() {
+			return this.answer_type === "fill_the_gaps";
+		}
+	});
+
+	Object.defineProperty(this, "fill", {
+		get: function() {
+			return this.answer_fill.replace(/\[.*\]/g, function(match) {
+				return "<input class=\"answer_fill\" type=\"text\">";
+			});
 		}
 	});
 
@@ -65,6 +80,7 @@ function QuestionAttempt() {
 	this.define("questionId", String); // refers to question
 	this.define("answer_text", String);
 	this.define("answer_number", Number);
+	this.define("answer_fill", [String]);
 	this.define("options", [Option]);
 
 	Object.defineProperty(this, "correct", {
@@ -73,6 +89,12 @@ function QuestionAttempt() {
 				this.question = this.container.container.container.container.questions[this.index];
 			}
 			var i = 0;
+			if(this.question.answer_type === "fill_the_gaps") {
+				console.log(this.answer_fill);
+				return this.answer_fill = this.question.answer_fill.match(/\[.*\]/g).map(function(m) {
+					return m.substring(1, m.length-1);
+				});
+			}
 			if(this.question.answer_type === "text") {
 				if(this.answer_text === undefined) {
 					return false;

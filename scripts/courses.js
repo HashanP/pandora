@@ -211,9 +211,10 @@ function CreateVocabQuizView(el, options) {
 	this.id = options.id;
 	this.model = options.model;
 	this.bind(".title", "title");
-	this.bind(".long", "long");
+	this.bind(".type", "type");
 	this.on("click .create-question", this.addQuestion.bind(this));
 	this.on("click .submit", this.submit.bind(this));
+	this.on("click .import", this.import.bind(this));
 
 	this.delegate(".questions", "questions", new achilles.Collection(VocabQuestion));
 }
@@ -222,6 +223,27 @@ util.inherits(CreateVocabQuizView, achilles.View);
 
 CreateVocabQuizView.prototype.addQuestion = function() {
 	this.model.questions.push(new models.VocabQuestion());
+};
+
+CreateVocabQuizView.prototype.import = function() {
+	var fileEl = document.createElement("input");
+	fileEl.type = "file";
+	fileEl.addEventListener("change", function() {
+		var reader = new FileReader();
+		reader.addEventListener("load", function(e) {
+			var n = new DOMParser();
+			var doc = n.parseFromString(e.target.result, "text/xml");
+			this.model.questions = Array.prototype.slice.call(doc.querySelectorAll("clues item")).map(function(el) {
+				var t=  new models.VocabQuestion();
+				console.log(el.querySelector("def").nodeValue);
+				t.question = el.querySelector("def").childNodes[0].nodeValue;
+				t.answer = el.querySelector("word").childNodes[0].nodeValue;
+				return t;
+			});
+		}.bind(this));
+		reader.readAsText(fileEl.files[0]);
+	}.bind(this));
+	fileEl.click();
 };
 
 CreateVocabQuizView.prototype.templateSync = require("../views/formVocabQuiz.mustache");
@@ -296,6 +318,30 @@ VocabQuiz.prototype.reset = function() {
 		});
 };
 
+function Crossword(el, options) {
+	achilles.View.call(this, el);
+	this.model = options.model;
+}
+
+util.inherits(Crossword, achilles.View);
+
+var c = require("./Crossword");
+
+Crossword.prototype.templateSync = function() {
+	var values = this.model.questions.map(function(question) {
+		return question.question;
+	});
+	var keys = this.model.questions.map(function(question) {
+		return question.answer;
+	});
+	var cw = new c.Crossword(keys, values);
+	var grid = cw.getSquareGrid(1000);
+	if(grid === null) {
+		return "<p class=\"text-warning\">The questions do not fit the grid. Sorry. Bad words: " + cw.getBadWords().map(function(x){return x.word}).join(", ") + "</p>"
+	}
+	return c.utils.toHtml(grid)
+};
+
 function Option(el) {
 	achilles.View.call(this, document.createElement("div"));
 	this.bind(".title", "title");
@@ -319,6 +365,7 @@ function Question(el, options) {
 		this.on("click .remove", this.remove.bind(this));
 		this.delegate(".content", "content", new Editor());
 		this.delegate(".options", "options", new achilles.Collection(Option));
+		this.bind(".answer_fill", "answer_fill");
 
 		this.model.on("change:answer_type", function() {
 			this.answer_text = null;
@@ -432,8 +479,9 @@ OptionAttempt.prototype.templateSync = require("../views/option.mustache");
 function QuestionAttempt() {
 	achilles.View.call(this, document.createElement("div"));
 	this.define("model", models.QuestionAttempt);
-	this.bind(".answer_text", "answer_text");
-	this.bind(".answer_number", "answer_number");
+//	this.bind(".answer_text", "answer_text");
+//	this.bind(".answer_number", "answer_number");
+	this.bind(".answer_fill", "answer_fill");
 	this.delegate(".options", "options", new achilles.Collection(OptionAttempt));
 }
 
@@ -1030,7 +1078,11 @@ page("/courses/:course/vocab_quizzes/create", function(e) {
 
 page("/courses/:course/vocab_quizzes/:quiz", function(e) {
 	models.Course.getById(e.params.course, function(err, doc) {
-		new VocabQuiz(document.querySelector(".course"), {id:doc._id, data:doc.vocabQuizzes[e.params.quiz]});
+		if(doc.vocabQuizzes[e.params.quiz].type === "crossword") {
+			new Crossword(document.querySelector(".course"), {id:doc._id, model:doc.vocabQuizzes[e.params.quiz]});
+		} else {
+			new VocabQuiz(document.querySelector(".course"), {id:doc._id, data:doc.vocabQuizzes[e.params.quiz]});
+		}
 	});
 });
 
