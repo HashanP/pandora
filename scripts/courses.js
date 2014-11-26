@@ -321,25 +321,68 @@ VocabQuiz.prototype.reset = function() {
 function Crossword(el, options) {
 	achilles.View.call(this, el);
 	this.model = options.model;
-}
+	this.id = options.id;
 
-util.inherits(Crossword, achilles.View);
-
-var c = require("./Crossword");
-
-Crossword.prototype.templateSync = function() {
 	var values = this.model.questions.map(function(question) {
 		return question.question;
 	});
 	var keys = this.model.questions.map(function(question) {
 		return question.answer;
 	});
-	var cw = new c.Crossword(keys, values);
-	var grid = cw.getSquareGrid(1000);
-	if(grid === null) {
-		return "<p class=\"text-warning\">The questions do not fit the grid. Sorry. Bad words: " + cw.getBadWords().map(function(x){return x.word}).join(", ") + "</p>"
+	this.correct = {};
+	this.cw = new c.Crossword(keys, values);
+	this.grid = this.cw.getSquareGrid(1000);
+	this.on("click .start", this.start.bind(this));
+	this.on("click .enter", this.enter.bind(this));
+}
+
+util.inherits(Crossword, achilles.View);
+
+var c = require("./Crossword");
+
+Crossword.prototype.templateSync = require("../views/crossword.mustache");
+
+Crossword.prototype.start = function(e) {
+	this.clues = [];
+	console.log(e.target);
+	if(e.target.dataset.down !== undefined) {
+		this.clues.push({name:"Down", label:e.target.querySelector("span").innerHTML, info: this.model.questions[e.target.dataset.down].question, index:e.target.dataset.down, title:e.target.title});
 	}
-	return c.utils.toHtml(grid)
+	if(e.target.dataset.across !== undefined) {
+		this.clues.push({name:"Across", label:e.target.querySelector("span").innerHTML,info: this.model.questions[e.target.dataset.across].question, index:e.target.dataset.across, title:e.target.title});
+	}
+	this.render();
+}
+
+Crossword.prototype.enter = function(e) {
+	if(this.model.questions[e.target.dataset.index].answer.toLowerCase() === e.target.parentNode.parentNode.querySelector("input").value.toLowerCase()) {
+		var v = e.target.title.split(",");
+		console.log(e.target.parentNode.parentNode);
+		if(e.target.parentNode.parentNode.querySelector("b").innerHTML.indexOf("Down") !== -1) {
+			for(var i = 0; i < e.target.value; i++) {
+				this.correct[v[0] + "," + (v[1] + i)] = e.target.value[i];
+			}
+		} else if(e.target.parentNode.parentNode.querySelector("b").innerHTML.indexOf("Across") !== -1) {
+			for(var i = 0; i < e.target.value; i++) {
+				this.correct[(v[0] + i) + "," + v[1]] = e.target.value[i];
+			}
+		}
+	}
+	this.clues = [];
+	this.render();
+}
+
+Crossword.prototype.render = function() {
+	achilles.View.prototype.render.call(this);
+
+	if(this.grid === null) {
+		return "<p class=\"text-warning\">The questions do not fit the grid. Sorry. Bad words: " + this.cw.getBadWords().map(function(x){return x.word}).join(", ") + "</p>"
+	}
+	this.el.querySelector(".crossword").innerHTML = c.utils.toHtml(this.grid);
+	console.log(this.correct);
+	for(var key in this.correct) {
+		this.querySelector("a[title=\"" + key + "\"]").innerHTML = this.correct[key];
+	}
 };
 
 function Option(el) {

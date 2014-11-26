@@ -374,6 +374,7 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
           for(var c = 0; c < grid[r].length; c++){
             var cell = grid[r][c];
             var is_start_of_word = false;
+            var additional = " ";
             if(cell == null){
               var char = "&nbsp;";
               var css_class = "no-border";
@@ -381,6 +382,15 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
               var char = cell['char'];
               var css_class = "";
               var is_start_of_word = (cell['across'] && cell['across']['is_start_of_word']) || (cell['down'] && cell['down']['is_start_of_word']);
+              if(is_start_of_word) {
+                css_class = "start";
+                if(cell["across"] && cell["across"].is_start_of_word) {
+                  additional += "data-across=\"" + cell["across"].index + "\" ";
+                }
+                if(cell["down"] && cell["down"].is_start_of_word) {
+                  additional += "data-down=\"" + cell["down"].index + "\"";
+                }
+              }
             }
 
             //    if(is_start_of_word) {
@@ -388,7 +398,7 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
             //    html.push("<td class='" + css_class + "' title='" + r + ", " + c + "' style=\"background-image:url('" + img_url + "')\">");
             //     label++;
             //  } else {
-            html.push("<td class='" + css_class + "' title='" + r + ", " + c + "'>");
+            html.push("<td class='" + css_class + "' title='" + r + "," + c + "'" + additional + ">");
             // }
 
             if(is_start_of_word) {
@@ -401,7 +411,7 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
               html.push(char);
             } else if(cell !== null) {
               //                    html.push("&nbsp;");
-              html.push("<input tabindex=\"-1\" maxlength=\"1\">");
+              //html.push("<input tabindex=\"-1\" maxlength=\"1\">");
             }
           }
           html.push("</tr>");

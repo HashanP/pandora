@@ -56,14 +56,14 @@ EditorController.prototype.updateFont = function(e) {
 EditorController.prototype.image = function() {
 	var fileEl = document.createElement("input");
 	fileEl.type = "file";
-  fileEl.addEventListener("change", function() {
+	fileEl.addEventListener("change", function() {
 		var reader = new FileReader();
 		reader.addEventListener("load", function(e) {
 			document.execCommand("insertImage", true, e.target.result);
 		});
 		reader.readAsDataURL(fileEl.files[0]);
 	});
-  fileEl.click();
+	fileEl.click();
 };
 
 EditorController.prototype.updateFormat = function(e) {
