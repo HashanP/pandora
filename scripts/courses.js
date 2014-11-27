@@ -330,8 +330,10 @@ function Crossword(el, options) {
 		return question.answer;
 	});
 	this.correct = {};
-	this.cw = new c.Crossword(this.model.questions);
-	this.grid = this.cw.getSquareGrid(1000);
+	if(this.model.questions.length > 2) {
+		this.cw = new c.Crossword(this.model.questions);
+		this.grid = this.cw.getSquareGrid(1000);
+	}
 	this.on("click .start", this.start.bind(this));
 	this.on("click .enter", this.enter.bind(this));
 }
@@ -365,11 +367,14 @@ Crossword.prototype.enter = function(e) {
 
 Crossword.prototype.render = function() {
 	achilles.View.prototype.render.call(this);
-
-	if(this.grid === null) {
-		return "<p class=\"text-warning\">The questions do not fit the grid. Sorry. Bad words: " + this.cw.getBadWords().map(function(x){return x.word}).join(", ") + "</p>"
+	if(this.model.questions.length <= 2) {
+		this.el.querySelector(".crossword").innerHTML = "<p class=\"text-warning\">There are must be at least 3 questions in a crossword.</p>";
+  	return;
+	} else if(this.grid === null) {
+		 this.el.querySelector(".crossword").innerHTML = "<p class=\"text-warning\">The answers do not fit the grid. Sorry. Bad words: " + this.cw.getBadWords().map(function(x){return x.word}).join(", ") + "</p>";
+	} else {
+		this.el.querySelector(".crossword").innerHTML = c.utils.toHtml(this.grid);
 	}
-	this.el.querySelector(".crossword").innerHTML = c.utils.toHtml(this.grid);
 };
 
 function Option(el) {
