@@ -22,7 +22,7 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "achilles": "^0.23.75",
-    "achilles-mongodb": "^0.3.0",
+    "achilles-mongodb": "^0.3.1",
     "body-parser": "~1.5.2",
     "browserify-middleware": "~3.0.1",
     "browserify-mustache": "0.0.4",
