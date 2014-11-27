@@ -22,8 +22,8 @@ function WordElement(word, index, visible){
 }
 
 module.exports.Crossword = function Crossword(questions){
-  var GRID_ROWS = 25;
-  var GRID_COLS = 25;
+  var GRID_ROWS = Math.floor(questions.length / 2);
+  var GRID_COLS = 20;
   // This is an index of the positions of the char in the crossword (so we know where we can potentially place words)
   // example {"a" : [{'row' : 10, 'col' : 5}, {'row' : 62, 'col' :17}], {'row' : 54, 'col' : 12}], "b" : [{'row' : 3, 'col' : 13}]}
   // where the two item arrays are the row and column of where the letter occurs
