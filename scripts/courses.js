@@ -330,7 +330,7 @@ function Crossword(el, options) {
 		return question.answer;
 	});
 	this.correct = {};
-	this.cw = new c.Crossword(keys, values);
+	this.cw = new c.Crossword(this.model.questions);
 	this.grid = this.cw.getSquareGrid(1000);
 	this.on("click .start", this.start.bind(this));
 	this.on("click .enter", this.enter.bind(this));
@@ -346,27 +346,18 @@ Crossword.prototype.start = function(e) {
 	this.clues = [];
 	console.log(e.target);
 	if(e.target.dataset.down !== undefined) {
-		this.clues.push({name:"Down", label:e.target.querySelector("span").innerHTML, info: this.model.questions[e.target.dataset.down].question, index:e.target.dataset.down, title:e.target.title});
+		this.clues.push({name:"Down", label:e.target.querySelector("span").innerHTML, info: this.model.questions[e.target.dataset.down].question, index:e.target.dataset.down});
 	}
 	if(e.target.dataset.across !== undefined) {
-		this.clues.push({name:"Across", label:e.target.querySelector("span").innerHTML,info: this.model.questions[e.target.dataset.across].question, index:e.target.dataset.across, title:e.target.title});
+		this.clues.push({name:"Across", label:e.target.querySelector("span").innerHTML,info: this.model.questions[e.target.dataset.across].question, index:e.target.dataset.across});
 	}
 	this.render();
 }
 
 Crossword.prototype.enter = function(e) {
+	console.log(this.model.questions[e.target.dataset.index]);
 	if(this.model.questions[e.target.dataset.index].answer.toLowerCase() === e.target.parentNode.parentNode.querySelector("input").value.toLowerCase()) {
-		var v = e.target.title.split(",");
-		console.log(e.target.parentNode.parentNode);
-		if(e.target.parentNode.parentNode.querySelector("b").innerHTML.indexOf("Down") !== -1) {
-			for(var i = 0; i < e.target.value; i++) {
-				this.correct[v[0] + "," + (v[1] + i)] = e.target.value[i];
-			}
-		} else if(e.target.parentNode.parentNode.querySelector("b").innerHTML.indexOf("Across") !== -1) {
-			for(var i = 0; i < e.target.value; i++) {
-				this.correct[(v[0] + i) + "," + v[1]] = e.target.value[i];
-			}
-		}
+		this.model.questions[e.target.dataset.index].visible = true;
 	}
 	this.clues = [];
 	this.render();
@@ -379,10 +370,6 @@ Crossword.prototype.render = function() {
 		return "<p class=\"text-warning\">The questions do not fit the grid. Sorry. Bad words: " + this.cw.getBadWords().map(function(x){return x.word}).join(", ") + "</p>"
 	}
 	this.el.querySelector(".crossword").innerHTML = c.utils.toHtml(this.grid);
-	console.log(this.correct);
-	for(var key in this.correct) {
-		this.querySelector("a[title=\"" + key + "\"]").innerHTML = this.correct[key];
-	}
 };
 
 function Option(el) {

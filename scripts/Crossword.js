@@ -9,17 +9,19 @@ function CrosswordCell(letter){
 
 // You can tell if the Node is the start of a word (which is needed if you want to number the cells)
 // and what word and clue it corresponds to (using the index)
-function CrosswordCellNode(is_start_of_word, index){
+function CrosswordCellNode(is_start_of_word, index, visible){
   this.is_start_of_word = is_start_of_word;
   this.index = index; // use to map this node to its word or clue
+  this.visible = visible;
 }
 
-function WordElement(word, index){
+function WordElement(word, index, visible){
   this.word = word; // the actual word
   this.index = index; // use to map this node to its word or clue
+  this.visible = visible;
 }
 
-module.exports.Crossword = function Crossword(words_in, clues_in){
+module.exports.Crossword = function Crossword(questions){
   var GRID_ROWS = 25;
   var GRID_COLS = 25;
   // This is an index of the positions of the char in the crossword (so we know where we can potentially place words)
@@ -64,7 +66,7 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
       }
 
       if(canPlaceWordAt(word_element.word, r, c, start_dir) !== false){
-        placeWordAt(word_element.word, word_element.index, r, c, start_dir);
+        placeWordAt(word_element.word, word_element.index, r, c, start_dir, word_element.visible);
       } else {
         bad_words = [word_element];
         return null;
@@ -88,7 +90,7 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
             groups[g+1].push(word_element);
           } else {
             var r = best_position["row"], c = best_position["col"], dir = best_position['direction'];
-            placeWordAt(word_element.word, word_element.index, r, c, dir);
+            placeWordAt(word_element.word, word_element.index, r, c, dir, word_element.visible);
             word_has_been_added_to_grid = true;
           }
         }
@@ -171,7 +173,7 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
   }
 
   // helper for placeWordAt();
-  var addCellToGrid = function(word, index_of_word_in_input_list, index_of_char, r, c, direction){
+  var addCellToGrid = function(word, index_of_word_in_input_list, index_of_char, r, c, direction, visible){
     var char = word.charAt(index_of_char);
     if(grid[r][c] == null){
       grid[r][c] = new CrosswordCell(char);
@@ -184,20 +186,20 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
     }
 
     var is_start_of_word = index_of_char == 0;
-    grid[r][c][direction] = new CrosswordCellNode(is_start_of_word, index_of_word_in_input_list);
+    grid[r][c][direction] = new CrosswordCellNode(is_start_of_word, index_of_word_in_input_list, visible);
 
   }
 
   // place the word at the row and col indicated (the first char goes there)
   // the next chars go to the right (across) or below (down), depending on the direction
-  var placeWordAt = function(word, index_of_word_in_input_list, row, col, direction){
+  var placeWordAt = function(word, index_of_word_in_input_list, row, col, direction, visible){
     if(direction == "across"){
       for(var c = col, i = 0; c < col + word.length; c++, i++){
-        addCellToGrid(word, index_of_word_in_input_list, i, row, c, direction);
+        addCellToGrid(word, index_of_word_in_input_list, i, row, c, direction, visible);
       }
     } else if(direction == "down"){
       for(var r = row, i = 0; r < row + word.length; r++, i++){
-        addCellToGrid(word, index_of_word_in_input_list, i, r, col, direction);
+        addCellToGrid(word, index_of_word_in_input_list, i, r, col, direction, visible);
       }
     } else {
       throw "Invalid Direction";
@@ -341,8 +343,8 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
       }
 
       // constructor
-      if(words_in.length < 2) throw "A crossword must have at least 2 words";
-      if(words_in.length != clues_in.length) throw "The number of words must equal the number of clues";
+      if(questions.length < 2) throw "A crossword must have at least 2 words";
+      //if(words_in.length != clues_in.length) throw "The number of words must equal the number of clues";
 
       // build the grid;
       var grid = new Array(GRID_ROWS);
@@ -352,8 +354,8 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
 
       // build the element list (need to keep track of indexes in the originial input arrays)
       var word_elements = [];
-      for(var i = 0; i < words_in.length; i++){
-        word_elements.push(new WordElement(words_in[i], i));
+      for(var i = 0; i < questions.length; i++){
+        word_elements.push(new WordElement(questions[i].answer, i, questions[i]));
       }
 
       // I got this sorting idea from http://stackoverflow.com/questions/943113/algorithm-to-generate-a-crossword/1021800#1021800
@@ -409,9 +411,10 @@ module.exports.Crossword = function Crossword(words_in, clues_in){
             console.log(show_answers);
             if(show_answers) {
               html.push(char);
-            } else if(cell !== null) {
+            } else if(cell && ((cell.across && cell.across.visible.visible) || (cell.down && cell.down.visible.visible))) {
               //                    html.push("&nbsp;");
               //html.push("<input tabindex=\"-1\" maxlength=\"1\">");
+              html.push(char);
             }
           }
           html.push("</tr>");
