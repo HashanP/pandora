@@ -5,6 +5,9 @@ pandora
 
 The world's most advanced V.L.E. - Version 2.0
 
+Contributions
+---
+
 Hashan Punchihewa - Programmer
 
 Joseph Bills - Tester
@@ -24,7 +27,10 @@ Features
  - Radio buttons
  - Checkboxes
  - Performance Graphs
- - Vocabulary Quizzes
+- Vocabulary Quizzes
+ - Short Format
+ - Long Format
+ - Crosswords
 - Student Pane
  - Email Students 
  - Random Name Generator 
