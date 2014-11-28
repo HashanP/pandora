@@ -5,6 +5,9 @@ pandora
 
 The world's most advanced V.L.E. - Version 2.0
 
+Contributions
+---
+
 Hashan Punchihewa - Programmer
 
 Joseph Bills - Tester
