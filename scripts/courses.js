@@ -519,8 +519,8 @@ OptionAttempt.prototype.templateSync = require("../views/option.mustache");
 function QuestionAttempt() {
 	achilles.View.call(this, document.createElement("div"));
 	this.define("model", models.QuestionAttempt);
-//	this.bind(".answer_text", "answer_text");
-//	this.bind(".answer_number", "answer_number");
+  this.bind(".answer_text", "answer_text");
+ 	this.bind(".answer_number", "answer_number");
 	this.bind(".answer_fill", "answer_fill");
 	this.delegate(".options", "options", new achilles.Collection(OptionAttempt));
 }
