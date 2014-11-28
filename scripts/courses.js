@@ -331,8 +331,12 @@ function Crossword(el, options) {
 	});
 	this.correct = {};
 	if(this.model.questions.length > 2) {
-		this.cw = new c.Crossword(this.model.questions);
-		this.grid = this.cw.getSquareGrid(1000);
+		var additional = 0;
+		while((this.grid === null || this.grid === undefined) && additional < 100) {
+			this.cw = new c.Crossword(this.model.questions, additional);
+			this.grid = this.cw.getSquareGrid(10);
+			additional += 5;
+		}
 	}
 	this.on("click .start", this.start.bind(this));
 	this.on("click .enter", this.enter.bind(this));
@@ -373,6 +377,7 @@ Crossword.prototype.render = function() {
 	} else if(this.grid === null) {
 		 this.el.querySelector(".crossword").innerHTML = "<p class=\"text-warning\">The answers do not fit the grid. Sorry. Bad words: " + this.cw.getBadWords().map(function(x){return x.word}).join(", ") + "</p>";
 	} else {
+		console.log(this.grid);
 		this.el.querySelector(".crossword").innerHTML = c.utils.toHtml(this.grid);
 	}
 };
