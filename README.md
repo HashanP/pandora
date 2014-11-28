@@ -24,7 +24,10 @@ Features
  - Radio buttons
  - Checkboxes
  - Performance Graphs
- - Vocabulary Quizzes
+- Vocabulary Quizzes
+ - Short Format
+ - Long Format
+ - Crosswords
 - Student Pane
  - Email Students 
  - Random Name Generator 
