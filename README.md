@@ -16,11 +16,12 @@ Oliver Croysdill - Icons
 
 Features
 ---
-- Flexible Content Editor
- - Rich Text
+- Content Editor
+ - Rich Text Editor
  - LaTeX
  - Images
  - YouTube
+- Blogs 
 - Quizzes
  - Multiple Answers
  - Multiple Choice 
