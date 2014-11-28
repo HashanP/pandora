@@ -2,35 +2,50 @@
   <div class="col-md-3 col-md-offset-9">
 	<div class="pull-right">
 	  <div class="btn-group">
-		<button type="button" class="grid btn btn-primary active">Grid</button>
-		<button type="button" class="list btn btn-primary">List</button>
+		<button type="button" class="grid btn btn-primary {{#grid}}active{{/grid}}">Grid</button>
+		<button type="button" class="list btn btn-primary {{^grid}}active{{/grid}}">List</button>
 	  </div>
-	  <a href="/create" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+	  {{#admin}}
+	  	<a href="/create" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+	  {{/admin}}
 	</div>
   </div>
 </div>
-<div class="row">
+<div class="row courses">
+  {{^data}}
+
+    <div class="col-md-12">
+    <div class="alert alert-info" role="alert">No courses have been allocated to you yet.</div>
+    </div>
+  {{/data}}
   {{#grid}}
+  <div class="block-grid-xl-6 block-grid-lg-5 block-grid-sm-4 block-grid-xs-2">
+
 	{{#data}}
-	  <div class="icon col-sm-6 col-md-3">
-		<a href="/course/{{_id}}/blog">
-		  <img src="/icons/{{icon}}.png" alt="{{icon}}">
-		</a>
-	  </div>
+  	  <div class="block-grid-item icon">
+    		<a href="/courses/{{_id}}/blog">
+    		  <img src="/icons/{{icon}}.png" alt="{{icon}}">
+    		</a>
+  	  </div>
 	{{/data}}
-	{{^data}}
-	  <div class="col-md-12">
-		<div class="alert alert-info" role="alert">No courses have been allocated to you yet.</div>
-	  </div>
-	{{/data}}
+</div>
+
   {{/grid}}
   {{^grid}}
+  <div class="row">
+
 	<div class="col-sm-12 col-md-12">
-	  <ul class="list-group">
+	  <div class="panel panel-primary">
+	    <div class="panel-heading">Courses</div>
+	    <ul class="list-group">
 		{{#data}}
-		  <li class="list-group-item">{{title}}</li>
+		  <li class="list-group-item">
+		    <a href="/courses/{{_id}}/blog">{{title}}</a>
+		  </li>
 		{{/data}}
-	  </ul>
+	    </ul>
+	  </div>
 	</div>
+</div>
   {{/grid}}
 </div>

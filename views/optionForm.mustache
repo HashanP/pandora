@@ -1,0 +1,21 @@
+  <div class="row">
+    <div class="col-md-12">
+    {{#model.container.container}}
+      <div class="input-group">
+      {{^isSimple}}
+          <span class="input-group-addon">
+            <input type="{{answer_type}}" name="option" class="correct">
+          </span>
+          <input type="text" class="form-control title">
+      {{/isSimple}}
+      {{#isSimple}}
+        <input type="{{answer_type}}" class="form-control title">
+      {{/isSimple}}
+        <span class="input-group-addon">
+          <a class="remove"><i class="fa fa-times"></i></a>
+        </span>
+      </div>
+    {{/model.container.container}}
+  </div>
+</div>
+</div>

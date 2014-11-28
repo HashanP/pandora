@@ -5,28 +5,25 @@ var hogan = require("hogan.js");
 var fs = require("fs");
 var serveStatic = require("serve-static");
 var bodyParser = require("body-parser");
-var cookieParser = require("cookie-parser");
-var session = require("express-session");
 var models = require("./models");
 var browserify = require("browserify-middleware");
-
-require.extensions[".mustache"] = function(module, filename) {
-	var template = hogan.compile(fs.readFileSync(filename).toString());
-	module.exports = function(data) {
-		return template.render(data);
-	};
-};
+var morgan = require("morgan");
+var oauthserver = require('node-oauth2-server');
+var compression = require('compression');
+var xl = require("excel4node");
 
 var mongodb = require("achilles-mongodb");
 
 var secrets = require("./config/secrets");
 
-achilles.User.connection
+models.User.connection
 = models.Course.connection
 = new mongodb.Connection(secrets.db);
 
 var app = new express();
 
+app.use(compression());
+app.use(morgan("short"));
 app.use(serveStatic("./public", {
 	extensions: ["html"]
 }));
@@ -34,49 +31,148 @@ app.use(bodyParser.urlencoded({
 	extended:true
 }));
 app.use(bodyParser.json());
-app.use(cookieParser("fsfds"));
-app.use(session({
- cookie : {
-    maxAge: 3600000 // see below
-  }
-}));
-app.use("/scripts", browserify("./scripts", {
-	transform:["browserify-mustache"]
+app.use("/scripts/courses.js", browserify("./scripts/courses.js", {
+	transform:["browserify-mustache"],
+	precompile:true
 }));
 
-app.post("/login", function(req, res, cb) {
-	achilles.User.login(req.body.username, req.body.password, function(err, user) {
-		if(err) {
-			return cb(err);
-		} else if(!user) {
-			res.redirect("/login");
+var tokens = {};
+
+var oauthConfig = {
+	model: {
+		getAccessToken: function(bearerToken, cb) {
+			if(!(bearerToken in tokens)) {
+				cb(true);
+			} else {
+				cb(null, {
+					expires:null,
+					userId: tokens[bearerToken]
+				});
+			}
+		},
+		getClient: function(clientId, clientSecret, cb) {
+			if(clientId === "000000") {
+				cb(null, {clientId:clientId});
+			} else {
+				cb(true);
+			}
+		},
+		grantTypeAllowed: function(clientId, grantType, cb) {
+			if(clientId === "000000" && grantType === "password") {
+				cb(null, {allowed:true});
+			} else {
+				cb(null, {allowed:false});
+			}
+		},
+		saveAccessToken: function(accessToken, clientId, expires, user, cb) {
+			tokens[accessToken] = user;
+			cb();
+		},
+		getUser: function(username, password, cb) {
+			achilles.User.login(username, password, function(err, user) {
+				if(err) {
+					return cb(err);
+				} else if(!user) {
+					return cb(err);
+				} else {
+					user.id = user._id;
+					cb(null, user);
+				}
+			});
+		}
+	},
+	grants: ['password'],
+	debug: true,
+	accessTokenLifetime:null
+};
+
+if(process.env.REDISCLOUD_URL) {
+	var redis = require("redis-url");
+
+	var client = redis.connect(process.env.REDISCLOUD_URL);
+
+	oauthConfig.saveAccessToken = function(accessToken, clientId, expires, user, cb) {
+		client.setex("accessToken:" + accessToken, 3600, user.toJSON(), cb);
+	};
+
+	oauthConfig.getAccessToken = function(bearerToken, cb) {
+		client.get("accessToken:" + bearerToken, function(err, str) {
+			if(!str) {
+				cb(true);
+			} else {
+				cb(null, {
+					expires:null,
+					userId: JSON.parse(str)
+				});
+			}
+		});
+	};
+}
+
+app.oauth = oauthserver(oauthConfig);
+
+app.get("/courses(*)", function(req, res) {
+	res.sendFile("public/index.html", {root:__dirname});
+});
+
+app.all('/oauth/token', app.oauth.grant());
+app.use(app.oauth.authorise());
+
+app.use(function(req, res, next) {
+	req.user = req.user.id;
+	next();
+});
+
+app.get("/userinfo", function(req, res) {
+	res.json(req.user.toJSON());
+});
+
+app.post("/userinfo/changePassword", function(req, res, next) {
+	req.user.comparePassword(req.body.oldPassword, function(err, isMatch) {
+		if(isMatch) {
+			req.user.password = req.body.newPassword;
+			req.user.save(function(err) {
+				if(err) {
+					return next(err);
+				}
+				res.end();
+			});
 		} else {
-			req.session.user = user.toJSON();
-			res.redirect("/");
+			next(new Error("Incorrect old password."));
 		}
 	});
 });
 
-app.all("*", function(req, res, cb) {
-	if(req.session.user) {
-		cb();
-	} else {
-		res.redirect("/login");
-	}
+app.use("/api", new achilles.Service(models.Course));
 
+app.get("/api/:id/students", function(req, res, next) {
+	models.User.get({where: {roles:{$in:["Course:get:" + req.params.id], $nin:["Course:put:" + req.params.id]}}, keys: "name"}, function(err, users) {
+		if(err) {
+			return next(err);
+		}
+		console.log(users);
+		res.end(JSON.stringify(users.map(function(e) {return e.toJSON()})));
+	}.bind(this));
 });
 
-var courses = require("./views/courses.mustache");
-
-app.get("/", function(req, res, cb) {
-	if(!req.xhr) {
-		res.end(courses());
-	} else {
-		cb();
-	}
+app.get("/api/:id/students.xlsx", function(req, res, next) {
+	models.User.get({where: {roles:{$in:["Course:get:" + req.params.id], $nin:["Course:put:" + req.params.id]}}, keys: "name"}, function(err, users) {
+		if(err) {
+			return next(err);
+		}
+		var wb = new xl.WorkBook();
+		var header = wb.Style();
+		header.Font.Bold();
+		var ws = wb.WorkSheet("Students");
+		ws.Cell(1,1).String("Username").Style(header);
+		users.forEach(function(user, i) {
+			ws.Cell(i + 2, 1).String(user.name);
+		});
+		wb.write("students.xlsx", res);
+	}.bind(this));
 });
 
-app.use("/courses", new achilles.Service(models.Course));
+app.use("/users", new achilles.Service(achilles.User));
 
 app.set("port", process.env.PORT || 5000);
 

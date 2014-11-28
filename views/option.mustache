@@ -1,0 +1,6 @@
+{{#model}}
+  <div class="col-md-12">
+    <input type="{{container.container.question.answer_type}}" class="correct" {{#container.container._id}}disabled{{/container.container._id}} name="question{{container.container.question.number}}" {{#correct}}selected{{/correct}}/>
+    {{title}}
+  </div>
+{{/model}}

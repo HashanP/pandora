@@ -1,0 +1,59 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">
+	Vocabulary Quizzes
+	<div class="pull-right">
+	  <a href="/courses/{{id}}/vocab_quizzes">
+		<i class="fa fa-times"></i>
+	  </a>
+	</div>
+  <a class="btn btn-info btn-xs import pull-right">Import from Hot Potatoes</a>
+
+  </div>
+  <div class="panel-body">
+	{{#error}}
+	  <div class="alert alert-warning" role="alert">
+		{{error}}
+	  </div>
+	{{/error}}
+	<form>
+    {{#model._id}}
+	   <h1>Edit Vocabulary Quiz</h1>
+    {{/model._id}}
+    {{^model._id}}
+     <h1>Create New Vocabulary Quiz</h1>
+    {{/model._id}}
+	  <div class="form-group">
+  		<label>Title</label>
+  		<input type="text" class="form-control title" placeholder="Amazing Vocabulary Quiz Title">
+	  </div>
+    <div class="form-group">
+      <label>Format</label>
+      <select class="form-control type">
+        <option value="short">Short</option>
+        <option value="long">Long</option>
+        <option value="crossword">Crossword</option>
+      </select>
+    </div>
+	  <div class="form-group">
+		<table class="table table-condensed">
+		  <thead>
+			<tr>
+			  <th>Question</th>
+			  <th>Answer</th>
+			</tr>
+		  </thead>
+		  <tbody class="questions">
+		  </tbody>
+		</table>
+    <a class="btn btn-xs btn-primary create-question"><i class="fa fa-plus"></i> Question</a>
+  </div>
+
+    <div>
+      <p class="text-info">ProTip: Use long format when there will be long questions.</p>
+      <p class="text-info">ProTip: If there is more that one possible answer, seperate all possible answers by commas.</p>
+    </div>
+	  <button class="btn btn-primary submit" type="button">Submit</button>
+	  <button type="reset" class="btn reset">Reset</button>
+	</form>
+  </div>
+</div>

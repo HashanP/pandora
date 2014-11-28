@@ -7,12 +7,24 @@
   </div>
   <div class="panel-body">
 	<form>
-	  {{#fields}}
 		<div class="form-group">
-		  <label>{{title}}</label>
-		  <input type="{{type}}" class="form-control control-{{key}}">
+		  <label>Title</label>
+		  <input type="text" class="form-control field-title" placeholder="11a/Fr1">
 		</div>
-	  {{/fields}}
+    <div class="form-group">
+      <label>Icon</label>
+      <select class="form-control field-icon">
+        <option value="French">French</option>
+        <option value="Computing">Computing</option>
+        <option value="Latin">Latin</option>
+        <option value="Mathematics">Maths</option>
+        <option value-"Art">Art</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Physics">Physics</option>
+        <option value="English">English</option>
+        <option value="Geography">Geography</option>
+      </select>
+    </div>
 	  <button class="btn btn-primary submit">Submit</button>
 	  <button type="reset" class="btn reset">Reset</button>
 	</form>

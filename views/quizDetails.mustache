@@ -1,0 +1,61 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">
+  Quizzes
+    <div class="pull-right">
+      <a href="/courses/{{id}}/quizzes">
+      <i class="fa fa-times"></i>
+      </a>
+    </div>
+  </div>
+  <div class="panel-body">
+    {{#model}}
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <h1>{{title}}</h1>
+        </div>
+      </div>
+      {{#can.put}}
+        <div class="row">
+          <div class="col-md-12">
+            <a href="/courses/{{id}}/quizzes/{{index}}/edit" class="btn btn-warning btn-sm">Edit</a>
+            <button type="button" class="btn btn-danger btn-sm del">Delete</button>
+            <a href="/courses/{{id}}/quizzes/{{index}}/graph" class="btn btn-info btn-sm">Performance Graph</a>
+            <a href="/courses/{{id}}/quizzes/{{index}}/results" class="btn btn-info btn-sm">Results</a>
+          </div>
+        </div>
+      {{/can.put}}
+      <div class="row">
+        <div class="col-md-12">
+          Total Questions: {{questions.length}}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h3>Previous Attempts</h3>
+          {{^myAttempts}}
+            You have not attempted this quiz yet.
+          {{/myAttempts}}
+          {{#myAttempts.length}}
+            <table class="table">
+              <tr>
+                <th>Previous Attempts</th>
+                <th>Score</th>
+              </tr>
+
+              {{#myAttempts}}
+                <tr>
+                  <td>{{date}}</td>
+                  <td>{{score}}</td>
+                  <td><a href="/courses/{{id}}/quizzes/{{model.index}}/attempts/{{index}}" class="btn btn-info btn-sm">Review</a></td>
+                </tr>
+              {{/myAttempts}}
+            </table>
+          {{/myAttempts.length}}
+       </div>
+       <div class="col-md-offset-5 col-md-2 text-center">
+         <a href="/courses/{{id}}/quizzes/{{index}}/attempt" class="btn btn-success">Attempt Quiz</a>
+        </div>
+      </div>
+    {{/model}}
+  </div>
+</div>

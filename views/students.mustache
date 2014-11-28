@@ -1,0 +1,11 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Students
+    <a class="btn btn-info btn-xs pull-right" href="/api/{{id}}/students.xlsx?access_token={{api_key}}">Export as Excel</a>
+  </div>
+  <ul class="list-group">
+    {{#model}}
+      <li class="list-group-item"><a href="mailto:{{name}}@whsb.essex.sch.uk">{{name}}</a></li>
+    {{/model}}
+  </ul>
+</div>

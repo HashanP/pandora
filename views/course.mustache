@@ -1,36 +1,44 @@
 <div class="row">
-  {{#data}}
-	<div class="col-md-3">
-	  <div class="panel panel-default">
-		<div class="panel-heading">{{title}}</div>
-		<ul class="list-group">
-		  <li class="list-group-item {{#blog}}active{{/blog}}">
-			<a href="/course/{{_id}}/blog">Blog</a>
-		  </li>
-		  <li class="list-group-item {{#vocab_quizzes}}active{{/vocab_quizzes}}">
-			<a href="/course/{{_id}}/vocab_quizzes">Vocabulary Quizzes</a>
-		  </li>
-		  <li class="list-group-item {{#quizzes}}active{{/quizzes}}">
-			<a href="/course/{{_id}}/quizzes">Quizzes</a>
-		  </li>
-		  <li class="list-group-item {{#uploads}}active{{/uploads}}">
-			<a href="/course/{{_id}}/uploads">File Uploads</a>
-		  </li>
-		  <li class="list-group-item {{#downloads}}active{{/downloads}}">
-			<a href="/course/{{_id}}/downloads">File Downloads</a>
-		  </li>
-		</ul>
-	  </div>
-	</div>
-	<div class="col-md-9 course">
-	  <div class="panel panel-danger">
-		<div class="panel-heading">
-		  <h3 class="panel-title">Error</h3>
-		</div>
-		<div class="panel-body">
-		  404 Not Found
-		</div>
-	  </div>
-	</div>
-  {{/data}}
+  <div class="col-sm-3 col-xs-12">
+    <div class="panel panel-default">
+    <div class="panel-heading">{{data.title}}</div>
+    <ul class="list-group subbar">
+      <!--<li>
+        <img class="course-icon" src="/icons/{{data.icon}}.png">
+      </li>-->
+      <li class="list-group-item {{#blog}}active{{/blog}}">
+        <a href="/courses/{{data._id}}/blog"><i class="fa fa-comment fa-fw"></i> Blog</a>
+      </li>
+      <li class="list-group-item {{#vocab_quizzes}}active{{/vocab_quizzes}}">
+        <a href="/courses/{{data._id}}/vocab_quizzes"><i class="fa fa-question fa-fw"></i> Vocabulary Quizzes</a>
+      </li>
+      <li class="list-group-item {{#quizzes}}active{{/quizzes}}">
+        <a href="/courses/{{data._id}}/quizzes"><i class="fa fa-trophy fa-fw"></i> Quizzes</a>
+      </li>
+      <!--<li class="list-group-item {{#uploads}}active{{/uploads}}">
+        <a href="/courses/{{data._id}}/uploads"><i class="fa fa-upload fa-fw"></i> File Uploads</a>
+      </li>
+      <li class="list-group-item {{#downloads}}active{{/downloads}}">
+        <a href="/courses/{{data._id}}/downloads"><i class="fa fa-download fa-fw"></i> File Downloads</a>
+      </li>-->
+      <li class="list-group-item {{#students}}active{{/students}}">
+        <a href="/courses/{{data._id}}/students"><i class="fa fa-graduation-cap fa-fw"></i> Students</a>
+      </li>
+      <li class="list-group-item {{#randomNameGenerator}}active{{/randomNameGenerator}}">
+        <a href="/courses/{{data._id}}/randomNameGenerator"><i class="fa fa-sort fa-fw"></i> Random Name Generator</a>
+      </li>
+      {{#can.del}}
+      <li class="list-group-item {{#settings}}active{{/settings}}">
+        <a href="/courses/{{data._id}}/settings"><i class="fa fa-cog fa-fw"></i> Settings</a>
+      </li>
+      {{/can.del}}
+      {{#data.links}}
+      <li class="list-group-item">
+        <a href="{{url}}" target="_blank"><i class="fa fa-external-link fa-w"></i> {{title}}</a>
+      </li>
+      {{/data.links}}
+    </ul>
+    </div>
+  </div>
+  <div class="course col-sm-9 col-xs-12"></div>
 </div>

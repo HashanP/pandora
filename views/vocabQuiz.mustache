@@ -1,33 +1,29 @@
 <div class="panel panel-primary">
   <div class="panel-heading">
 	Vocabulary Quizzes
-	<div class="pull-right">
-	  <a href="/course/{{id}}/vocab_quizzes">
-		<i class="fa fa-times"></i>
-	  </a>
-	</div>
+  	<div class="pull-right">
+  	  <a href="/courses/{{id}}/vocab_quizzes">
+  		<i class="fa fa-times"></i>
+  	  </a>
+  	</div>
   </div>
   <div class="panel-body">
 	{{#data}}
     <div class="row">
-      <div class="col-md-offset-7 col-md-1">
-        <a href="/course/{{id}}/vocab_quizzes/{{index}}/edit" class="btn btn-sm btn-warning pull-right">Edit</a>
-      </div>
-      <div class="col-md-1">
-        <button type="button" class="btn btn-sm btn-danger pull-right del">Delete</button>
-      </div>
-      <div class="col-md-1">
+      <div class="col-md-12">
+        {{#can.put}}
+          <a href="/courses/{{id}}/vocab_quizzes/{{index}}/edit" class="btn btn-sm btn-warning">Edit</a>
+          <button type="button" class="btn btn-sm btn-danger del">Delete</button>
+        {{/can.put}}
         <button type="button" class="btn btn-sm btn-primary reset">Reset</button>
-      </div>
-      <div class="col-md-2">
         <button type="button" class="btn btn-sm btn-primary answers">Reveal Answers</button>
       </div>
     </div>
 	  <h1>{{title}}</h1>
-	  <div class="row vocab-quiz">
+	  <div class="row vocab-quiz {{#long}}vocab-quiz-long{{/long}}">
 		{{#questions}}
-		  <div class="col-md-2">{{question}}</div>
-		  <input type="text" class="col-md-2" data-answer="{{answer}}">
+		  <div class="col-xs-6 col-sm-6{{^long}} col-md-3 col-lg-2{{/long}}">{{question}}</div>
+		  <input type="text" class="col-xs-6 col-sm-6{{^long}} col-md-3 col-lg-2{{/long}}" data-answer="{{answer}}">
 		{{/questions}}
 	  </div>
 	{{/data}}

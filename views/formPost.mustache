@@ -2,7 +2,7 @@
   <div class="panel-heading">
 	Blog
 	<div class="pull-right">
-	  <a href="/course/{{id}}/blog">
+	  <a href="/courses/{{id}}/blog">
 		<i class="fa fa-times"></i>
 	  </a>
 	</div>
@@ -14,10 +14,15 @@
 	  </div>
 	{{/error}}
 	<form>
-	  <h1>Create New Post</h1>
+    {{#model._id}}
+	  <h1>Edit Post</h1>
+    {{/model._id}}
+    {{^model._id}}
+    <h1>Create New Post</h1>
+    {{/model._id}}
 	  <div class="form-group">
 		<label>Title</label>
-		<input type="text" value="{{model.title}}" class="form-control title" placeholder="Amazing Blog Post Title">
+		<input type="text" class="form-control title" placeholder="Amazing Blog Post Title">
 	  </div>
 	  <div class="form-group">
 		<label>Content</label>

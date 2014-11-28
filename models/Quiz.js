@@ -1,58 +1,167 @@
 var util = require("util");
 var achilles = require("achilles");
 var Content = require("./Content");
-
-function QuestionAttempt() {
-	achilles.Model.call(this);
-
-	this.define("question", String); // refers to question
-	this.define("answer_type", String); // "text", "number", "radio", "checkbox"
-	this.define("answer_text", String);
-	this.define("answer_number", Number);
-	this.define("answer_radio", String);
-	this.define("answer_checkbox", [String]);
-}
-
-util.inherits(QuestionAttempt, achilles.Model);
-
-
-function QuizAttempt() {
-	achilles.Model.call(this);
-
-	this.ref("user", achilles.User);
-	this.define("question", [QuestionAttempt]);
-}
-
-util.inherits(QuizAttempt, achilles.Model);
+var Option = require("./Option");
 
 function Question() {
 	achilles.Model.call(this);
 
 	this.define("content", Content);
-	this.define("answer_type", String); // "text", "number", "radio", "checkbox"
-	this.define("answer_text", String);
-	this.define("answer_number", Number);
-	this.define("answer_radio", String);
-	this.define("answer_checkbox", [String]);
-	this.define("options", [String]);
+	this.define("answer_type", String); // "text", "number", "radio", "checkbox", "fill_the_gaps"
+	this.define("answer_fill", String); // "text", "number", "radio", "checkbox", "fill_the_gaps"
+	this.define("options", [Option]);
 	this.options = [];
 
+	Object.defineProperty(this, "number", {
+		get: function() {
+			return this.index + 1;
+		}
+	});
+
+	Object.defineProperty(this, "isSimple", {
+		get: function() {
+			return this.answer_type === "text" || this.answer_type === "number";
+		}
+	});
+
+	Object.defineProperty(this, "isNumber", {
+		get: function() {
+			return this.answer_type === "number";
+		}
+	});
+
+	Object.defineProperty(this, "isText", {
+		get: function() {
+			return this.answer_type === "text";
+		}
+	});
+
+	Object.defineProperty(this, "isFill", {
+		get: function() {
+			return this.answer_type === "fill_the_gaps";
+		}
+	});
+
+	Object.defineProperty(this, "fill", {
+		get: function() {
+			return this.answer_fill.replace(/\[.*\]/g, function(match) {
+				return "<input class=\"answer_fill\" type=\"text\">";
+			});
+		}
+	});
+
+	Object.defineProperty(this, "answer", {
+		get: function() {
+				if(this.isSimple) {
+					return this.options.map(function(option) {
+						return option.title;
+					}).join(", ");
+				} else {
+					return this.options.filter(function(option) {
+						return option.correct;
+					}).map(function(option) {
+						return option.title;
+					}).join(", ");
+				}
+		}
+	});
+
 	this.answer_type = "text";
-	this.on("change:answer_type", this.delAnswer.bind(this));
+	this.content = new Content();
 }
 
 util.inherits(Question, achilles.Model);
 
-Question.prototype.delAnswer = function() {
-	this.answer_text = null;
-	this.answer_number = null;
-	this.answer_radio = null;
-	this.answer_checkbox = null;
+module.exports.Question = Question;
 
-	if(this.answer_type !== "radio" || this.answer_type !== "checkbox") {
-		this.options = [];
-	}
-};
+function QuestionAttempt() {
+	achilles.Model.call(this);
+
+	this.define("questionId", String); // refers to question
+	this.define("answer_text", String);
+	this.define("answer_number", Number);
+	this.define("answer_fill", [String]);
+	this.define("options", [Option]);
+
+	Object.defineProperty(this, "correct", {
+		get: function() {
+			if(!this.question) {
+				this.question = this.container.container.container.container.questions[this.index];
+			}
+			var i = 0;
+			if(this.question.answer_type === "fill_the_gaps") {
+				console.log(this.answer_fill);
+				return this.answer_fill = this.question.answer_fill.match(/\[.*\]/g).map(function(m) {
+					return m.substring(1, m.length-1);
+				});
+			}
+			if(this.question.answer_type === "text") {
+				if(this.answer_text === undefined) {
+					return false;
+				}
+				for(i = 0; i < this.question.options.length; i++) {
+					console.log(this.question.options[i].title);
+					console.log(this.answer_text);
+					if(this.question.options[i].title.toLowerCase() === this.answer_text.toLowerCase()) {
+						return true;
+					}
+				}
+				return false;
+			} else if(this.question.answer_type === "number") {
+				if(this.answer_number === undefined) {
+					return false;
+				}
+				for(i = 0; i < this.question.options.length; i++) {
+					if(this.question.options[i].title === this.answer_number.toString()) {
+						return true;
+					}
+				}
+				return false;
+			} else {
+				if(this.options === undefined) {
+					return false;
+				}
+				console.log(this.options);
+				for(i = 0; i < this.question.options.length; i++) {
+					if(!this.question.options[i].correct !== !this.options[i].correct) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+	});
+}
+
+util.inherits(QuestionAttempt, achilles.Model);
+
+module.exports.QuestionAttempt = QuestionAttempt;
+
+function QuizAttempt() {
+	achilles.Model.call(this);
+
+	this.ref("user", achilles.User);
+	this.define("questions", [QuestionAttempt]);
+	this.define("date", Date);
+
+	this.questions = [];
+
+	Object.defineProperty(this, "score", {
+		get: function() {
+			var i = 0;
+			this.questions.forEach(function(question) {
+				if(question.correct) {
+					i++;
+				}
+			}.bind(this));
+			return i;
+		}
+	});
+}
+
+util.inherits(QuizAttempt, achilles.Model);
+
+module.exports.QuizAttempt = QuizAttempt;
 
 function Quiz() {
 	achilles.Model.call(this);
@@ -63,8 +172,9 @@ function Quiz() {
 	this.define("attempts", [QuizAttempt]);
 
 	this.questions = [];
+	this.attempts = [];
 }
 
 util.inherits(Quiz, achilles.Model);
 
-module.exports = Quiz;
+module.exports.Quiz = Quiz;

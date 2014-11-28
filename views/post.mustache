@@ -2,7 +2,7 @@
   <div class="panel-heading">
 	Blog
 	<div class="pull-right">
-	  <a href="/course/{{id}}/blog">
+	  <a href="/courses/{{id}}/blog">
 		<i class="fa fa-times"></i>
 	  </a>
 	</div>
@@ -10,18 +10,18 @@
   {{#data}}
 	<div class="panel-body">
 	  <div class="row">
-		<div class="col-md-offset-10 col-md-1">
-		  <button type="button" class="btn btn-sm btn-warning del">Delete</button>
-		</div>
-		<div class="col-md-1">
-		  <a href="/course/{{id}}/blog/{{index}}/edit" class="btn btn-sm btn-info">Edit</a>
-		</div>
-	  </div>  
+    {{#can.put}}
+  		<div class="col-md-12">
+  			<a href="/courses/{{id}}/blog/{{index}}/edit" class="btn btn-sm btn-warning">Edit</a>
+  			<button type="button" class="btn btn-sm btn-danger del">Delete</a>
+  		</div>
+    {{/can.put}}
+	  </div>
 	  <h1>{{title}}</h1>
 	  <div class="blog-post-meta">
 		<i class="fa fa-clock-o"></i> Posted on {{date}}
 	  </div>
-	  <p>{{& content.html}}
+	  <p class="post post-{{content.type}}">{{& content.html}}
 	</div>
   {{/data}}
   </ul>

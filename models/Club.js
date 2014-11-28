@@ -1,4 +1,4 @@
-var Course = require("./Course");
+var Course = require("./Course").Course;
 var util = require("util");
 
 function Club() {

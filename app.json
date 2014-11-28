@@ -13,6 +13,10 @@
     "postdeploy": "node models/createAdmin"
   },
   "addons": [
-    "mongolab"
-  ]
+    "mongolab",
+    "rediscloud"
+  ],
+  "env": {
+    "NODE_ENV":"production"
+  }
 }

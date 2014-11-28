@@ -1,9 +1,10 @@
 var util = require("util");
 var achilles = require("achilles");
 var Post = require("./Post");
-var Quiz = require("./Quiz");
+var Quiz = require("./Quiz").Quiz;
 var Content = require("./Content");
 var VocabQuiz = require("./VocabQuiz").VocabQuiz;
+var User = require("./User");
 
 function Page(title) {
 	achilles.Model.call(this);
@@ -26,6 +27,8 @@ function Link(title, url) {
 
 util.inherits(Link, achilles.Model);
 
+module.exports.Link = Link;
+
 function Course(title) {
 	achilles.Model.call(this);
 
@@ -36,16 +39,18 @@ function Course(title) {
 	this.define("vocabQuizzes", [VocabQuiz]);
 	this.define("links", [Link]);
 	this.define("pages", [Page]);
+	this.define("users", [User], {virtual:true});
 
 	this.posts = [];
 	this.quizzes = [];
 	this.vocabQuizzes = [];
 	this.links = [];
 	this.pages = [];
+	this.crosswords = [];
 
 	this.title = title;
 }
 
 util.inherits(Course, achilles.Model);
 
-module.exports = Course;
+module.exports.Course = Course;

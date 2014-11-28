@@ -22,12 +22,10 @@ var EditorController = function(el) {
 	this.on("keydown .editor-rich", this.reconfigure.bind(this)); // Reconfigure Editor Rich
 	this.on("click .open-tab", this.openTab.bind(this)); // Open Tab
 	this.on("change:model", this.setupModel.bind(this));
-
-	this.on("render", function() {
-		console.log(this.el);
-	}.bind(this));
+	this.on("click .image", this.image.bind(this));
 
 	this.bind(".editor-rich", "data");
+	this.bind(".editor-youtube", "data");
 	this.bind(".editor-mode", "type");
 	this.codebox = new CodeBox(CodeBox.Modes.LaTeX);
 	this.delegate(".editor-latex", "data", this.codebox);
@@ -45,17 +43,27 @@ EditorController.prototype.render = function() {
 	this.editorOpen = this.open_tab === "editor";
 	if(this.model) {
 		this.rich = this.model.type === "rich-text-editor";
+		this.latex = this.model.type === "latex";
+		this.youtube = this.model.type === "youtube";
 	}
 	achilles.View.prototype.render.call(this);
-	if(this.open_tab === "preview" && this.model.type === EditorModes.LaTeX) {
-		console.log("fsdfds");
-		console.log(this.model);
-		MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.el.querySelector(".preview")]);
-	}
 };
 
 EditorController.prototype.updateFont = function(e) {
 	document.execCommand("fontName", false, e.target.value);
+};
+
+EditorController.prototype.image = function() {
+	var fileEl = document.createElement("input");
+	fileEl.type = "file";
+	fileEl.addEventListener("change", function() {
+		var reader = new FileReader();
+		reader.addEventListener("load", function(e) {
+			document.execCommand("insertImage", true, e.target.result);
+		});
+		reader.readAsDataURL(fileEl.files[0]);
+	});
+	fileEl.click();
 };
 
 EditorController.prototype.updateFormat = function(e) {

@@ -1,0 +1,47 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+  {{#model._id}}Edit User{{/model._id}}
+  {{^model._id}}Create User{{/model._id}}
+  <div class="pull-right">
+    <a href="/users"><i class="fa fa-times"></i></a>
+  </div>
+  </div>
+  <div class="panel-body">
+  <form>
+    <div class="row">
+      <div class="col-md-2 col-md-offset-10">
+        <button type="button" class="btn btn-danger del pull-right">Delete</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" class="form-control name">
+    </div>
+    <div class="form-group">
+      <label>Admin</label>
+      <input type="checkbox" value="admin" class="role">
+    </div>
+    <div class="form-group">
+      <label>Permissions</label>
+      <div class="row">
+        <table class="table">
+          <tr>
+            <th>Course</th>
+            <th>Access</th>
+            <th>Edit</th>
+          </tr>
+          {{#courses}}
+            <tr>
+              <td>{{title}}</td>
+              <td><input type="checkbox" class="role" value="Course:get:{{_id}}"></td>
+              <td><input type="checkbox" class="role" value="Course:put:{{_id}}"></td>
+            </tr>
+          {{/courses}}
+        </table>
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary submit">Submit</button>
+    <button type="reset" class="btn reset">Reset</button>
+  </form>
+  </div>
+</div>

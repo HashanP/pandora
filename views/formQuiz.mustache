@@ -1,0 +1,44 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">
+  Quizzes
+  <div class="pull-right">
+    <a href="/courses/{{id}}/quizzes">
+    <i class="fa fa-times"></i>
+    </a>
+  </div>
+  </div>
+  <div class="panel-body">
+  {{#error}}
+    <div class="alert alert-warning" role="alert">
+    {{error}}
+    </div>
+  {{/error}}
+  <form>
+    {{#model._id}}
+    <h1>Edit Quiz</h1>
+    {{/model._id}}
+    {{^model._id}}
+    <h1>Create New Quiz</h1>
+    {{/model._id}}
+    {{#model}}
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" class="form-control title" placeholder="Amazing Quiz Title">
+      </div>
+      <div role="tabpanel">
+        <ul class="nav nav-tabs" role="tablist">
+          {{#questions}}
+            <li class="question button-{{index}}">
+              <a data-index="{{index}}">{{number}}</a>
+            </li>
+          {{/questions}}
+          <li class="add-question"><a><i class="fa fa-plus"></i></a></li>
+        </ul>
+        <div class="tab-content current_question"></div>
+      </div>
+      {{/model}}
+      <button class="btn btn-primary submit" type="button">Submit</button>
+      <button type="reset" class="btn reset">Reset</button>
+  </form>
+  </div>
+</div>
