@@ -1008,7 +1008,6 @@ var errorPage = require("../views/error.mustache");
 page(function(e,next) {
 	if(process.env.USER) {
 		document.body.classList.add("loggedIn");
-		ga('send', 'pageview', window.location.pathname);
 		next();
 	} else if(localStorage.getItem("access_token")) {
 		window.XMLHttpRequest.prototype.open = function() {
@@ -1026,7 +1025,6 @@ page(function(e,next) {
 				window.XMLHttpRequest.prototype.open = proxied;
 			} else {
 				process.env.USER = achilles.User.parse(body);
-				ga("set", "&uid", process.env.USER._id); // Set the user ID using signed-in user_id.
 				document.body.classList.add("loggedIn");
 				document.body.innerHTML = m({user:process.env.USER, admin: process.env.USER.roles.indexOf("admin") !== -1});
 				document.querySelector(".dropdown-toggle").addEventListener("click", function(e) {
