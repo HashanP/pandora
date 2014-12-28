@@ -43,10 +43,11 @@ if (Meteor.isClient) {
 
   Template.navbar.helpers({
     "username":function() {
+      console.log(Meteor.user());
       return Meteor.user().emails[0].address.split("@")[0];
     },
     "admin": function() {
-      return Meteor.user().roles.indexOf("admin") !== "admin";
+      return Meteor.user().roles.indexOf("admin") !== -1;
     }
   });
 
@@ -70,6 +71,11 @@ if (Meteor.isClient) {
     this.render("blog_list", {data: function() {
       return Courses.findOne(this.params.id);
     }});
+  });
+
+  Router.route("/logout", function() {
+    Meteor.logout();
+    this.redirect("/");
   });
 }
 
