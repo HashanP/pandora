@@ -667,14 +667,18 @@ body {
   width:100%;
 }
 
-.icon img:hover {
-  padding-top:30px;
-  padding-bottom:30px;
-  padding-left:30px;
-  padding-right:30px;
-  -webkit-transition-property: padding;
-  -webkit-transition-duration: 0.5s;
+@media (min-width: 768px) {
+  .icon img:hover {
+    padding-top:30px;
+    padding-bottom:30px;
+    padding-left:30px;
+    padding-right:30px;
+    -webkit-transition-property: padding;
+    -webkit-transition-duration: 0.5s;
+  }
 }
+
+
 
 .navbar ~ * {
   padding-top:50px;
