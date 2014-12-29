@@ -681,21 +681,200 @@ body {
 
 
 .navbar ~ * {
-  padding-top:50px;
+  padding-top:60px;
 }
 
 .st-container, .st-pusher, .st-menu {
   height:100%;
 }
 
+.grid, .st-content {
+  padding-top:20px;
+}
+
 .st-menu {
-  background-color:#48a770;
+  padding-top:10px;
+}
+
+.st-pusher {
+  position: relative;
+  left: 0;
+  z-index: 99;
+  height: 100%;
+  -webkit-transition: -webkit-transform 0.5s;
+  transition: transform 0.5s;
+}
+
+.st-pusher::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  background: rgba(0,0,0,0.2);
+  content: '';
+  opacity: 0;
+  -webkit-transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+  transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+}
+
+.st-menu-open .st-pusher::after {
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+}
+
+.st-menu {
+  /*position: absolute;
+  top: 0;
+  left: 0;*/
+  z-index: 100;
+  /*visibility: hidden;*/
+  height: 100%;
+  background: #48a770;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+.st-menu::after {
+  /*position: absolute;
+  top: 0;
+  right: 0;*/
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.2);
+  content: '';
+  opacity: 1;
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+}
+
+.st-menu-open .st-menu::after {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  -webkit-transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+  transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+}
+
+/* content style */
+
+.st-menu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .st-menu h2 {
-  color: rgba(0,0,0,0.4);
+  font-size: 2em;
+  padding: 1em;
 }
 
-.grid, .st-content {
-  padding-top:15px;
+.st-menu h2, .st-menu small {
+  font-weight: 300;
+  margin: 0;
+  color: rgba(0,0,0,0.4);
+  text-shadow: 0 0 1px rgba(0,0,0,0.1);
+}
+
+.st-menu ul li a {
+  display: block;
+  padding: 1em 1em 1em 1.2em;
+  outline: none;
+  box-shadow: inset 0 -1px rgba(0,0,0,0.2);
+  color: #f3efe0;
+  text-transform: uppercase;
+  text-shadow: 0 0 1px rgba(255,255,255,0.1);
+  letter-spacing: 1px;
+  font-weight: 400;
+  -webkit-transition: background 0.3s, box-shadow 0.3s;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.st-menu ul li:first-child a {
+  box-shadow: inset 0 -1px rgba(0,0,0,0.2), inset 0 1px rgba(0,0,0,0.2);
+}
+
+.st-menu ul li a:hover {
+  background: rgba(0,0,0,0.2);
+  box-shadow: inset 0 -1px rgba(0,0,0,0);
+  color: #fff;
+  text-decoration:none;
+}
+
+/* Effect 12: Open door */
+
+.st-effect-12.st-container {
+  -webkit-perspective: 1500px;
+  perspective: 1500px;
+}
+
+.st-effect-12 .st-pusher {
+  -webkit-transform-origin: 100% 50%;
+  transform-origin: 100% 50%;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+.st-effect-12.st-menu-open .st-pusher {
+  -webkit-transform: rotateY(-10deg);
+  transform: rotateY(-10deg);
+}
+
+.st-effect-12.st-menu {
+  opacity: 1;
+  -webkit-transform: translate3d(-100%, 0, 0);
+  transform: translate3d(-100%, 0, 0);
+}
+
+.st-effect-12.st-menu-open .st-effect-12.st-menu {
+  visibility: visible;
+  -webkit-transition: -webkit-transform 0.5s;
+  transition: transform 0.5s;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+.st-effect-12.st-menu::after {
+  display: none;
+}
+
+.panel-primary > .panel-heading {
+  background-color:#694489;
+  border-color:#694489;
+}
+
+.panel-primary {
+  border-color:#694489;
+  overflow:hidden;
+  background-color:#694489;
+}
+
+.panel-primary > .panel-heading a {
+  color:white;
+}
+
+.panel-primary > .panel-heading a i {
+  padding-top:9px;
+}
+
+a {
+  color:#48a770;
+}
+
+a:hover {
+  color: #295A3E;
+}
+
+.panel {
+  border-radius:7px;
+}
+
+.panel h3 {
+  font-size:18px;
+  font-weight:200;
+  text-transform:none;
+  display:inline;
 }

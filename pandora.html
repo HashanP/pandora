@@ -40,64 +40,31 @@
 </template>
 
 <template name="subjects">
-  <main class="container-fluid">
-    <div class="grid block-grid-xl-8 block-grid-lg-8 block-grid-sm-4 block-grid-xs-2">
-      {{#each courses}}
-        <div class="block-grid-item icon">
-          <a href="/courses/{{_id}}/blog">
-           <img src="/icons/{{icon}}.png" alt="{{icon}}">
-          </a>
-        </div>
-      {{/each}}
-    </div>
-  </main>
-</template>
-
-<template name="main">
   <div class="main">
     {{> navbar}}
-    {{> yield}}
+
+    <main class="container-fluid">
+      <div class="grid block-grid-xl-8 block-grid-lg-8 block-grid-sm-4 block-grid-xs-2">
+        {{#each courses}}
+        <div class="block-grid-item icon">
+          <a href="/courses/{{_id}}/blog">
+            <img src="/icons/{{icon}}.png" alt="{{icon}}">
+          </a>
+        </div>
+        {{/each}}
+      </div>
+    </main>
   </div>
 </template>
 
 <template name="blog_list">
-  <div id="st-container" class="container-fluid st-container">
-
-    <!-- content push wrapper -->
-    <div class="st-pusher row">
-
-      <nav class="st-menu st-effect-1 col-md-3 col-lg-2 col-xl-1" id="menu-1">
-        <h2>{{title}}</h2>
-        <ul class="nav nav-pills nav-stacked">
-          <li role="presentation" class="active"><a href="#">Blog</a></li>
-          <li role="presentation"><a href="#">Quizzes</a></li>
-          <li role="presentation"><a href="#">Vocabulary Quizzes</a></li>
-          <li role="presentation"><a href="#">File Uploads</a></li>
-          <li role="presentation"><a href="#">File Downloads</a></li>
-          <li role="presentation"><a href="#">Students</a></li>
-          <li role="presentation"><a href="#">Random Name Generator</a></li>
-      </ul>
-      </nav>
-
-      <div class="st-content col-md-9 col-lg-10  col-xl-11"><!-- this is the wrapper for the content -->
-        <div class="st-content-inner"><!-- extra div for emulating position:fixed of the menu -->
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Blog</h3>
-            </div>
-            <ul class="list-group">
-              {{#posts}}
-                <li class="list-group-item">
-                  {{title}}
-                </li>
-              {{/posts}}
-            </ul>
-          </div>
-        </div><!-- /st-content-inner -->
-      </div><!-- /st-content -->
-
-    </div><!-- /st-pusher -->
-  </div>
+  <ul class="list-group">
+    {{#each i posts}}
+    <li class="list-group-item">
+      <a href="/courses/{{../_id}}/blog/{{index}}">{{title}}</a>
+    </li>
+    {{/each}}
+  </ul>
 </template>
 
 <template name="navbar">
@@ -117,7 +84,7 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="#">Subjects <span class="sr-only">(current)</span></a></li>
+          <li class="active"><a href="/">Subjects <span class="sr-only">(current)</span></a></li>
           {{#if admin}}
           <li><a href="#">Clubs</a></li>
           {{/if}}
@@ -144,4 +111,84 @@
       </div>
     </div>
   </nav>
+</template>
+
+<template name="course">
+  <div class="main">
+    {{> navbar}}
+
+    <div id="st-container" class="container-fluid st-container">
+
+      <!-- content push wrapper -->
+      <div class="st-pusher row">
+
+        <nav class="st-menu col-md-3 col-lg-2 col-xl-1" id="menu-1">
+          <h2><i class="fa fa-flash"></i> {{title}}
+            <br><small>{{icon}}</small>
+          </h2>
+          <ul>
+            <li role="presentation" class="active"><a href="/courses/{{_id}}/blog">Blog</a></li>
+            <li role="presentation"><a href="/courses/{{_id}}/quizzes">Quizzes</a></li>
+            <li role="presentation"><a href="/courses/{{_id}}/vocabulary_quizzes">Vocabulary Quizzes</a></li>
+            <li role="presentation"><a href="/courses/{{_id}}/file_uploads">File Uploads</a></li>
+            <li role="presentation"><a href="/courses/{{_id}}/file_downloads">File Downloads</a></li>
+            <li role="presentation"><a href="/courses/{{_id}}/students">Students</a></li>
+            <li role="presentation"><a href="/courses/{{_id}}/random_name_generator">Random Name Generator</a></li>
+          </ul>
+        </nav>
+
+        <div class="st-content col-md-9 col-lg-10  col-xl-11"><!-- this is the wrapper for the content -->
+          <div class="st-content-inner"><!-- extra div for emulating position:fixed of the menu -->
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title">Blog
+
+                </h3>
+                <div class="pull-right">
+                  <a href="/courses/{{_id}}/blog/new"><i class="fa fa-plus"></i></a>
+                </div>
+              </div>
+              {{> yield}}
+            </div>
+          </div><!-- /st-content-inner -->
+        </div><!-- /st-content -->
+
+      </div><!-- /st-pusher -->
+    </div>
+  </div>
+</template>
+
+<template name="insertPost">
+  <form class="panel-body">
+    <fieldset>
+      <legend>Create Post</legend>
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" placeholder="Title">
+      </div>
+      <div class="form-group">
+        <label for="options">Type</label>
+        <select id="options" name="type" class="form-control">
+          <option value="rich">Rich Text Editor</option>
+          <option value="latex">LaTeX</option>
+          <option value="youtube">YouTube</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Content</label>
+        {{#if eq type "rich"}}
+        <div>
+          <textarea rows="6" id="editor">{{post.content}}</textarea>
+        </div>
+        {{else}}
+          {{#if eq type "latex"}}
+            <textarea rows="6">{{post.content}}</textarea>
+          {{else}}
+            <input class="form-control" type="text" placeholder="Video URL" value="{{post.content}}">
+          {{/if}}
+        {{/if}}
+      </div>
+    </fieldset>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
 </template>
