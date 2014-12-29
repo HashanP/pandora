@@ -27,6 +27,10 @@ Schemas.Post = new SimpleSchema({
   },
   "type": {
     type: String
+  },
+  "postId": {
+    type: String,
+    autoValue: Meteor.uuid
   }
 });
 
@@ -49,6 +53,22 @@ Schemas.Course = new SimpleSchema({
 Courses.attachSchema(Schemas.Course);
 
 if (Meteor.isClient) {
+  Meteor.startup(function() {
+    MathJax.Hub.Config({
+    /*  tex2jax: {
+        displayMath: [],
+        inlineMath: []
+      },*/
+      /**
+      * Disables MathJax's ugly context menu.
+      */
+      showMathMenu:false,
+      "HTML-CSS": { linebreaks: { automatic: true } },
+      SVG: { linebreaks: { automatic: true } }
+    });
+  });
+
+
   Template.login.events({
     "submit .login-form": function(e) {
       var username = e.target.username.value;
@@ -85,6 +105,19 @@ if (Meteor.isClient) {
     }
   });
 
+  Template.post.helpers({
+    "id": function() {
+      return this.content.split("?v=")[1];
+    }
+  });
+
+  Template.post.events({
+    "click .del": function() {
+      Courses.update(this._id, {$pull: {posts: {postId: this.postId}}});
+      Router.go("/courses/" + this._id +"/blog");
+    }
+  });
+
   Template.insertPost.helpers({
     "schema": function() {
       return Schemas.Post;
@@ -99,7 +132,7 @@ if (Meteor.isClient) {
       Session.set("type", e.target.value);
     },
     "submit form": function(e) {
-      console.log(this._id);
+      console.log(e.target.type.value);
       Courses.update(this._id, {
           $push:
             {
@@ -112,6 +145,11 @@ if (Meteor.isClient) {
           }
         );
       return false;
+    },
+    "DOMNodeInserted": function(e) {
+        if(e.target.classList.contains("form-group")) {
+          $("#editor").wysihtml5();
+        }
     }
   });
 
@@ -119,11 +157,14 @@ if (Meteor.isClient) {
     $("#editor").wysihtml5();
   }
 
+  Template.post.rendered = function() {
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.find(".mathjax")]);
+  }
+
   Router.onBeforeAction(function() {
     if (!Meteor.userId()) {
       this.render('login');
     } else {
-
       this.next();
     }
   });
@@ -135,7 +176,7 @@ if (Meteor.isClient) {
       }
     });
     this.next();
-  }, {except:"subjects"});
+  }, {except:["subjects", "admin"]});
 
   Router.route('/', {name: "subjects"});
 
@@ -148,9 +189,12 @@ if (Meteor.isClient) {
   });
 
   Router.route('/courses/:id/blog/new', function() {
-    console.log("hero");
     Session.set("type", "rich");
     this.render("insertPost", {data: Courses.findOne(this.params.id)});
+  });
+
+  Router.route('/courses/:id/blog/:post', function() {
+    this.render("post", {data: Courses.findOne(this.params.id).posts[this.params.post]});
   });
 
   Router.route("/logout", function() {
