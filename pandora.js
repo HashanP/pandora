@@ -30,7 +30,11 @@ Schemas.Post = new SimpleSchema({
   },
   "postId": {
     type: String,
-    autoValue: Meteor.uuid
+    autoValue:function() {
+      if(this.operator !== "$pull") {
+        return Meteor.uuid();
+      }
+    }
   }
 });
 
@@ -46,7 +50,8 @@ Schemas.Course = new SimpleSchema({
     allowedValues:["French", "Latin", "Computing", "Art", "English", "Mathematics"]
   },
   "posts": {
-    type: [Schemas.Post]
+    type: [Schemas.Post],
+    optional: true
   }
 });
 
@@ -107,14 +112,15 @@ if (Meteor.isClient) {
 
   Template.post.helpers({
     "id": function() {
-      return this.content.split("?v=")[1];
+      return this.post.content.split("?v=")[1];
     }
   });
 
   Template.post.events({
     "click .del": function() {
-      Courses.update(this._id, {$pull: {posts: {postId: this.postId}}});
-      Router.go("/courses/" + this._id +"/blog");
+      Courses.update(this.doc._id, {$pull:{posts:{postId:this.post.postId}}});
+      Router.go("/courses/" + this.doc._id +"/blog");
+      //return false;
     }
   });
 
@@ -144,6 +150,7 @@ if (Meteor.isClient) {
             }
           }
         );
+      Router.go("/courses/" + this._id + "/blog");
       return false;
     },
     "DOMNodeInserted": function(e) {
@@ -170,13 +177,15 @@ if (Meteor.isClient) {
   });
 
   Router.onBeforeAction(function() {
-    this.layout("course", {
-      data: function() {
-        return Courses.findOne(this.params.id);
-      }
-    });
+    if(this.route._path.slice(0, 6) !== "/admin") {
+      this.layout("course", {
+        data: function() {
+          return Courses.findOne(this.params.id);
+        }
+      });
+    }
     this.next();
-  }, {except:["subjects", "admin"]});
+  }, {except:["subjects"]});
 
   Router.route('/', {name: "subjects"});
 
@@ -194,8 +203,13 @@ if (Meteor.isClient) {
   });
 
   Router.route('/courses/:id/blog/:post', function() {
-    this.render("post", {data: Courses.findOne(this.params.id).posts[this.params.post]});
+    this.render("post", {data: {doc: Courses.findOne(this.params.id), post: Courses.findOne(this.params.id).posts[this.params.post]}});
   });
+
+/*  Router.route('/courses/:id/blog/:post/delete', function() {
+    Courses.update(this.doc._id, {$pull: {posts:{postId:this.post.postId}}});
+    this.redirect("/courses/" + this.params.id + "/blog");
+  });*/
 
   Router.route("/logout", function() {
     Meteor.logout();
@@ -219,6 +233,7 @@ this.AdminConfig = {
     Users: {
     },
     Courses: {
-    }
+        omitFields:["posts"]
+      }
   }
 };

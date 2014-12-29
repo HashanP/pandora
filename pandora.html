@@ -72,22 +72,22 @@
   <div class="panel-body">
     <div class="pull-right">
       <a class="btn btn-sm btn-info">Edit</a>
-      <a class="btn btn-sm btn-danger del">Delete</a>
+      <button class="btn btn-sm btn-danger del">Delete</button>
     </div>
-    <h1>{{title}}</h1>
-    {{#if eq type "rich"}}
-      {{{content}}}
+    <h1>{{post.title}}</h1>
+    {{#if eq post.type "rich"}}
+      {{{post.content}}}
     {{else}}
-      {{#if eq type "latex"}}
+      {{#if eq post.type "latex"}}
       <div class="mathjax">
-        $${{content}}$$
+        $${{post.content}}$$
       </div>
       {{else}}
-      <div class="maxi">
-        <div class="youtube">
-          <iframe src="//www.youtube.com/embed/{{id}}" frameborder="0" allowfullscreen></iframe>
+        <div class="maxi">
+          <div class="youtube">
+            <iframe src="//www.youtube.com/embed/{{id}}" frameborder="0" allowfullscreen></iframe>
+          </div>
         </div>
-      </div>
       {{/if}}
     {{/if}}
   </div>
