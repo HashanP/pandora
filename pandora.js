@@ -1,4 +1,7 @@
 Courses = new Mongo.Collection("courses");
+Files = new FS.Collection("files", {
+  stores: [new FS.Store.FileSystem("files", {path: "~/files"})]
+});
 
 UI.registerHelper('eq', function(v1, v2, options) {
   if(v1 == v2){
@@ -97,6 +100,10 @@ Schemas.Course = new SimpleSchema({
   "vocabularyQuizzes": {
     type: [Schemas.VocabularyQuiz],
     optional: true
+  },
+  "studentResources": {
+    type: [String],
+    optional:true
   }
 });
 
@@ -280,6 +287,58 @@ if (Meteor.isClient) {
     }
   });
 
+  Template.fileUpload.helpers({
+    finished: function() {
+      for(var i = 0; i < this.files.length; i++) {
+        if(!Files.findOne(this.files[i]).isUploaded()) {
+          return false;
+        }
+      }
+      return true;
+    }
+  });
+
+  Template.studentResources.events({
+    "click .del": function(e) {
+      Files.remove(this._id);
+      Courses.update(Template.instance().data._id, {$pull:{studentResources:this._id}});
+    }
+  });
+
+  Template.fileUpload.rendered = function() {
+    $(".modal").modal("show");
+    $(".modal").on('hidden.bs.modal', function() {
+      $(this).remove();
+    });
+  }
+
+  Template.course.events({
+    "click .uploadFile": function() {
+      var fileEl = document.createElement("input");
+      fileEl.type = "file";
+      fileEl.addEventListener("change", function(e) {
+        var files = new ReactiveVar([]);
+        Blaze.renderWithData(Template.fileUpload, function() {
+          return {files:files.get()};
+        }, document.body);
+        console.log("here");
+        FS.Utility.eachFile(event, function(file) {
+          Files.insert(file, function(err, fileObj) {
+            var f = files.get();
+            f.push(fileObj._id);
+            files.set(f);
+            Courses.update(this.doc._id, {$push:{studentResources:fileObj._id}});
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+      fileEl.click();
+      return false;
+    },
+    "click .abort": function() {
+      FS.HTTP.uploadQueue.cancel();
+    }
+  });
+
   Template.insertVocabularyQuiz.rendered = function() {
     var sort = new Sortable(this.find(".questions"), {
       animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
@@ -362,6 +421,20 @@ if (Meteor.isClient) {
   Router.route("/courses/:id/vocabularyQuizzes/:vocabularyQuiz/edit", function() {
     var data = Courses.findOne(this.params.id);
     this.render("insertVocabularyQuiz", {data:{quiz:_.findWhere(data.vocabularyQuizzes, {_id:this.params.vocabularyQuiz}), doc:data}});
+  });
+
+  Router.route("/courses/:id/studentResources", function() {
+    this.render("studentResources", {
+      data: function() {
+        var data = Courses.findOne(this.params.id);
+        if(data && data.studentResources) {
+          data.studentResources = data.studentResources.map(function(fileId) {
+            return Files.findOne(fileId)
+          });
+        }
+        return data;
+      }
+    });
   });
 
 /*  Router.route('/courses/:id/blog/:post/delete', function() {
