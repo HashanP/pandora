@@ -16,6 +16,14 @@ UI.registerHelper("i", function(obj) {
   return obj;
 });
 
+UI.registerHelper("truncate", function(text, max) {
+  text = $("<p>" + text + "</p>").text();
+  if(text.length > max) {
+    return text.substring(0, max) + "...";
+  }
+  return text;
+});
+
 var Schemas = {};
 
 Schemas.Post = new SimpleSchema({
@@ -38,6 +46,24 @@ Schemas.Post = new SimpleSchema({
   }
 });
 
+Schemas.VocabularyQuestion = new SimpleSchema({
+  "question": {
+    type:String
+  },
+  "answer": {
+    type: String
+  }
+});
+
+Schemas.VocabularyQuiz = new SimpleSchema({
+  "title": {
+    type: String
+  },
+  "questions":{
+    type:[Schemas.VocabularyQuestion]
+  }
+});
+
 Schemas.Course = new SimpleSchema({
   "title": {
     type: String,
@@ -51,6 +77,10 @@ Schemas.Course = new SimpleSchema({
   },
   "posts": {
     type: [Schemas.Post],
+    optional: true
+  },
+  "vocabularyQuizzes": {
+    type: [Schemas.VocabularyQuiz],
     optional: true
   }
 });

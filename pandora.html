@@ -59,13 +59,24 @@
 </template>
 
 <template name="blog_list">
-  <ul class="list-group">
+  <div class="list-group">
     {{#each i posts}}
-    <li class="list-group-item">
-      <a href="/courses/{{../_id}}/blog/{{index}}">{{title}}</a>
-    </li>
+    <a href="/courses/{{../_id}}/blog/{{index}}" class="list-group-item">
+      <h4 class="list-group-item-heading">{{title}}</h4>
+      <p class="list-group-item-text">
+        {{#if eq type "latex"}}
+          LaTeX
+        {{else}}
+          {{#if eq type "youtube"}}
+            <i class="fa fa-youtube-play"></i> YouTube
+          {{else}}
+            {{truncate content 100}}
+          {{/if}}
+        {{/if}}
+      </p>
+    </a>
     {{/each}}
-  </ul>
+  </div>
 </template>
 
 <template name="post">
