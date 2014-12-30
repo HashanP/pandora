@@ -79,6 +79,16 @@
   </div>
 </template>
 
+<template name="vocabularyQuizzes">
+  <ul class="list-group">
+    {{#each vocabularyQuizzes}}
+      <li class="list-group-item">
+        <a href="/courses/{{../_id}}/vocabularyQuizzes/{{_id}}">{{title}}</a>
+      </li>
+    {{/each}}
+  </ul>
+</template>
+
 <template name="post">
   <div class="panel-body">
     <div class="pull-right">
@@ -160,17 +170,17 @@
       <div class="st-pusher row">
 
         <nav class="st-menu col-md-3 col-lg-2 col-xl-1" id="menu-1">
-          <h2><i class="fa fa-flash"></i> {{title}}
-            <br><small>{{icon}}</small>
+          <h2><i class="fa fa-flash"></i> {{doc.title}}
+            <br><small>{{doc.icon}}</small>
           </h2>
           <ul>
-            <li role="presentation" class="active"><a href="/courses/{{_id}}/blog">Blog</a></li>
-            <li role="presentation"><a href="/courses/{{_id}}/quizzes">Quizzes</a></li>
-            <li role="presentation"><a href="/courses/{{_id}}/vocabulary_quizzes">Vocabulary Quizzes</a></li>
-            <li role="presentation"><a href="/courses/{{_id}}/file_uploads">File Uploads</a></li>
-            <li role="presentation"><a href="/courses/{{_id}}/file_downloads">File Downloads</a></li>
-            <li role="presentation"><a href="/courses/{{_id}}/students">Students</a></li>
-            <li role="presentation"><a href="/courses/{{_id}}/random_name_generator">Random Name Generator</a></li>
+            <li role="presentation" class="active"><a href="/courses/{{doc._id}}/blog">Blog</a></li>
+            <li role="presentation"><a href="/courses/{{doc._id}}/quizzes">Quizzes</a></li>
+            <li role="presentation"><a href="/courses/{{doc._id}}/vocabularyQuizzes">Vocabulary Quizzes</a></li>
+            <li role="presentation"><a href="/courses/{{doc._id}}/file_uploads">File Uploads</a></li>
+            <li role="presentation"><a href="/courses/{{doc._id}}/file_downloads">File Downloads</a></li>
+            <li role="presentation"><a href="/courses/{{doc._id}}/students">Students</a></li>
+            <li role="presentation"><a href="/courses/{{doc._id}}/random_name_generator">Random Name Generator</a></li>
           </ul>
         </nav>
 
@@ -178,11 +188,11 @@
           <div class="st-content-inner"><!-- extra div for emulating position:fixed of the menu -->
             <div class="panel panel-primary">
               <div class="panel-heading">
-                <h3 class="panel-title">Blog
-
+                <h3 class="panel-title">
+                  {{titleCase section}}
                 </h3>
                 <div class="pull-right">
-                  <a href="/courses/{{_id}}/blog/new"><i class="fa fa-plus"></i></a>
+                  <a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>
                 </div>
               </div>
               {{> yield}}
@@ -235,6 +245,62 @@
             <input class="form-control" name="content" type="text" placeholder="Video URL" value="{{post.content}}">
           {{/if}}
         {{/if}}
+      </div>
+    </fieldset>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</template>
+
+<template name="vocabularyQuestion">
+  <div class="row question">
+    <div class="col-md-11">
+      <div class="row">
+        <div class="col-md-6">
+          <input class="form-control part-q" placeholder="Question" type="text">
+        </div>
+        <div class="col-md-6">
+          <input class="form-control part-a" placeholder="Answer" type="text">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-1">
+      <button type="button" class="btn handle btn-sm btn-default"><i class="fa fa-bars"></i></button>
+      <button type="button" class="del btn btn-sm btn-danger"><i class="fa fa-times"></i></button>
+    </div>
+  </div>
+</template>
+
+<template name="accents">
+  <button class="accent btn btn-sm btn-info">&aacute;</button>
+  <button class="accent btn btn-sm btn-info">&agrave;</button>
+  <button class="accent btn btn-sm btn-info">&auml;</button>
+  <button class="accent btn btn-sm btn-info">&eacute; </button>
+  <button class="accent btn btn-sm btn-info">&egrave;</button>
+  <button class="accent btn btn-sm btn-info">&ecirc;</button>
+  <button class="accent btn btn-sm btn-info">&euml;</button>
+  <button class="accent btn btn-sm btn-info">&iuml;</button>
+  <button class="accent btn btn-sm btn-info">&ouml;</button>
+  <button class="accent btn btn-sm btn-info">&uuml;</button>
+</template>
+
+<template name="insertVocabularyQuiz">
+  <form class="panel-body">
+    <fieldset>
+      <legend>Create Vocabulary Quiz</legend>
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" placeholder="Title">
+      </div>
+      <div class="form-group questions">
+        <label>Questions</label>
+        <br>
+        {{> accents}}
+        {{> vocabularyQuestion}}
+        <div class="row">
+          <div class="col-md-12">
+            <button type="button" class="addQuestion btn btn-sm btn-default">Add</button>
+          </div>
+        </div>
       </div>
     </fieldset>
     <button type="submit" class="btn btn-primary">Submit</button>

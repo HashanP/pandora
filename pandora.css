@@ -902,3 +902,24 @@ a:hover {
   margin-left:auto;
   margin-right:auto;
 }
+
+.questions > .row {
+  margin-top:8px;
+}
+
+.question button {
+  margin-top:6px;
+}
+
+.handle {
+  cursor:move;
+}
+
+.ghost {
+  visibility:hidden;
+}
+
+.btn.accent {
+  text-transform:none;
+  font-size:18px;
+}

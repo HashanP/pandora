@@ -24,6 +24,11 @@ UI.registerHelper("truncate", function(text, max) {
   return text;
 });
 
+UI.registerHelper("titleCase", function(str) {
+  var result = str.replace(/([A-Z]+)/g, " $1").replace(/([A-Z][a-z])/g, " $1");
+  return result.charAt(0).toUpperCase() + result.slice(1);
+});
+
 var Schemas = {};
 
 Schemas.Post = new SimpleSchema({
@@ -61,6 +66,14 @@ Schemas.VocabularyQuiz = new SimpleSchema({
   },
   "questions":{
     type:[Schemas.VocabularyQuestion]
+  },
+  "_id": {
+    type: String,
+    autoValue:function() {
+      if(this.operator !== "$pull") {
+        return Meteor.uuid();
+      }
+    }
   }
 });
 
@@ -88,6 +101,8 @@ Schemas.Course = new SimpleSchema({
 Courses.attachSchema(Schemas.Course);
 
 if (Meteor.isClient) {
+  var lastActive;
+
   Meteor.startup(function() {
     MathJax.Hub.Config({
     /*  tex2jax: {
@@ -100,6 +115,10 @@ if (Meteor.isClient) {
       showMathMenu:false,
       "HTML-CSS": { linebreaks: { automatic: true } },
       SVG: { linebreaks: { automatic: true } }
+    });
+    $("body").on("blur", "input", function(e) {
+      console.log("fsddfs");
+      lastActive = e.target;
     });
   });
 
@@ -183,6 +202,45 @@ if (Meteor.isClient) {
     }
   });
 
+  Template.vocabularyQuestion.events({
+    "click .del": function() {
+      Blaze.remove(Blaze.currentView);
+    }
+  });
+
+  Template.insertVocabularyQuiz.events({
+    "click .addQuestion": function(e) {
+      Blaze.render(Template.vocabularyQuestion, e.target.parentNode.parentNode.parentNode, e.target.parentNode.parentNode);
+    },
+    "submit form": function(e) {
+      var data = {title:e.target.title.value, questions:[]};
+      var el = $(e.target);
+      el.find(".questions").each(function(i, el) {
+        data.questions.push({
+          question:$(el).find(".part-q").val(),
+          answer:$(el).find(".part-a").val()
+        })
+      });
+      Courses.update(this.doc._id, {$push:{vocabularyQuizzes:data}});
+    }
+  });
+
+  Template.accents.events({
+    "click .accent":function(e) {
+        var focus = $(lastActive);
+        focus.val(focus.val().substring(0, lastActive.selectionStart) + $(e.target).text() + focus.val().slice(lastActive.selectionEnd));
+    }
+  });
+
+  Template.insertVocabularyQuiz.rendered = function() {
+    var sort = new Sortable(this.find(".questions"), {
+      animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
+      handle: ".handle", // Restricts sort start click/touch to the specified element
+      draggable: ".question",
+      ghostClass:"ghost"
+    });
+  }
+
   Template.insertPost.rendered = function() {
     $("#editor").wysihtml5();
   }
@@ -203,7 +261,7 @@ if (Meteor.isClient) {
     if(this.route._path.slice(0, 6) !== "/admin") {
       this.layout("course", {
         data: function() {
-          return Courses.findOne(this.params.id);
+          return {doc:Courses.findOne(this.params.id), section:this.route._path.split("/")[3]};
         }
       });
     }
@@ -234,6 +292,14 @@ if (Meteor.isClient) {
     var data = Courses.findOne(this.params.id);
     Session.set("type", data.posts[this.params.post].type);
     this.render("insertPost", {data: {doc: data, post: data.posts[this.params.post]}});
+  });
+
+  Router.route('/courses/:id/vocabularyQuizzes', function() {
+    this.render("vocabularyQuizzes", { data: function() { return Courses.findOne(this.params.id);}});
+  });
+
+  Router.route('/courses/:id/vocabularyQuizzes/new', function() {
+    this.render("insertVocabularyQuiz", {data: function(){ return {doc:Courses.findOne(this.params.id)}; }});
   });
 
 /*  Router.route('/courses/:id/blog/:post/delete', function() {
