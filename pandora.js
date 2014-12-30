@@ -138,19 +138,12 @@ if (Meteor.isClient) {
       Session.set("type", e.target.value);
     },
     "submit form": function(e) {
-      console.log(e.target.type.value);
-      Courses.update(this._id, {
-          $push:
-            {
-              posts: {
-                title: e.target.title.value,
-                type: e.target.type.value,
-                content: (e.target.type.value === "rich" ? $("#editor").val() : e.target.content.value)
-              }
-            }
-          }
-        );
-      Router.go("/courses/" + this._id + "/blog");
+      Meteor.call("post", this._id || this.doc._id, {
+        title: e.target.title.value,
+        type: e.target.type.value,
+        content: (e.target.type.value === "rich" ? $("#editor").val() : e.target.content.value)
+      }, (this.post ? this.post.postId : undefined))
+      Router.go("/courses/" + (this._id || this.doc._id)+ "/blog" + (this.post ? "/" + this.doc.posts.indexOf(this.post) : ""));
       return false;
     },
     "DOMNodeInserted": function(e) {
@@ -203,7 +196,14 @@ if (Meteor.isClient) {
   });
 
   Router.route('/courses/:id/blog/:post', function() {
-    this.render("post", {data: {doc: Courses.findOne(this.params.id), post: Courses.findOne(this.params.id).posts[this.params.post]}});
+    var data = Courses.findOne(this.params.id);
+    this.render("post", {data: {doc: data, post: data.posts[this.params.post], index:this.params.post}});
+  });
+
+  Router.route('/courses/:id/blog/:post/edit', function() {
+    var data = Courses.findOne(this.params.id);
+    Session.set("type", data.posts[this.params.post].type);
+    this.render("insertPost", {data: {doc: data, post: data.posts[this.params.post]}});
   });
 
 /*  Router.route('/courses/:id/blog/:post/delete', function() {
@@ -225,6 +225,15 @@ if (Meteor.isServer) {
   Accounts.config({restrictCreationByEmailDomain:'whsb.essex.sch.uk'});
 }
 
+Meteor.methods({
+  "post": function(courseId, post, postId) {
+    if(postId) {
+      Courses.update({_id:courseId,"posts.postId":postId}, {$set:{"posts.$": post}});
+    } else {
+      Courses.update(courseId, {$push:{posts:post}});
+    }
+  }
+});
 
 this.AdminConfig = {
   name:"Pandora",
