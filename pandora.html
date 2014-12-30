@@ -94,6 +94,7 @@
     <div class="pull-right">
       <button type="button" class="btn btn-sm btn-default reset">Reset</button>
       <button type="button" class="btn btn-sm btn-warning revealAnswers">Reveal Answers</button>
+      <a href="/courses/{{_id}}/vocabularyQuizzes/{{quiz._id}}/edit" class="btn btn-sm btn-info">Edit</a>
       <button type="button" class="btn btn-sm btn-danger del">Delete</button>
     </div>
     <h1>{{quiz.title}}</h1>
@@ -275,10 +276,10 @@
     <div class="col-md-11">
       <div class="row">
         <div class="col-md-6">
-          <input class="form-control part-q" placeholder="Question" type="text">
+          <input class="form-control part-q" value="{{question}}" placeholder="Question" type="text">
         </div>
         <div class="col-md-6">
-          <input class="form-control part-a" placeholder="Answer" type="text">
+          <input class="form-control part-a" value="{{answer}}" placeholder="Answer" type="text">
         </div>
       </div>
     </div>
@@ -308,13 +309,19 @@
       <legend>Create Vocabulary Quiz</legend>
       <div class="form-group">
         <label for="title">Title</label>
-        <input type="text" class="form-control" id="title" placeholder="Title">
+        <input type="text" class="form-control" id="title" value="{{quiz.title}}" placeholder="Title">
       </div>
       <div class="form-group questions">
         <label>Questions</label>
         <br>
         {{> accents}}
-        {{> vocabularyQuestion}}
+        {{#if quiz}}
+          {{#each quiz.questions}}
+            {{> vocabularyQuestion}}
+          {{/each}}
+        {{else}}
+          {{> vocabularyQuestion}}
+        {{/if}}
         <div class="row">
           <div class="col-md-12">
             <button type="button" class="addQuestion btn btn-sm btn-default">Add</button>

@@ -72,7 +72,7 @@ Schemas.VocabularyQuiz = new SimpleSchema({
   "_id": {
     type: String,
     autoValue:function() {
-      if(this.operator !== "$pull") {
+      if(this.operator !== "$pull" && this.operator !== "$set") {
         return Meteor.uuid();
       }
     }
@@ -217,13 +217,16 @@ if (Meteor.isClient) {
     "submit form": function(e) {
       var data = {title:e.target.title.value, questions:[]};
       var el = $(e.target);
-      el.find(".questions").each(function(i, el) {
+      el.find(".question").each(function(i, el) {
         data.questions.push({
           question:$(el).find(".part-q").val(),
           answer:$(el).find(".part-a").val()
         })
       });
-      Courses.update(this.doc._id, {$push:{vocabularyQuizzes:data}});
+      console.log(this.doc._id);
+      Meteor.call("vocabularyQuiz", this.doc._id, data, (this.quiz ? this.quiz._id : undefined));
+      Router.go("/courses/" + this.doc._id + "/vocabularyQuizzes" + (this.quiz ? "/" + this.quiz._id : ""));
+      return false;
     }
   });
 
@@ -356,6 +359,11 @@ if (Meteor.isClient) {
     }});
   });
 
+  Router.route("/courses/:id/vocabularyQuizzes/:vocabularyQuiz/edit", function() {
+    var data = Courses.findOne(this.params.id);
+    this.render("insertVocabularyQuiz", {data:{quiz:_.findWhere(data.vocabularyQuizzes, {_id:this.params.vocabularyQuiz}), doc:data}});
+  });
+
 /*  Router.route('/courses/:id/blog/:post/delete', function() {
     Courses.update(this.doc._id, {$pull: {posts:{postId:this.post.postId}}});
     this.redirect("/courses/" + this.params.id + "/blog");
@@ -381,6 +389,14 @@ Meteor.methods({
       Courses.update({_id:courseId,"posts.postId":postId}, {$set:{"posts.$": post}});
     } else {
       Courses.update(courseId, {$push:{posts:post}});
+    }
+  },
+  "vocabularyQuiz": function(courseId, data, vocabQuizId) {
+    if(vocabQuizId) {
+      Courses.update({_id:courseId, "vocabularyQuizzes._id":vocabQuizId}, {$set:{
+        "vocabularyQuizzes.$.title":data.title, "vocabularyQuizzes.$.questions":data.questions}});
+    } else {
+      Courses.update(courseId, {$push:{vocabularyQuizzes:data}});
     }
   }
 });
