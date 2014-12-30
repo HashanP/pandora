@@ -81,12 +81,31 @@
 
 <template name="vocabularyQuizzes">
   <ul class="list-group">
-    {{#each vocabularyQuizzes}}
+    {{#each sortBy vocabularyQuizzes "title"}}
       <li class="list-group-item">
         <a href="/courses/{{../_id}}/vocabularyQuizzes/{{_id}}">{{title}}</a>
       </li>
     {{/each}}
   </ul>
+</template>
+
+<template name="vocabularyQuiz">
+  <div class="panel-body">
+    <div class="pull-right">
+      <button type="button" class="btn btn-sm btn-default reset">Reset</button>
+      <button type="button" class="btn btn-sm btn-warning revealAnswers">Reveal Answers</button>
+      <button type="button" class="btn btn-sm btn-danger del">Delete</button>
+    </div>
+    <h1>{{quiz.title}}</h1>
+    {{> accents}}
+    <br><br>
+    <div class="row vocab-quiz">
+      {{#each quiz.questions}}
+      <div class="col-xs-6 col-sm-6 col-md-3 col-lg-2">{{question}}</div>
+      <input type="text" class="col-xs-6 col-sm-6 col-md-3 col-lg-2" data-answer="{{answer}}">
+      {{/each}}
+    </div>
+  </div>
 </template>
 
 <template name="post">
@@ -271,16 +290,16 @@
 </template>
 
 <template name="accents">
-  <button class="accent btn btn-sm btn-info">&aacute;</button>
-  <button class="accent btn btn-sm btn-info">&agrave;</button>
-  <button class="accent btn btn-sm btn-info">&auml;</button>
-  <button class="accent btn btn-sm btn-info">&eacute; </button>
-  <button class="accent btn btn-sm btn-info">&egrave;</button>
-  <button class="accent btn btn-sm btn-info">&ecirc;</button>
-  <button class="accent btn btn-sm btn-info">&euml;</button>
-  <button class="accent btn btn-sm btn-info">&iuml;</button>
-  <button class="accent btn btn-sm btn-info">&ouml;</button>
-  <button class="accent btn btn-sm btn-info">&uuml;</button>
+  <button type="button" class="accent btn btn-sm btn-info">&aacute;</button>
+  <button type="button" class="accent btn btn-sm btn-info">&agrave;</button>
+  <button type="button" class="accent btn btn-sm btn-info">&auml;</button>
+  <button type="button" class="accent btn btn-sm btn-info">&eacute; </button>
+  <button type="button" class="accent btn btn-sm btn-info">&egrave;</button>
+  <button type="button" class="accent btn btn-sm btn-info">&ecirc;</button>
+  <button type="button" class="accent btn btn-sm btn-info">&euml;</button>
+  <button type="button" class="accent btn btn-sm btn-info">&iuml;</button>
+  <button type="button" class="accent btn btn-sm btn-info">&ouml;</button>
+  <button type="button" class="accent btn btn-sm btn-info">&uuml;</button>
 </template>
 
 <template name="insertVocabularyQuiz">

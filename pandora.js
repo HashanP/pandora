@@ -24,6 +24,8 @@ UI.registerHelper("truncate", function(text, max) {
   return text;
 });
 
+UI.registerHelper("sortBy", _.sortBy);
+
 UI.registerHelper("titleCase", function(str) {
   var result = str.replace(/([A-Z]+)/g, " $1").replace(/([A-Z][a-z])/g, " $1");
   return result.charAt(0).toUpperCase() + result.slice(1);
@@ -228,7 +230,50 @@ if (Meteor.isClient) {
   Template.accents.events({
     "click .accent":function(e) {
         var focus = $(lastActive);
-        focus.val(focus.val().substring(0, lastActive.selectionStart) + $(e.target).text() + focus.val().slice(lastActive.selectionEnd));
+        var start = lastActive.selectionStart, end = lastActive.selectionEnd;
+        focus.val(focus.val().substring(0, start) + $(e.target).text() + focus.val().slice(end));
+        lastActive.focus();
+        lastActive.setSelectionRange(start+1, start + 2);
+    }
+  });
+
+  Template.vocabularyQuiz.events({
+    "change input": function(e) {
+      if(e.target.dataset.answer.toLowerCase().split(",").map(function(str) {return str.trim()}).indexOf(e.target.value.toLowerCase().trim()) !== -1) {
+        if(!e.target.classList.contains("correct")) {
+          e.target.classList.add("correct");
+          e.target.classList.remove("incorrect");
+          if(e.target.nextSibling && e.target.nextSibling.nextSibling) {
+            e.target.nextElementSibling.nextElementSibling.focus();
+          } else {
+            e.target.blur();
+          }
+        }
+      } else if(e.target.value !== "") {
+        e.target.classList.add("incorrect");
+        e.target.classList.remove("correct");
+      }
+    },
+    "click .revealAnswers": function() {
+      Template.instance().findAll("input").forEach(function(el) {
+        if(!el.classList.contains("correct")) {
+          el.classList.add("incorrect");
+        }
+        el.value = el.dataset.answer;
+        el.readOnly = true;
+      });
+    },
+    "click .reset": function() {
+      Template.instance().findAll("input").forEach(function(el) {
+        el.value = "";
+        el.classList.remove("correct");
+        el.classList.remove("incorrect");
+        el.readOnly = false;
+      });
+    },
+    "click .del": function() {
+      Courses.update(this._id, {$pull: {vocabularyQuizzes:{_id:this.quiz._id}}});
+      Router.go("/courses/" + this._id + "/vocabularyQuizzes")
     }
   });
 
@@ -300,6 +345,15 @@ if (Meteor.isClient) {
 
   Router.route('/courses/:id/vocabularyQuizzes/new', function() {
     this.render("insertVocabularyQuiz", {data: function(){ return {doc:Courses.findOne(this.params.id)}; }});
+  });
+
+  Router.route("/courses/:id/vocabularyQuizzes/:vocabularyQuiz", function() {
+    this.render("vocabularyQuiz", {data: function() {
+      var data = Courses.findOne(this.params.id);
+      if(data) {
+        return {quiz:_.findWhere(data.vocabularyQuizzes, {_id:this.params.vocabularyQuiz}), _id:data._id};
+      }
+    }});
   });
 
 /*  Router.route('/courses/:id/blog/:post/delete', function() {

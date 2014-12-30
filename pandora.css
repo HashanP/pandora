@@ -923,3 +923,62 @@ a:hover {
   text-transform:none;
   font-size:18px;
 }
+
+.vocab-quiz *, .vocab-quiz input:focus {
+  border-right:1px solid black;
+  border-bottom:1px solid black;
+  border-left:0px;
+  border-top:0px;
+  text-overflow:ellipsis;
+  height:30px;
+}
+
+.vocab-quiz-long input, .vocab-quiz-long input:focus {
+  border-right:0;
+}
+
+.vocab-quiz input {
+  outline:none;
+}
+
+
+
+.vocab-quiz div {
+  line-height:30px;
+  white-space:nowrap;
+  overflow:hidden;
+  background-color:goldenrod;
+}
+
+
+.vocab-quiz input.correct {
+  background-color:lightgreen;
+}
+
+.vocab-quiz input.incorrect {
+  background-color:#ef3d47;
+}
+
+@media screen and (max-width:969px) {
+  .vocab-quiz *:nth-child(2n) {
+    border-right-width: 0px;
+  }
+}
+
+@media screen and (min-width:970px) and (max-width:1200px) {
+  .vocab-quiz *:nth-child(4n) {
+    border-right-width: 0px;
+  }
+  .vocab-quiz:not(.vocab-quiz-long) *:nth-child(-n+4), .vocab-quiz:not(.vocab-quiz-long) *:nth-child(-n+4):focus {
+    border-top:1px solid black;
+  }
+}
+
+@media screen and (min-width:1200px) {
+  .vocab-quiz *:nth-child(6n) {
+    border-right-width: 0px;
+  }
+  .vocab-quiz:not(.vocab-quiz-long) *:nth-child(-n+6), .vocab-quiz:not(.vocab-quiz-long) *:nth-child(-n+6):focus {
+    border-top:1px solid black;
+  }
+}
