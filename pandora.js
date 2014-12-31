@@ -11,14 +11,6 @@ UI.registerHelper('eq', function(v1, v2, options) {
   }
 });
 
-UI.registerHelper("i", function(obj) {
-  if(!obj) return null;
-  obj.forEach(function(item, i) {
-    item.index = i;
-  });
-  return obj;
-});
-
 UI.registerHelper("truncate", function(text, max) {
   text = $("<p>" + text + "</p>").text();
   if(text.length > max) {
@@ -72,6 +64,10 @@ UI.registerHelper("getScore", function(attempt, quiz) {
 UI.registerHelper("sortBy", _.sortBy);
 UI.registerHelper("shuffle", _.shuffle);
 
+UI.registerHelper("sortByReverse", function(arr, val) {
+  return _.sortBy(arr, val).reverse();
+})
+
 UI.registerHelper("titleCase", function(str) {
   var result = str.replace(/([A-Z]+)/g, " $1").replace(/([A-Z][a-z])/g, " $1");
   return result.charAt(0).toUpperCase() + result.slice(1);
@@ -101,6 +97,9 @@ Schemas.Post = new SimpleSchema({
         return Meteor.uuid();
       }
     }
+  },
+  "date": {
+    type: Date
   }
 });
 
@@ -319,7 +318,7 @@ if (Meteor.isClient) {
         type: e.target.type.value,
         content: (e.target.type.value === "rich" ? $("#editor").val() : e.target.content.value)
       }, (this.post ? this.post.postId : undefined))
-      Router.go("/courses/" + (this._id || this.doc._id)+ "/blog" + (this.post ? "/" + this.doc.posts.indexOf(this.post) : ""));
+      Router.go("/courses/" + (this._id || this.doc._id)+ "/blog" + (this.post ? "/" + this.post.postId : ""));
       return false;
     },
     "DOMNodeInserted": function(e) {
@@ -673,13 +672,14 @@ if (Meteor.isClient) {
 
   Router.route('/courses/:id/blog/:post', function() {
     var data = Courses.findOne(this.params.id);
-    this.render("post", {data: {doc: data, post: data.posts[this.params.post], index:this.params.post}});
+    this.render("post", {data: {doc: data, post: _.findWhere(data.posts, {postId:this.params.post})}});
   });
 
   Router.route('/courses/:id/blog/:post/edit', function() {
     var data = Courses.findOne(this.params.id);
-    Session.set("type", data.posts[this.params.post].type);
-    this.render("insertPost", {data: {doc: data, post: data.posts[this.params.post]}});
+    var post = _.findWhere(data.posts, {postId:this.params.post});
+    Session.set("type", post.type);
+    this.render("insertPost", {data: {doc: data, post: post}});
   });
 
   Router.route('/courses/:id/vocabularyQuizzes', function() {
@@ -803,8 +803,9 @@ if (Meteor.isServer) {
 Meteor.methods({
   "post": function(courseId, post, postId) {
     if(postId) {
-      Courses.update({_id:courseId,"posts.postId":postId}, {$set:{"posts.$": post}});
+      Courses.update({_id:courseId,"posts.postId":postId}, {$set:{"posts.$.title": post.title, "posts.$.type":post.type,"posts.$.content":post.content}});
     } else {
+      post.date = new Date(Date.now());
       Courses.update(courseId, {$push:{posts:post}});
     }
   },
