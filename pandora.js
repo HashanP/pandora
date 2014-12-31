@@ -82,6 +82,69 @@ Schemas.VocabularyQuiz = new SimpleSchema({
   }
 });
 
+Schemas.Option = new SimpleSchema({
+  "title": {
+    type: String
+  },
+  "correct": {
+    type: Boolean,
+    optional:true
+  }
+});
+
+Schemas.Question = new SimpleSchema({
+  "question":{
+    type: String
+  },
+  "type": {
+    type: String,
+    allowedValues: ["string", "number", "boolean", "radio", "checkbox"]
+  },
+  "options": {
+    type: [Schemas.Option],
+    optional:true
+  }
+});
+
+Schemas.QuestionAttempt = new SimpleSchema({
+  "options": {
+    type: [Schemas.Option],
+    optional:true
+  }
+});
+
+Schemas.QuizAttempt = new SimpleSchema({
+  "userId": {
+    type: String
+  },
+  "questions": {
+    type: [Schemas.QuestionAttempt],
+    optional:true
+  }
+});
+
+Schemas.Quiz = new SimpleSchema({
+  "title": {
+    type: String
+  },
+  "questions": {
+    type: [Schemas.Question],
+    optional:true
+  },
+  "attempts": {
+    type: [Schemas.QuizAttempt],
+    optional:true
+  },
+  "_id": {
+    type: String,
+    autoValue:function() {
+      if(this.operator !== "$pull" && this.operator !== "$set") {
+        return Meteor.uuid();
+      }
+    }
+  }
+});
+
 Schemas.Course = new SimpleSchema({
   "title": {
     type: String,
@@ -96,6 +159,10 @@ Schemas.Course = new SimpleSchema({
   "posts": {
     type: [Schemas.Post],
     optional: true
+  },
+  "quizzes": {
+    type:[Schemas.Quiz],
+    optional:true
   },
   "vocabularyQuizzes": {
     type: [Schemas.VocabularyQuiz],
@@ -217,9 +284,43 @@ if (Meteor.isClient) {
     }
   });
 
+  Template.optionForm.events({
+    "click .del": function() {
+      Blaze.remove(Blaze.currentView);
+      return false;
+    }
+  });
+
+  Template.questionForm.helpers({
+    "type": function() {
+      return Session.get("type")[this.no];
+    }
+  });
+
+  Template.questionForm.events({
+    "change .type": function(e) {
+      var y = Session.get("type")
+      y[this.no] = e.target.value;
+      Session.set("type", y);
+    },
+    "click .del": function() {
+      Blaze.remove(Blaze.currentView);
+    }
+  });
+
+  Template.optionForm.helpers({
+    "type": function() {
+      return Session.get("type")[this.no];
+    }
+  });
+
+  var addVocabularyQuestion = function(el, data) {
+    Blaze.renderWithData(Template.vocabularyQuestion, data || {}, el, el.lastElementChild);
+  };
+
   Template.insertVocabularyQuiz.events({
     "click .addQuestion": function(e) {
-      Blaze.render(Template.vocabularyQuestion, e.target.parentNode.parentNode.parentNode, e.target.parentNode.parentNode);
+      addVocabularyQuestion(e.target.parentNode.parentNode.parentNode);
     },
     "submit form": function(e) {
       var data = {title:e.target.title.value, questions:[]};
@@ -340,10 +441,111 @@ if (Meteor.isClient) {
   });
 
   Template.insertVocabularyQuiz.rendered = function() {
+    var data = Template.currentData();
+    if(data.quiz) {
+      data.quiz.questions.forEach(function(question) {
+        addVocabularyQuestion(Template.instance().find(".questions"), question);
+      });
+    } else {
+      addVocabularyQuestion(Template.instance().find(".questions"));
+    }
     var sort = new Sortable(this.find(".questions"), {
       animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
       handle: ".handle", // Restricts sort start click/touch to the specified element
       draggable: ".question",
+      ghostClass:"ghost"
+    });
+  }
+
+  var addOption = function(el, data) {
+    if(!data) {
+      data = {};
+    }
+    data.no = Template.currentData().no;
+    Blaze.renderWithData(Template.optionForm, data, el, el.querySelector(".btn"));
+  }
+
+  var count = 0;
+  var addQuestion = function(el, data) {
+    if(!data) {
+      data = {};
+    }
+    data.no = count;
+    Blaze.renderWithData(Template.questionForm, data, el);
+    count++;
+  };
+
+  Template.questionForm.events({
+    "click .addOption": function() {
+      addOption(Template.instance().find(".options"));
+    }
+  });
+
+  Template.questionForm.created = function() {
+    var y = Session.get("type");
+    y.push("string");
+    Session.set("type", y);
+  }
+
+  Template.questionForm.rendered = function() {
+    if(this.question) {
+      this.question.options.forEach(function(option) {
+        addOption(Template.instance().find(".options"), option);
+      });
+    } else {
+      addOption(Template.instance().find(".options"));
+    }
+    $(Template.instance().find(".editor")).wysihtml5();
+  }
+
+  Template.quizForm.events({
+    "click .addQuestion": function() {
+      addQuestion(Template.instance().find(".questions"));
+    },
+    "submit form": function(e) {
+      var data = {
+        title: e.target.title.value,
+        questions:[]
+      };
+      Template.instance().findAll(".panel").forEach(function(q) {
+        q = $(q);
+        var question = {
+          question: q.find(".editor").val(),
+          type: q.find(".type").val(),
+          options:[]
+        };
+        q.find(".option").each(function(i,option) {
+          option = $(option);
+          var o = {
+            title: option.find(".title").val()
+          }
+          if(option.find(".correct").length === 1) {
+            o.correct = option.find(".correct").prop("checked");
+          }
+          question.options.push(o);
+        });
+        data.questions.push(question);
+      });
+      console.log(data);
+      Meteor.call("quiz", this._id, data);
+      Router.go("/courses/" + this._id + "/quizzes");
+      return false;
+    }
+  });
+
+  Template.quizForm.rendered = function() {
+    count = 0;
+    if(this.quiz) {
+      this.quiz.questions.forEach(function(question) {
+        addQuestion(Template.instance.find(".questions"), question);
+      });
+    } else {
+      addQuestion(Template.instance().find(".questions"));
+    }
+    var sort = new Sortable(this.find(".questions"), {
+      animation: 150, // ms, animation speed moving items when sorting, `0` — without animation
+      handle: ".handle", // Restricts sort start click/touch to the specified element
+      draggable: ".panel",
       ghostClass:"ghost"
     });
   }
@@ -437,6 +639,23 @@ if (Meteor.isClient) {
     });
   });
 
+  Router.route("/courses/:id/quizzes", function() {
+    this.render("quizzes", {
+      data: function() {
+        return Courses.findOne(this.params.id);
+      }
+    });
+  });
+
+  Router.route("/courses/:id/quizzes/new", function() {
+    Session.set("type", []);
+    this.render("quizForm", {
+      data: function() {
+        return Courses.findOne(this.params.id);
+      }
+    });
+  });
+
 /*  Router.route('/courses/:id/blog/:post/delete', function() {
     Courses.update(this.doc._id, {$pull: {posts:{postId:this.post.postId}}});
     this.redirect("/courses/" + this.params.id + "/blog");
@@ -471,6 +690,9 @@ Meteor.methods({
     } else {
       Courses.update(courseId, {$push:{vocabularyQuizzes:data}});
     }
+  },
+  "quiz": function(courseId, data) {
+    Courses.update(courseId, {$push: {quizzes: data}});
   }
 });
 

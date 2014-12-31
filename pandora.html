@@ -1,5 +1,7 @@
 <head>
   <title>Pandora 3.0</title>
+  <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.1/sandstone/bootstrap.min.css" rel="stylesheet">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </head>
 
@@ -77,6 +79,16 @@
     </a>
     {{/each}}
   </div>
+</template>
+
+<template name="quizzes">
+  <ul class="list-group">
+    {{#each sortBy quizzes "title"}}
+      <li class="list-group-item">
+        <a href="/courses/{{../_id}}/quizzes/{{_id}}">{{title}}</a>
+      </li>
+    {{/each}}
+  </ul>
 </template>
 
 <template name="vocabularyQuizzes">
@@ -330,13 +342,6 @@
         <label>Questions</label>
         <br>
         {{> accents}}
-        {{#if quiz}}
-          {{#each quiz.questions}}
-            {{> vocabularyQuestion}}
-          {{/each}}
-        {{else}}
-          {{> vocabularyQuestion}}
-        {{/if}}
         <div class="row">
           <div class="col-md-12">
             <button type="button" class="addQuestion btn btn-sm btn-default">Add</button>
@@ -346,6 +351,91 @@
     </fieldset>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
+</template>
+
+<template name="optionForm">
+  <div class="input-group option">
+    {{#if eq type "radio"}}
+      <span class="input-group-addon">
+        <input type="radio" name="option{{no}}" class="correct">
+      </span>
+    {{/if}}
+    {{#if eq type "checkbox"}}
+    <span class="input-group-addon">
+      <input type="checkbox" name="option{{no}}" class="correct">
+    </span>
+    {{/if}}
+    {{#if eq type "number"}}
+      <input type="number" class="form-control title">
+    {{else}}
+      <input type="text" class="form-control title">
+    {{/if}}
+    <span class="input-group-addon">
+      <a class="del"><i class="fa fa-times"></i></a>
+    </span>
+  </div>
+</template>
+
+<template name="questionForm">
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="heading{{no}}">
+        <h4 class="panel-title">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{no}}" class="collapsed" aria-expanded="false" aria-controls="collapse{{no}}">
+            Question
+          </a>
+          <button class="btn btn-xs btn-default pull-right handle" type="button"><i class="fa fa-bars"></i></button>
+        </h4>
+      </div>
+      <div id="collapse{{no}}" class="panel-collapse collapse" role="tabpanel" aria-expaned="false" aria-labelledby="heading{{no}}">
+        <div class="panel-body">
+          <div class="form-group">
+            <label>Question</label>
+            <textarea name="question" class="editor form-control"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <select name="type" class="type form-control">
+              <option value="string">Text</option>
+              <option value="number">Number</option>
+              <option value="radio">Multiple Choice</option>
+              <option value="checkbox">Checkboxes</option>
+            </select>
+          </div>
+          <div class="form-group options">
+            {{#if eq type "string"}}
+              <label>All Correct Answers</label>
+              {{else}}
+              {{#if eq type "number"}}
+                <label>All Correct Answers</label>
+              {{/if}}
+            {{/if}}
+            <button type="button" class="btn btn-default btn-sm addOption">Add</button>
+            <button type="button" class="btn btn-danger btn-sm del">Delete Question</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</template>
+
+<template name="quizForm">
+  <div class="panel-body">
+    <form>
+      <fieldset>
+        <legend>Create Quiz</legend>
+        <div class="form-group">
+          <label>Title</label>
+          <input class="form-control" name="title" type="text" placeholder="Title">
+        </div>
+        <div class="form-group">
+          <label>Questions</label>
+          <div class="panel-group questions" id="accordion" role="tablist" aria-multiselectable="true">
+          </div>
+          <button type="button" class="btn btn-default addQuestion">Add Question</button>
+          <button type="sumbit" class="btn btn-primary">Submit</button>
+        </div>
+      </fieldset>
+    </form>
+  </div>
 </template>
 
 <template name="fileUpload">

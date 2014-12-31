@@ -838,26 +838,26 @@ body {
   display: none;
 }
 
-.panel-primary > .panel-heading {
+.st-container .panel-primary > .panel-heading {
   background-color:#694489;
   border-color:#694489;
 }
 
-.panel-primary {
+.st-container .panel-primary {
   border-color:#694489;
   overflow:hidden;
   background-color:#694489;
 }
 
-.panel-primary > .panel-heading a:hover {
+.st-container .panel-primary > .panel-heading a:hover {
   color:white;
 }
 
-.panel-primary > .panel-heading a i {
+.st-container .panel-primary > .panel-heading a i {
   padding-top:9px;
 }
 
-.panel-body {
+.st-container .panel-body {
   background-color:white;
 }
 
@@ -869,11 +869,11 @@ a:hover {
   color: #295A3E;
 }
 
-.panel {
+.st-container .panel {
   border-radius:7px;
 }
 
-.panel h3 {
+.st-container .panel h3 {
   font-size:18px;
   font-weight:200;
   text-transform:none;
@@ -903,8 +903,12 @@ a:hover {
   margin-right:auto;
 }
 
-.questions > .row {
+.questions > .row{
   margin-top:8px;
+}
+
+.options > .input-group {
+  margin-bottom:8px;
 }
 
 .question button {
