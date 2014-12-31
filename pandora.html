@@ -438,6 +438,108 @@
   </div>
 </template>
 
+<template name="quiz">
+  <div class="panel-body">
+    <div class="pull-right">
+      <a href="/courses/{{doc._id}}/quizzes/{{quiz._id}}/edit" class="btn btn-sm btn-info">Edit</a>
+      <button type="button" class="btn btn-sm btn-danger del">Delete</button>
+    </div>
+    <h1>{{quiz.title}}</h1>
+    {{#if previousAttempts}}
+      <h4>Previous Attempts</h4>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>
+              Date
+            </th>
+            <th>
+              Score
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each i myAttempts}}
+          <tr>
+            <td>{{britishDate date}}</td>
+            <td>{{getScore this ../quiz}}</td>
+            <td><a href="/courses/{{../doc._id}}/quizzes/{{../quiz._id}}/attempts/{{index}}" class="btn btn-sm btn-info">View</a></td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    {{/if}}
+    <div class="text-center">
+      <a href="/courses/{{doc._id}}/quizzes/{{quiz._id}}/attempt" class="btn-success btn attemptQuiz">Attempt Quiz</a>
+    </div>
+  </div>
+</template>
+
+<template name="quizAttempt">
+  <div class="panel-body">
+    <form>
+      {{#each quiz.questions}}
+        <div class="form-group question{{index}}">
+          <p>{{index}}. {{question}}</p>
+          {{#if eq type "string"}}
+            <input type="text" class="form-control">
+          {{else}}
+            {{#if eq type "number"}}
+              <input type="number" class="form-control">
+            {{else}}
+              {{#each shuffle options}}
+                <div class="checkbox">
+                  <label>
+                    <input value="{{title}}" name="question{{../index}}" type="{{../type}}"> <strong>{{title}}</strong>
+                  </label>
+                </div>
+              {{/each}}
+            {{/if}}
+          {{/if}}
+        </div>
+      {{/each}}
+      <br>
+      <button class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</template>
+
+<template name="previousAttempt">
+  <div class="panel-body">
+    <form>
+      Score: {{info.score}}
+      <br><br>
+      {{#each attempt.questions}}
+        <div class="form-group {{class}}">
+          <p>{{index}}. {{question}}</p>
+          {{#if eq type "string"}}
+            <input type="text" readonly class="form-control" value="{{answer}}">
+          {{else}}
+            {{#if eq type "number"}}
+              <input type="number" readonly class="form-control" value="{{answer}}">
+            {{else}}
+              {{#each options}}
+                <div class="checkbox">
+                  <label>
+                    {{#if correct}}
+                      <input value="{{title}}" disabled checked type="{{../type}}"> <strong>{{title}}</strong>
+                    {{else}}
+                      <input value="{{title}}" disabled type="{{../type}}"> <strong>{{title}}</strong>
+                    {{/if}}
+                  </label>
+                </div>
+              {{/each}}
+            {{/if}}
+          {{/if}}
+          {{#if eq correct false}}
+            Correct Answer: {{correctAnswer}}
+          {{/if}}
+        </div>
+      {{/each}}
+    </form>
+  </div>
+</template>
+
 <template name="fileUpload">
   <div class="modal fade">
     <div class="modal-dialog">

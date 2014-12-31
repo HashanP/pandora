@@ -27,11 +27,59 @@ UI.registerHelper("truncate", function(text, max) {
   return text;
 });
 
+var getInfo = function(attempt, quiz) {
+  var corrects = [];
+  var correct = 0;
+  console.log(attempt);
+  console.log(quiz);
+  attempt.questions.forEach(function(question, i) {
+    console.log("here");
+    if(quiz.questions[i].type === "string" || quiz.questions[i].type === "number") {
+      if(quiz.questions[i].options.map(function(str){return str.title.toLowerCase();}).indexOf(question.answer[0].toLowerCase()) !== -1) {
+        corrects.push(true);
+        correct++;
+      } else {
+        corrects.push(false);
+      }
+    } else if(quiz.questions[i].type === "radio") {
+      if(question.answer[0] === _.findWhere(quiz.questions[i].options, {correct:true}).title) {
+        corrects.push(true);
+        correct++;
+      } else {
+        corrects.push(false);
+      }
+    } else if(quiz.questions[i].type === "checkbox") {
+      console.log(question.answer);
+      if(_.uniq(question.answer) === _.uniq(_.pluck(_.where(quiz.questions[i].options, {correct:true}), "title"))) {
+        corrects.push(true);
+        correct++;
+      } else {
+        corrects.push(false);
+      }
+    }
+  });
+  return {score: correct, corrects: corrects};
+}
+
+UI.registerHelper("getScore", function(attempt, quiz) {
+  try {
+    return getInfo(attempt, quiz).score;
+  } catch (e) {
+    console.log(e);
+  }
+});
+
 UI.registerHelper("sortBy", _.sortBy);
+UI.registerHelper("shuffle", _.shuffle);
 
 UI.registerHelper("titleCase", function(str) {
   var result = str.replace(/([A-Z]+)/g, " $1").replace(/([A-Z][a-z])/g, " $1");
   return result.charAt(0).toUpperCase() + result.slice(1);
+});
+
+UI.registerHelper("britishDate", function(date) {
+  console.log(date);
+  return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
 });
 
 var Schemas = {};
@@ -107,8 +155,8 @@ Schemas.Question = new SimpleSchema({
 });
 
 Schemas.QuestionAttempt = new SimpleSchema({
-  "options": {
-    type: [Schemas.Option],
+  "answer": {
+    type: [String],
     optional:true
   }
 });
@@ -120,6 +168,9 @@ Schemas.QuizAttempt = new SimpleSchema({
   "questions": {
     type: [Schemas.QuestionAttempt],
     optional:true
+  },
+  "date": {
+    type: Date
   }
 });
 
@@ -558,6 +609,27 @@ if (Meteor.isClient) {
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.find(".mathjax")]);
   }
 
+  Template.quizAttempt.events({
+    "submit form": function() {
+      console.log("here");
+      var data = {questions:[]};
+      this.quiz.questions.forEach(function(question) {
+        if(question.type === "string" || question.type === "number") {
+          data.questions.push({
+            answer: [Template.instance().$(".question" + question.index + " input").val()]
+          });
+        } else {
+          data.questions.push({
+            answer: _.pluck(Template.instance().findAll(".question" + question.index + " input:checked"), "value")
+          });
+        }
+      });
+      Meteor.call("quizAttempt", this.doc._id, this.quiz._id, data);
+      Router.go("/courses/" + this.doc._id + "/quizzes/" + this.quiz._id + "/attempts/" + this.quiz.attempts.length);
+      return false;
+    }
+  });
+
   Router.onBeforeAction(function() {
     if (!Meteor.userId()) {
       this.render('login');
@@ -656,6 +728,52 @@ if (Meteor.isClient) {
     });
   });
 
+  Router.route("/courses/:id/quizzes/:quiz", function() {
+    this.render("quiz", {data: function() {
+      var data = Courses.findOne(this.params.id);
+      if(data) {
+        var quiz = _.findWhere(data.quizzes, {_id:this.params.quiz});
+        var myAttempts = _.where(quiz.attempts, {userId: Meteor.userId()});
+        return {doc: data, quiz: quiz, myAttempts: myAttempts, previousAttempts: myAttempts.length !== 0};
+      }
+    }})
+  });
+
+  Router.route("/courses/:id/quizzes/:quiz/attempt", function() {
+    var data = Courses.findOne(this.params.id);
+    var quiz = _.findWhere(data.quizzes, {_id:this.params.quiz});
+    quiz.questions = quiz.questions.map(function(question, i) {
+      question.index = i + 1;
+      return question;
+    });
+    this.render("quizAttempt", {data: {doc: data, quiz:quiz}});
+  });
+
+  Router.route("/courses/:id/quizzes/:quiz/attempts/:attempt", function() {
+    var data = Courses.findOne(this.params.id);
+    var quiz = _.findWhere(data.quizzes, {_id:this.params.quiz});
+    var attempt = quiz.attempts[this.params.attempt];
+    var info = getInfo(attempt, quiz);
+    attempt.questions.forEach(function(question, i) {
+      question.question = quiz.questions[i].question;
+      question.type = quiz.questions[i].type;
+      question.correct = info.corrects[i];
+      question.class = (question.correct ? "has-success" : "has-error");
+      if(question.type === "radio" || question.type === "checkbox") {
+        question.options = quiz.questions[i].options.map(function(c) {
+          c.correct = question.answer.indexOf(c.title) !== -1;
+          return c;
+        });
+        question.answer = question.answer[0];
+        question.correctAnswer = _.pluck(_.where(quiz.questions[i].options, {correct:true}), "title").join(", ");
+      } else {
+        question.correctAnswer = _.pluck(_.where(quiz.questions[i].options, {correct:true}), "title").join("/");
+      }
+      question.index = i +1;
+    });
+    this.render("previousAttempt", {data: {doc: data, quiz:quiz, attempt:attempt, info:info}});
+  });
+
 /*  Router.route('/courses/:id/blog/:post/delete', function() {
     Courses.update(this.doc._id, {$pull: {posts:{postId:this.post.postId}}});
     this.redirect("/courses/" + this.params.id + "/blog");
@@ -693,6 +811,11 @@ Meteor.methods({
   },
   "quiz": function(courseId, data) {
     Courses.update(courseId, {$push: {quizzes: data}});
+  },
+  "quizAttempt": function(courseId, quizId, data) {
+    data.date = new Date(Date.now());
+    data.userId = Meteor.userId();
+    Courses.update({_id: courseId, "quizzes._id":quizId}, {$push:{"quizzes.$.attempts":data}});
   }
 });
 
