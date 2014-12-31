@@ -601,6 +601,13 @@ if (Meteor.isClient) {
     });
   }
 
+  Template.quiz.events({
+    "click .del": function() {
+      Courses.update(this.doc._id, {$pull:{quizzes:{_id:this.quiz._id}}});
+      Router.go("/courses/" + this.doc._id + "/quizzes");
+    }
+  });
+
   Template.insertPost.rendered = function() {
     $("#editor").wysihtml5();
   }
