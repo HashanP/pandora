@@ -47,6 +47,13 @@
     {{> navbar}}
 
     <main class="container-fluid">
+      <div class="pull-right">
+        <br>
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-info active">Grid</button>
+          <button type="button" class="btn btn-info">List</button>
+        </div>
+      </div>
       <div class="grid block-grid-xl-8 block-grid-lg-8 block-grid-sm-4 block-grid-xs-2">
         {{#each courses}}
         <div class="block-grid-item icon">
@@ -215,7 +222,7 @@
             <li role="presentation"><a href="/courses/{{doc._id}}/file_uploads">File Uploads</a></li>
             <li role="presentation"><a href="/courses/{{doc._id}}/studentResources">Student Resources</a></li>
             <li role="presentation"><a href="/courses/{{doc._id}}/students">Students</a></li>
-            <li role="presentation"><a href="/courses/{{doc._id}}/random_name_generator">Random Name Generator</a></li>
+            <li role="presentation"><a href="/courses/{{doc._id}}/randomNameGenerator">Random Name Generator</a></li>
           </ul>
         </nav>
 
@@ -230,7 +237,15 @@
                   {{#if eq section "studentResources"}}
                     <a class="uploadFile" href="#"><i class="fa fa-plus"></i></a>
                   {{else}}
+                    {{# if eq section "blog"}}
+                      <a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>
+                    {{/if}}
+                    {{# if eq section "quizzes"}}
                     <a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>
+                    {{/if}}
+                    {{# if eq section "vocabularyQuizzes"}}
+                    <a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>
+                    {{/if}}
                   {{/if}}
                 </div>
               </div>
@@ -433,6 +448,7 @@
 <template name="quiz">
   <div class="panel-body">
     <div class="pull-right">
+      <a href="/courses/{{doc._id}}/quizzes/{{quiz._id}}/results" class="btn btn-sm btn-primary">Results</a>
       <a href="/courses/{{doc._id}}/quizzes/{{quiz._id}}/edit" class="btn btn-sm btn-info">Edit</a>
       <button type="button" class="btn btn-sm btn-danger del">Delete</button>
     </div>
@@ -556,5 +572,29 @@
         </div>
       </div>
     </div>
+  </div>
+</template>
+
+<template name="students">
+  <ul class="list-group">
+    {{#each students}}
+      <li class="list-group-item"><a href="mailto:{{email}}">{{username}}</a></li>
+    {{/each}}
+  </ul>
+</template>
+
+<template name="quizResults">
+  <div class="panel-body">
+    <h1>{{quiz.title}}</h1>
+    <div class="svg"></div>
+  </div>
+</template>
+
+<template name="randomNameGenerator">
+  <div class="panel-body text-center">
+    <p class="text-lg">
+      ~
+    </p>
+    <button type="button" class="btn btn-primary">Generate</button>
   </div>
 </template>

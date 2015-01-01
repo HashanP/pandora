@@ -986,3 +986,7 @@ a:hover {
     border-top:1px solid black;
   }
 }
+
+.text-lg {
+  font-size:36px;
+}

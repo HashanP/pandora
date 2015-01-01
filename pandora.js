@@ -19,6 +19,14 @@ UI.registerHelper("truncate", function(text, max) {
   return text;
 });
 
+UI.registerHelper("i", function(obj) {
+  if(!obj) return null;
+  obj.forEach(function(item, i) {
+    item.index = i;
+  });
+  return obj;
+});
+
 var getInfo = function(attempt, quiz) {
   var corrects = [];
   var correct = 0;
@@ -221,12 +229,28 @@ Schemas.Course = new SimpleSchema({
   "studentResources": {
     type: [String],
     optional:true
+  },
+  "students": {
+    type: [String],
+    optional:true,
+    autoform: {
+      options: function() {
+        return _.map(Meteor.users.find().fetch(), function(user) {
+          return {
+            label: user.emails[0].address,
+            value: user._id
+          }
+        });
+      }
+    }
   }
 });
 
 Courses.attachSchema(Schemas.Course);
 
 if (Meteor.isClient) {
+  Meteor.subscribe("userData");
+
   var lastActive;
 
   Meteor.startup(function() {
@@ -636,6 +660,44 @@ if (Meteor.isClient) {
     }
   });
 
+  var stub;
+  Template.quizResults.rendered = function() {
+    stub = Meteor.autorun(function() {
+      var doc = Courses.findOne(this.doc._id);
+      var quiz = _.findWhere(doc.quizzes, {_id: this.quiz._id});
+    //  var users = Meteor.call("users", )
+      var attempts = {};
+      this.quiz.attempts.forEach(function(attempt) {
+        this.users.forEach(function(user) {
+          if(user._id === attempt.userId) {
+            attempt.score = getInfo(attempt, this.quiz).score;
+            if(Session.equals("criterion", "average")) {
+              if(!(user.name in attempts)) {
+                attempts[user.name] = [attempt.score];
+              } else {
+                attempts[user.name].push(attempt.score);
+              }
+            }
+            if(Session.equals("criterion", "best") && (!(user.name in attempts) || attempt.score > attempts[user.name].score)) {
+              attempts[user.name] = attempt;
+            }
+            if(Session.get("criterion", "first") && (!(user.name in attempts) || attempt.date < attempts[user.name].date)) {
+              attempts[user.name] = attempt;
+            }
+          }
+        }.bind(this));
+      }.bind(this));
+      var attemptsL = [];
+      for(var user in attempts) {
+        if(Session.equals("criterion", "average")) {
+          attemptsL.push({user: user, score:attempts[user].reduce(function(a, b) {return a + b}) / attempts[user].length});
+        } else {
+          attemptsL.push({user: user, score:attempts[user].score, index: attempts[user].index});
+        }
+      }
+    });
+  }
+
   Router.onBeforeAction(function() {
     if (!Meteor.userId()) {
       this.render('login');
@@ -714,6 +776,42 @@ if (Meteor.isClient) {
           });
         }
         return data;
+      }
+    });
+  });
+
+  Router.route("/courses/:id/students", function() {
+    this.render("students", {
+      data: function() {
+        var data = Courses.findOne(this.params.id);
+        if(data) {
+          return {students:_.map(Meteor.users.find({_id: {$in: data.students}}, {fields:{emails:1}}).fetch(), function(user) {
+            console.log(user);
+            return {
+              email:user.emails[0].address,
+              username: user.emails[0].address.split("@")[0]
+            }
+          })}
+        }
+      }
+    });
+  });
+
+  Template.randomNameGenerator.events({
+    "click .btn": function() {
+      Template.instance().find(".text-lg").innerHTML = this.students[Math.floor(Math.random() * (this.students.length))];
+    }
+  });
+
+  Router.route("/courses/:id/randomNameGenerator", function() {
+    this.render("randomNameGenerator", {
+      data: function() {
+        var data = Courses.findOne(this.params.id);
+        if(data) {
+          return {students:_.map(Meteor.users.find({_id: {$in: data.students}}, {fields:{emails:1}}).fetch(), function(user) {
+            return  user.emails[0].address.split("@")[0];
+          })}
+        }
       }
     });
   });
@@ -797,6 +895,10 @@ if (Meteor.isServer) {
     // code to run on server at startup
   });
 
+  Meteor.publish("userData", function () {
+    return Meteor.users.find({},  {fields: {'emails': 1}});
+  });
+
   Accounts.config({restrictCreationByEmailDomain:'whsb.essex.sch.uk'});
 }
 
@@ -834,7 +936,8 @@ this.AdminConfig = {
     Users: {
     },
     Courses: {
-        omitFields:["posts"]
-      }
+      omitFields:["posts", "quizzes", "vocabularyQuizzes", "studentResources"],
+      auxCollections:["Users"]
+    }
   }
 };
