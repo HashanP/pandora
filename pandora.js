@@ -906,6 +906,34 @@ if (Meteor.isServer) {
     return Meteor.users.find({},  {fields: {'emails': 1}});
   });
 
+  RssFeed.publish('course', function(query) {
+    var self = this;
+
+    if(!query.id) {
+      throw new Error();
+    }
+
+    var course = Courses.findOne(query.id);
+
+    self.setValue('title', self.cdata(course.title));
+    self.setValue('description', self.cdata('This is a live feed of the blog of ' + course.title));
+    self.setValue('link', Meteor.absoluteUrl("courses/" + course._id + "/blog"));
+    self.setValue('lastBuildDate', new Date());
+    self.setValue('pubDate', new Date());
+    self.setValue('ttl', 1);
+    // managingEditor, webMaster, language, docs, generator
+
+    _.sortBy(course.posts, "date").reverse().forEach(function(doc) {
+      self.addItem({
+        title: doc.title,
+        description: (doc.content.length > 150 ? doc.content.substring(0, 300) + "..." : doc.content),
+        link: Meteor.absoluteUrl("courses/" + course._id + "/blog/" + doc.postId),
+        pubDate: doc.date,
+        guid:doc.postId
+      });
+    });
+  });
+
   Accounts.config({restrictCreationByEmailDomain:'whsb.essex.sch.uk'});
 }
 

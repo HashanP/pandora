@@ -238,6 +238,7 @@
                     <a class="uploadFile" href="#"><i class="fa fa-plus"></i></a>
                   {{else}}
                     {{# if eq section "blog"}}
+                      <a href="/rss/course?id={{doc._id}}" class="btn btn-xs rss btn-warning">RSS</a>
                       <a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>
                     {{/if}}
                     {{# if eq section "quizzes"}}
