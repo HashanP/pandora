@@ -994,3 +994,9 @@ a:hover {
 .shuffle, .rss {
   margin-right:5px;
 }
+
+.domain {
+  fill: none;
+  stroke: black;
+  stroke-width: 1;
+}

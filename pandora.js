@@ -662,40 +662,121 @@ if (Meteor.isClient) {
 
   var stub;
   Template.quizResults.rendered = function() {
+    var y = Template.instance();
+    console.log(this);
+    var data = this.data;
     stub = Meteor.autorun(function() {
-      var doc = Courses.findOne(this.doc._id);
-      var quiz = _.findWhere(doc.quizzes, {_id: this.quiz._id});
-    //  var users = Meteor.call("users", )
-      var attempts = {};
-      this.quiz.attempts.forEach(function(attempt) {
-        this.users.forEach(function(user) {
-          if(user._id === attempt.userId) {
-            attempt.score = getInfo(attempt, this.quiz).score;
-            if(Session.equals("criterion", "average")) {
-              if(!(user.name in attempts)) {
-                attempts[user.name] = [attempt.score];
-              } else {
-                attempts[user.name].push(attempt.score);
+      console.log(this);
+      var doc = Courses.findOne(this.data.id);
+      console.log(doc);
+      if(doc) {
+        console.log(doc);
+        var quiz = _.findWhere(doc.quizzes, {_id: this.data.quiz});
+
+        var attempts = {};
+        quiz.attempts.forEach(function(attempt) {
+          doc.students.forEach(function(user) {
+            user = Meteor.users.findOne(user, {fields:{emails:1}});
+            user.name = user.emails[0].address.split("@")[0];
+            if(user._id === attempt.userId) {
+              attempt.score = getInfo(attempt, quiz).score;
+              if(Session.equals("criterion", "average")) {
+                if(!(user.name in attempts)) {
+                  attempts[user.name] = [attempt.score];
+                } else {
+                  attempts[user.name].push(attempt.score);
+                }
+              }
+              if(Session.equals("criterion", "best") && (!(user.name in attempts) || attempt.score > attempts[user.name].score)) {
+                attempts[user.name] = attempt;
+              }
+              if(Session.get("criterion", "first") && (!(user.name in attempts) || attempt.date < attempts[user.name].date)) {
+                attempts[user.name] = attempt;
               }
             }
-            if(Session.equals("criterion", "best") && (!(user.name in attempts) || attempt.score > attempts[user.name].score)) {
-              attempts[user.name] = attempt;
-            }
-            if(Session.get("criterion", "first") && (!(user.name in attempts) || attempt.date < attempts[user.name].date)) {
-              attempts[user.name] = attempt;
-            }
-          }
+          }.bind(this));
         }.bind(this));
-      }.bind(this));
-      var attemptsL = [];
-      for(var user in attempts) {
-        if(Session.equals("criterion", "average")) {
-          attemptsL.push({user: user, score:attempts[user].reduce(function(a, b) {return a + b}) / attempts[user].length});
-        } else {
-          attemptsL.push({user: user, score:attempts[user].score, index: attempts[user].index});
+        var attemptsL = [];
+        for(var user in attempts) {
+          if(Session.equals("criterion", "average")) {
+            attemptsL.push({user: user, score:attempts[user].reduce(function(a, b) {return a + b}) / attempts[user].length});
+          } else {
+            attemptsL.push({user: user, score:attempts[user].score, index: attempts[user].index});
+          }
         }
+        var HEIGHT = attemptsL.length * 30;
+
+        var canvas = d3.select(y.find(".svg"))
+        .append('svg')
+        .attr({viewBox:"0 0 907 " + (HEIGHT + 70)});
+
+        console.log(quiz.questions.length);
+
+        var color = d3.scale.quantize()
+        .domain([0, quiz.questions.length])
+        .range(colorbrewer.RdYlGn[9]);
+
+        var xscale = d3.scale.linear()
+        .domain([0, quiz.questions.length])
+        .range([0,722]);
+
+        var yscale = d3.scale.linear()
+        .domain([0, attemptsL.length])
+        .range([0, HEIGHT]);
+
+        var	yAxis = d3.svg.axis();
+        yAxis
+        .orient('left')
+        .scale(yscale)
+        .tickSize(4)
+        .tickFormat(function(d,i){ return attemptsL[i].user; })
+        .tickValues(d3.range(attemptsL.length));
+
+        var	xAxis = d3.svg.axis();
+        xAxis
+        .orient('bottom')
+        .scale(xscale)
+        .tickFormat(function(d,i){return d.toString()} )
+        .tickValues([0].concat(quiz.questions.map(function(d,i){return i +1})));
+
+        var x_xis = canvas.append('g')
+        .attr("transform", "translate(149,"+ (HEIGHT + 16) +")")
+        .attr('id','xaxis')
+        .call(xAxis);
+
+        var y_xis = canvas.append('g')
+        .attr("transform", "translate(149,16)")
+        .attr('id','yaxis')
+        .call(yAxis);
+
+        y_xis.selectAll("text").attr("dy", "1.25em");
+
+        var chart = canvas.append('g')
+        .attr("transform", "translate(149.7,0)")
+        .attr('id','bars')
+        .selectAll('rect')
+        .data(attemptsL)
+        .enter()
+        .append('rect')
+        .attr('height',19)
+        .on('mouseover', function(d){
+          d3.select(this).style({fill:d3.rgb(color(d.score)).darker(0.35)})
+        })
+        .on('mouseout', function(d){
+          d3.select(this).style({fill:color(d.score)})
+        })
+        .on('click', function(d) {
+          page("/courses/" + this.id + "/quizzes/" + this.quiz.index + "/attempts/" + d.index)
+        }.bind(this))
+        .attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
+        .style('fill',function(d,i){ return color(d.score); })
+        .attr('width',function(d){ return xscale(d.score); });
       }
-    });
+    }.bind(this));
+  }
+
+  Template.quizResults.destroyed = function() {
+    stub.stop();
   }
 
   Template.course.events({
@@ -886,10 +967,10 @@ if (Meteor.isClient) {
     this.render("previousAttempt", {data: {doc: data, quiz:quiz, attempt:attempt, info:info}});
   });
 
-/*  Router.route('/courses/:id/blog/:post/delete', function() {
-    Courses.update(this.doc._id, {$pull: {posts:{postId:this.post.postId}}});
-    this.redirect("/courses/" + this.params.id + "/blog");
-  });*/
+  Router.route("/courses/:id/quizzes/:quiz/results", function() {
+    Session.set("criterion", "best");
+    this.render("quizResults", {data: this.params});
+  });
 
   Router.route("/logout", function() {
     Meteor.logout();
