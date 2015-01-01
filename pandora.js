@@ -698,6 +698,13 @@ if (Meteor.isClient) {
     });
   }
 
+  Template.course.events({
+    "click .shuffle": function() {
+      var rnd = this.doc[this.section][Math.floor(Math.random()* this.doc[this.section].length)]._id;
+      Router.go("/courses/" + this.doc._id + "/" + this.section + "/" + rnd);
+    }
+  });
+
   Router.onBeforeAction(function() {
     if (!Meteor.userId()) {
       this.render('login');
