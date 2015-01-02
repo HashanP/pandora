@@ -873,7 +873,7 @@ a:hover {
   border-radius:7px;
 }
 
-.st-container .panel h3 {
+.st-container .panel h3:not(.popover-title) {
   font-size:18px;
   font-weight:200;
   text-transform:none;
@@ -963,6 +963,10 @@ a:hover {
   background-color:#ef3d47;
 }
 
+.vocab-quiz *:nth-child(-n+2), .vocab-quiz *:nth-child(-n+2):focus {
+  border-top:1px solid black;
+}
+
 @media screen and (max-width:969px) {
   .vocab-quiz *:nth-child(2n) {
     border-right-width: 0px;
@@ -999,4 +1003,57 @@ a:hover {
   fill: none;
   stroke: black;
   stroke-width: 1;
+}
+
+/* CROSSWORDS */
+
+.crossword {
+  border-collapse:collapse;
+  margin-left:auto;
+  margin-right:auto;
+  clear:both;
+  margin-top:10px;
+  margin-bottom:10px;
+}
+
+.crossword td {
+  border:1px solid #aaa;
+  padding:0;
+  margin:0;
+  vertical-align:middle;
+  padding:0;
+  text-align:center;
+  width:40px;
+  height:40px;
+  position:relative;
+  background:white;
+}
+
+.crossword .start {
+  cursor:pointer;
+}
+
+.crossword td span {
+  color: #444;
+  font-weight:normal;
+  font-size:0.5em !important;
+  position: absolute;
+  top: -1px;
+  left: 1px;
+}
+
+
+.crossword .no-border {
+  background-color:#333;
+}
+
+.crossword td  {
+  padding-top:2px;
+  color:green;
+  font-weight:bold;
+  font-size:25px;
+}
+
+button:focus {
+  outline:0 !important;
 }

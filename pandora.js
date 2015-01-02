@@ -124,6 +124,10 @@ Schemas.VocabularyQuiz = new SimpleSchema({
   "title": {
     type: String
   },
+  "format": {
+    type: String,
+    allowedValues:["short", "long", "crossword"]
+  },
   "questions":{
     type:[Schemas.VocabularyQuestion]
   },
@@ -267,7 +271,6 @@ if (Meteor.isClient) {
       SVG: { linebreaks: { automatic: true } }
     });
     $("body").on("blur", "input", function(e) {
-      console.log("fsddfs");
       lastActive = e.target;
     });
   });
@@ -397,7 +400,7 @@ if (Meteor.isClient) {
       addVocabularyQuestion(e.target.parentNode.parentNode.parentNode);
     },
     "submit form": function(e) {
-      var data = {title:e.target.title.value, questions:[]};
+      var data = {title:e.target.title.value, format:e.target.format.value, questions:[]};
       var el = $(e.target);
       el.find(".question").each(function(i, el) {
         data.questions.push({
@@ -419,46 +422,6 @@ if (Meteor.isClient) {
         focus.val(focus.val().substring(0, start) + $(e.target).text() + focus.val().slice(end));
         lastActive.focus();
         lastActive.setSelectionRange(start+1, start + 2);
-    }
-  });
-
-  Template.vocabularyQuiz.events({
-    "change input": function(e) {
-      if(e.target.dataset.answer.toLowerCase().split(",").map(function(str) {return str.trim()}).indexOf(e.target.value.toLowerCase().trim()) !== -1) {
-        if(!e.target.classList.contains("correct")) {
-          e.target.classList.add("correct");
-          e.target.classList.remove("incorrect");
-          if(e.target.nextSibling && e.target.nextSibling.nextSibling) {
-            e.target.nextElementSibling.nextElementSibling.focus();
-          } else {
-            e.target.blur();
-          }
-        }
-      } else if(e.target.value !== "") {
-        e.target.classList.add("incorrect");
-        e.target.classList.remove("correct");
-      }
-    },
-    "click .revealAnswers": function() {
-      Template.instance().findAll("input").forEach(function(el) {
-        if(!el.classList.contains("correct")) {
-          el.classList.add("incorrect");
-        }
-        el.value = el.dataset.answer;
-        el.readOnly = true;
-      });
-    },
-    "click .reset": function() {
-      Template.instance().findAll("input").forEach(function(el) {
-        el.value = "";
-        el.classList.remove("correct");
-        el.classList.remove("incorrect");
-        el.readOnly = false;
-      });
-    },
-    "click .del": function() {
-      Courses.update(this._id, {$pull: {vocabularyQuizzes:{_id:this.quiz._id}}});
-      Router.go("/courses/" + this._id + "/vocabularyQuizzes")
     }
   });
 
@@ -639,6 +602,135 @@ if (Meteor.isClient) {
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, this.find(".mathjax")]);
   }
 
+  var grid, cw, quiz;
+
+  var rerun = function() {
+    if(quiz.questions.length <= 2) {
+      this.find(".crossword").innerHTML = "<p class=\"text-warning\">There must be at least 3 questions in a crossword.</p>";
+      return;
+    } else if(this.grid === null) {
+      this.find(".crossword").innerHTML = "<p class=\"text-warning\">The answers do not fit the grid. Sorry. Bad words: " + cw.getBadWords().map(function(x){return x.word}).join(", ") + "</p>";
+    } else {
+      this.find(".crossword").innerHTML = crosswordUtils.toHtml(grid);
+    }
+  }
+
+  Template.vocabularyQuiz.rendered = function() {
+    var complete = false;
+    this.autorun(function() {
+      if(complete) {
+        return;
+      }
+      var doc = Courses.findOne(this.data._id);
+      if(doc) {
+        complete = true;
+        console.log(this.data);
+        console.log(doc);
+        quiz = _.findWhere(doc.vocabularyQuizzes, {_id:this.data.quizId});
+        if(quiz.format !== "crossword") {
+          return;
+        }
+        var values = quiz.questions.map(function(question) {
+          return question.question;
+        });
+        var keys = quiz.questions.map(function(question) {
+          return question.answer;
+        });
+        var correct = {};
+        if(quiz.questions.length > 2) {
+          var additional = 0;
+          while((grid === null || grid === undefined) && additional < 100) {
+            cw = new Crossword(quiz.questions, additional);
+            grid = cw.getSquareGrid(10);
+            additional += 5;
+          }
+        }
+        rerun.call(this);
+      }
+    }.bind(this));
+  };
+
+  Template.vocabularyQuiz.events({
+    "click .start": function(e) {
+      var clues = [];
+      if(e.target.dataset.down !== undefined) {
+        clues.push({name:"Down", label:e.target.querySelector("span").innerHTML, info: quiz.questions[e.target.dataset.down].question, index:e.target.dataset.down});
+      }
+      if(e.target.dataset.across !== undefined) {
+        clues.push({name:"Across", label:e.target.querySelector("span").innerHTML,info: quiz.questions[e.target.dataset.across].question, index:e.target.dataset.across});
+      }
+      Template.instance().find(".clues").innerHTML = "";
+      Blaze.renderWithData(Template.clues, {clues: clues}, Template.instance().find(".clues"));
+    },
+    "click .enter": function(e) {
+      console.log(quiz.questions);
+      if(quiz.questions[e.target.dataset.index].answer.toLowerCase() === e.target.parentNode.parentNode.querySelector("input").value.toLowerCase()) {
+        quiz.questions[e.target.dataset.index].visible = true;
+        $(e.target).closest(".form-group").remove();
+        rerun.call(Template.instance());
+      } else {
+        $(e.target).closest(".form-group").addClass("has-error");
+      }
+    }
+  });
+
+  Template.vocabularyQuiz.events({
+    "keyup input.answer": function(e) {
+      console.log("here");
+      if(e.target.dataset.answer.toLowerCase().split(",").map(function(str) {return str.trim()}).indexOf(e.target.value.toLowerCase().trim()) !== -1) {
+        if(!e.target.classList.contains("correct")) {
+          e.target.classList.add("correct");
+          e.target.classList.remove("incorrect");
+          if(e.target.nextSibling && e.target.nextSibling.nextSibling) {
+            e.target.nextElementSibling.nextElementSibling.focus();
+          } else {
+            e.target.blur();
+          }
+        }
+      } else if(e.target.value !== "") {
+        e.target.classList.add("incorrect");
+        e.target.classList.remove("correct");
+      }
+    },
+    "click .revealAnswers": function() {
+      if(this.quiz.format !== "crossword") {
+        Template.instance().findAll("input").forEach(function(el) {
+          if(!el.classList.contains("correct")) {
+            el.classList.add("incorrect");
+          }
+          el.value = el.dataset.answer;
+          el.readOnly = true;
+        });
+      } else {
+          quiz.questions.forEach(function(question) {
+            question.visible = true;
+          });
+          rerun.call(Template.instance());
+          return false;
+      }
+    },
+    "click .reset": function() {
+      if(this.quiz.format !== "crossword") {
+        Template.instance().findAll("input").forEach(function(el) {
+          el.value = "";
+          el.classList.remove("correct");
+          el.classList.remove("incorrect");
+          el.readOnly = false;
+        });
+      } else{
+        quiz.questions.forEach(function(question) {
+          question.visible = false;
+        });
+        rerun.call(Template.instance());
+      }
+      return false;
+    },
+    "click .del": function() {
+      Courses.update(this._id, {$pull: {vocabularyQuizzes:{_id:this.quiz._id}}});
+      Router.go("/courses/" + this._id + "/vocabularyQuizzes")
+    }
+  });
+
   Template.quizAttempt.events({
     "submit form": function() {
       console.log("here");
@@ -671,7 +763,7 @@ if (Meteor.isClient) {
       console.log(doc);
       if(doc) {
         console.log(doc);
-        var quiz = _.findWhere(doc.quizzes, {_id: this.data.quiz});
+        var quiz = _.findWhere(doc.quizzes, {_id: this.data.quizId});
 
         var attempts = {};
         quiz.attempts.forEach(function(attempt) {
@@ -844,7 +936,7 @@ if (Meteor.isClient) {
     this.render("vocabularyQuiz", {data: function() {
       var data = Courses.findOne(this.params.id);
       if(data) {
-        return {quiz:_.findWhere(data.vocabularyQuizzes, {_id:this.params.vocabularyQuiz}), _id:data._id};
+        return {quiz:_.findWhere(data.vocabularyQuizzes, {_id:this.params.vocabularyQuiz}), _id:data._id, quizId:this.params.vocabularyQuiz};
       }
     }});
   });
@@ -1030,7 +1122,7 @@ Meteor.methods({
   "vocabularyQuiz": function(courseId, data, vocabQuizId) {
     if(vocabQuizId) {
       Courses.update({_id:courseId, "vocabularyQuizzes._id":vocabQuizId}, {$set:{
-        "vocabularyQuizzes.$.title":data.title, "vocabularyQuizzes.$.questions":data.questions}});
+        "vocabularyQuizzes.$.title":data.title, "vocabularyQuizzes.$.questions":data.questions, "vocabularyQuizzes.$.format":data.format}});
     } else {
       Courses.update(courseId, {$push:{vocabularyQuizzes:data}});
     }
