@@ -117,8 +117,10 @@
     <div class="pull-right">
       <button type="button" class="btn btn-sm btn-default reset">Reset</button>
       <button type="button" class="btn btn-sm btn-warning revealAnswers">Reveal Answers</button>
+      {{#if teacher}}
       <a href="/courses/{{_id}}/vocabularyQuizzes/{{quiz._id}}/edit" class="btn btn-sm btn-info">Edit</a>
       <button type="button" class="btn btn-sm btn-danger del">Delete</button>
+      {{/if}}
     </div>
     <h1>{{quiz.title}}</h1>
     {{> accents}}
@@ -149,8 +151,10 @@
 <template name="post">
   <div class="panel-body">
     <div class="pull-right">
-      <a href="/courses/{{doc._id}}/blog/{{post.postId}}/edit" class="btn btn-sm btn-info">Edit</a>
-      <button class="btn btn-sm btn-danger del">Delete</button>
+      {{#if teacher}}
+        <a href="/courses/{{doc._id}}/blog/{{post.postId}}/edit" class="btn btn-sm btn-info">Edit</a>
+        <button class="btn btn-sm btn-danger del">Delete</button>
+      {{/if}}
     </div>
     <h1>{{post.title}}</h1>
     {{#if eq post.type "rich"}}
@@ -188,11 +192,19 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
+          {{#if eq selected "subjects"}}
           <li class="active"><a href="/">Subjects <span class="sr-only">(current)</span></a></li>
-          {{#if admin}}
-          <li><a href="#">Clubs</a></li>
+          {{else}}
+          <li><a href="/">Subjects</a></li>
           {{/if}}
+          {{#if eq selected "clubs"}}
+          <li class="active"><a href="/clubs">Clubs <span class="sr-only">(current)</span></a></li>
+          {{else}}
+          <li><a href="/clubs">Clubs</a></li>
+          {{/if}}
+          {{#if admin}}
           <li><a href="/admin">Admin</a></li>
+          {{/if}}
         </ul>
         <form class="navbar-form navbar-left" role="search">
           <div class="form-group">
@@ -250,19 +262,19 @@
                 </h3>
                 <div class="pull-right">
                   {{#if eq section "studentResources"}}
-                    <a class="uploadFile" href="#"><i class="fa fa-plus"></i></a>
+                  {{#if teacher}}<a class="uploadFile" href="#"><i class="fa fa-plus"></i></a>{{/if}}
                   {{else}}
                     {{# if eq section "blog"}}
                       <a href="/rss/course?id={{doc._id}}" class="btn btn-xs rss btn-warning">RSS</a>
-                      <a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>
+                      {{#if teacher}}<a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>{{/if}}
                     {{/if}}
                     {{# if eq section "quizzes"}}
                     <button type="button" class="btn btn-xs shuffle btn-info">Shuffle</button>
-                    <a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>
+                    {{#if teacher}}<a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>{{/if}}
                     {{/if}}
                     {{# if eq section "vocabularyQuizzes"}}
                     <button type="button" class="btn btn-xs shuffle btn-info">Shuffle</button>
-                    <a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>
+                    {{#if teacher}}<a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>{{/if}}
                     {{/if}}
                   {{/if}}
                 </div>
@@ -488,9 +500,11 @@
 <template name="quiz">
   <div class="panel-body">
     <div class="pull-right">
-      <a href="/courses/{{doc._id}}/quizzes/{{quiz._id}}/results" class="btn btn-sm btn-primary">Results</a>
-      <a href="/courses/{{doc._id}}/quizzes/{{quiz._id}}/edit" class="btn btn-sm btn-info">Edit</a>
-      <button type="button" class="btn btn-sm btn-danger del">Delete</button>
+      {{#if teacher}}
+        <a href="/courses/{{doc._id}}/quizzes/{{quiz._id}}/results" class="btn btn-sm btn-primary">Results</a>
+        <a href="/courses/{{doc._id}}/quizzes/{{quiz._id}}/edit" class="btn btn-sm btn-info">Edit</a>
+        <button type="button" class="btn btn-sm btn-danger del">Delete</button>
+      {{/if}}
     </div>
     <h1>{{quiz.title}}</h1>
     {{#if previousAttempts}}

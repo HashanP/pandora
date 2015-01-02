@@ -211,7 +211,7 @@ Schemas.Course = new SimpleSchema({
   "title": {
     type: String,
     label: "Title",
-    max: 10
+    max: 20
   },
   "icon": {
     type: String,
@@ -246,7 +246,27 @@ Schemas.Course = new SimpleSchema({
           }
         });
       }
-    }
+    },
+    defaultValue: []
+  },
+  "teachers": {
+    type: [String],
+    optional:true,
+    autoform: {
+      options: function() {
+        return _.map(Meteor.users.find().fetch(), function(user) {
+          return {
+            label: user.emails[0].address,
+            value: user._id
+          }
+        });
+      }
+    },
+    defaultValue: []
+  },
+  "club": {
+    type: Boolean,
+    defaultValue:false
   }
 });
 
@@ -254,6 +274,7 @@ Courses.attachSchema(Schemas.Course);
 
 if (Meteor.isClient) {
   Meteor.subscribe("userData");
+  Meteor.subscribe("courses");
 
   var lastActive;
 
@@ -293,11 +314,6 @@ if (Meteor.isClient) {
     }
   });
 
-  Template.subjects.helpers({
-    "courses": function() {
-      return Courses.find({}, {sort:{icon:1}});
-    }
-  });
 
   Template.navbar.helpers({
     "username":function() {
@@ -309,6 +325,38 @@ if (Meteor.isClient) {
       if(Meteor.user()) {
         return Meteor.user().roles.indexOf("admin") !== -1;
       }
+    }
+  });
+
+  Template.course.helpers({
+    "teacher": function() {
+        console.log(this.doc);
+        return  (this.doc && this.doc.teachers && this.doc.teachers.indexOf(Meteor.userId()) !== -1)
+        || (Meteor.user() && Meteor.user().roles.indexOf("admin") !== -1);
+    }
+  });
+
+  Template.post.helpers({
+    "teacher": function() {
+      console.log(this.doc);
+      return  (this.doc && this.doc.teachers && this.doc.teachers.indexOf(Meteor.userId()) !== -1)
+      || (Meteor.user() && Meteor.user().roles.indexOf("admin") !== -1);
+    }
+  });
+
+  Template.vocabularyQuiz.helpers({
+    "teacher": function() {
+      console.log(this.doc);
+      return  (this.doc && this.doc.teachers && this.doc.teachers.indexOf(Meteor.userId()) !== -1)
+      || (Meteor.user() && Meteor.user().roles.indexOf("admin") !== -1);
+    }
+  });
+
+  Template.quiz.helpers({
+    "teacher": function() {
+      console.log(this.doc);
+      return  (this.doc && this.doc.teachers && this.doc.teachers.indexOf(Meteor.userId()) !== -1)
+      || (Meteor.user() && Meteor.user().roles.indexOf("admin") !== -1);
     }
   });
 
@@ -916,9 +964,19 @@ if (Meteor.isClient) {
       });
     }
     this.next();
-  }, {except:["subjects"]});
+  }, {except:["subjects", "clubs"]});
 
-  Router.route('/', {name: "subjects"});
+  Router.route('/', function() {
+    this.render("subjects", {data: function() {
+      return {courses: Courses.find({club:false}), selected: "subjects"};
+    }});
+  }, {name:"subjects"});
+
+  Router.route('/clubs', function() {
+    this.render("subjects", {data: function() {
+      return {courses: Courses.find({club:true}), selected:"clubs"};
+    }});
+  }, {name:"clubs"});
 
   Router.route('/courses/:id/blog', function() {
     this.render("blog_list", {
@@ -1098,6 +1156,14 @@ if (Meteor.isServer) {
 
   Meteor.publish("userData", function () {
     return Meteor.users.find({},  {fields: {'emails': 1}});
+  });
+
+  Meteor.publish("courses", function() {
+    if(Meteor.users.findOne(this.userId).roles.indexOf("admin") === -1) {
+      return Courses.find({$or:[{students:{$in:[this.userId]}}, {teachers: {$in:[this.userId]}}, {club:true}]});
+    } else {
+      return Courses.find({});
+    }
   });
 
   RssFeed.publish('course', function(query) {
