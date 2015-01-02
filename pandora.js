@@ -412,6 +412,27 @@ if (Meteor.isClient) {
       Meteor.call("vocabularyQuiz", this.doc._id, data, (this.quiz ? this.quiz._id : undefined));
       Router.go("/courses/" + this.doc._id + "/vocabularyQuizzes" + (this.quiz ? "/" + this.quiz._id : ""));
       return false;
+    },
+    "click .import": function() {
+      var y= Template.instance();
+      var fileEl = document.createElement("input");
+      fileEl.type = "file";
+      fileEl.addEventListener("change", function() {
+        var reader = new FileReader();
+        reader.addEventListener("load", function(e) {
+          var n = new DOMParser();
+          var doc = n.parseFromString(e.target.result, "text/xml");
+          Array.prototype.slice.call(doc.querySelectorAll("clues item")).forEach(function(el) {
+            addVocabularyQuestion(y.find(".questions"), {
+              question: el.querySelector("def").childNodes[0].nodeValue,
+              answer: el.querySelector("word").childNodes[0].nodeValue
+            })
+          });
+        }.bind(this));
+        reader.readAsText(fileEl.files[0]);
+      }.bind(this));
+      fileEl.click();
+
     }
   });
 
