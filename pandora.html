@@ -416,18 +416,26 @@
   <div class="input-group option">
     {{#if eq type "radio"}}
       <span class="input-group-addon">
-        <input type="radio" name="option{{no}}" class="correct">
+        {{#if correct}}
+          <input type="radio" name="option{{no}}" checked class="correct">
+        {{else}}
+          <input type="radio" name="option{{no}}" class="correct">
+        {{/if}}
       </span>
     {{/if}}
     {{#if eq type "checkbox"}}
-    <span class="input-group-addon">
-      <input type="checkbox" name="option{{no}}" class="correct">
-    </span>
+      <span class="input-group-addon">
+        {{#if correct}}
+          <input type="checkbox" name="option{{no}}" checked class="correct">
+        {{else}}
+          <input type="checkbox" name="option{{no}}" class="correct">
+        {{/if}}
+      </span>
     {{/if}}
     {{#if eq type "number"}}
-      <input type="number" class="form-control title">
+      <input type="number" value="{{title}}" class="form-control title">
     {{else}}
-      <input type="text" class="form-control title">
+      <input type="text" value="{{title}}" class="form-control title">
     {{/if}}
     <span class="input-group-addon">
       <a class="del"><i class="fa fa-times"></i></a>
@@ -449,15 +457,31 @@
         <div class="panel-body">
           <div class="form-group">
             <label>Question</label>
-            <textarea name="question" class="editor form-control"></textarea>
+            <textarea name="question" class="editor form-control">{{question.question}}</textarea>
           </div>
           <div class="form-group">
             <label>Type</label>
             <select name="type" class="type form-control">
-              <option value="string">Text</option>
-              <option value="number">Number</option>
-              <option value="radio">Multiple Choice</option>
-              <option value="checkbox">Checkboxes</option>
+              {{#if eq question.type "string"}}
+                <option value="string" selected>Text</option>
+              {{else}}
+                <option value="string">Text</option>
+              {{/if}}
+              {{#if eq question.type "number"}}
+                <option value="number" selected>Number</option>
+              {{else}}
+                <option value="number">Number</option>
+              {{/if}}
+              {{#if eq question.type "radio"}}
+                <option value="radio" selected>Multiple Choice</option>
+              {{else}}
+                <option value="radio">Multiple Choice</option>
+              {{/if}}
+              {{#if eq question.type "checkbox"}}
+                <option value="checkbox" selected>Checkboxes</option>
+              {{else}}
+                <option value="checkbox">Checkboxes</option>
+              {{/if}}
             </select>
           </div>
           <div class="form-group options">
@@ -483,7 +507,7 @@
         <legend>Create Quiz</legend>
         <div class="form-group">
           <label>Title</label>
-          <input class="form-control" name="title" type="text" placeholder="Title">
+          <input class="form-control" name="title" value="{{quiz.title}}" type="text" placeholder="Title">
         </div>
         <div class="form-group">
           <label>Questions</label>

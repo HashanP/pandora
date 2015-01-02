@@ -435,6 +435,7 @@ if (Meteor.isClient) {
 
   Template.optionForm.helpers({
     "type": function() {
+      console.log(this.no);
       return Session.get("type")[this.no];
     }
   });
@@ -567,7 +568,7 @@ if (Meteor.isClient) {
     if(!data) {
       data = {};
     }
-    data.no = Template.currentData().no;
+    data.no = Template.currentData().no || Template.currentData().question.no;
     Blaze.renderWithData(Template.optionForm, data, el, el.querySelector(".btn"));
   }
 
@@ -577,7 +578,7 @@ if (Meteor.isClient) {
       data = {};
     }
     data.no = count;
-    Blaze.renderWithData(Template.questionForm, data, el);
+    Blaze.renderWithData(Template.questionForm, {question:data}, el);
     count++;
   };
 
@@ -588,16 +589,23 @@ if (Meteor.isClient) {
   });
 
   Template.questionForm.created = function() {
-    var y = Session.get("type");
-    y.push("string");
-    Session.set("type", y);
+    console.log(this);
+    if(!this.data.question) {
+      var y = Session.get("type");
+      y.push("string");
+      Session.set("type", y);
+    } else {
+      var y = Session.get("type");
+      y.push(this.data.question.type);
+      Session.set("type", y);
+    }
   }
 
   Template.questionForm.rendered = function() {
-    if(this.question) {
-      this.question.options.forEach(function(option) {
+    if(this.data.question) {
+      this.data.question.options.forEach(function(option) {
         addOption(Template.instance().find(".options"), option);
-      });
+      }.bind(this));
     } else {
       addOption(Template.instance().find(".options"));
     }
@@ -641,9 +649,9 @@ if (Meteor.isClient) {
 
   Template.quizForm.rendered = function() {
     count = 0;
-    if(this.quiz) {
-      this.quiz.questions.forEach(function(question) {
-        addQuestion(Template.instance.find(".questions"), question);
+    if(this.data.quiz) {
+      this.data.quiz.questions.forEach(function(question) {
+        addQuestion(Template.instance().find(".questions"), question);
       });
     } else {
       addQuestion(Template.instance().find(".questions"));
@@ -1101,6 +1109,15 @@ if (Meteor.isClient) {
         return {doc: data, quiz: quiz, myAttempts: myAttempts, previousAttempts: myAttempts.length !== 0};
       }
     }})
+  });
+
+  Router.route("/courses/:id/quizzes/:quiz/edit", function() {
+    var data = Courses.findOne(this.params.id);
+    if(data) {
+      var quiz = _.findWhere(data.quizzes, {_id:this.params.quiz});
+      Session.set("type", []);
+      this.render("quizForm", {data:{quiz:quiz, doc:data}});
+    }
   });
 
   Router.route("/courses/:id/quizzes/:quiz/attempt", function() {
