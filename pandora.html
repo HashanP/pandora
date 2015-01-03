@@ -10,16 +10,13 @@
 </body>
 
 <template name="login">
-    <div class="site-wrapper">
+  <div class="site-wrapper">
     <div class="site-wrapper-inner">
-
       <div class="cover-container">
-
         <div class="masthead clearfix">
           <div class="inner">
             <h3 class="masthead-brand">Pandora 3.0</h3>
             <nav>
-
               <ul class="nav additional-nav">
                 {{> loginButtons}}
               </ul>
@@ -46,7 +43,6 @@
 <template name="subjects">
   <div class="main">
     {{> navbar}}
-
     <main class="container-fluid">
       <div class="pull-right">
         <br>
@@ -68,7 +64,7 @@
   </div>
 </template>
 
-<template name="blog_list">
+<template name="posts">
   <div class="list-group">
     {{#each sortByReverse posts "date"}}
     <a href="/courses/{{../_id}}/blog/{{postId}}" class="list-group-item">
@@ -246,7 +242,7 @@
             <li role="presentation" class="active"><a href="/courses/{{doc._id}}/blog">Blog</a></li>
             <li role="presentation"><a href="/courses/{{doc._id}}/quizzes">Quizzes</a></li>
             <li role="presentation"><a href="/courses/{{doc._id}}/vocabularyQuizzes">Vocabulary Quizzes</a></li>
-            <li role="presentation"><a href="/courses/{{doc._id}}/file_uploads">File Uploads</a></li>
+            <li role="presentation"><a href="/courses/{{doc._id}}/handInFolders">Hand In Folders</a></li>
             <li role="presentation"><a href="/courses/{{doc._id}}/studentResources">Student Resources</a></li>
             <li role="presentation"><a href="/courses/{{doc._id}}/students">Students</a></li>
             <li role="presentation"><a href="/courses/{{doc._id}}/randomNameGenerator">Random Name Generator</a></li>
@@ -627,7 +623,7 @@
 </template>
 
 <template name="fileUpload">
-  <div class="modal fade">
+  <div class="modal fade" data-backdrop="static">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -690,4 +686,14 @@
   </div>
   <br>
   {{/each}}
+</template>
+
+<template name="handInFolders">
+  <ul class="list-group">
+    {{#each handInFolders}}
+      <li class="list-item-group">
+        <a href="/courses/{{../_id}}/handInFolders/{{_id}}">{{title}}</a>
+      </li>
+    {{/each}}
+  </ul>
 </template>

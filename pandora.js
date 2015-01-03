@@ -1,7 +1,11 @@
 Courses = new Mongo.Collection("courses");
 Files = new FS.Collection("files", {
-  stores: [new FS.Store.FileSystem("files", {path: "~/files"})]
+  stores: [new FS.Store.FileSystem("files", {path: "~/files"})],
+  filter: {
+    maxSize: 5 * 1024 * 1024
+  }
 });
+
 
 UI.registerHelper('eq', function(v1, v2, options) {
   if(v1 == v2){
@@ -32,7 +36,12 @@ var isAdmin = function() {
 }
 
 var isTeacher = function(courseId) {
-  return isAdmin() || Courses.findOne(courseId).teachers.indexOf(Meteor.userId()) !== -1;
+  if(isAdmin()) {
+    return true
+  } else {
+    var doc = Courses.findOne(courseId);
+    return doc && doc.teachers && doc.teachers.indexOf(Meteor.userId()) !== -1;
+  }
 }
 
 var getInfo = function(attempt, quiz) {
@@ -93,6 +102,12 @@ UI.registerHelper("britishDate", function(date) {
   console.log(date);
   return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
 });
+
+/**
+  * Schemata
+  * Control Validation
+  * [SECURITY]
+  */
 
 var Schemas = {};
 
@@ -215,6 +230,32 @@ Schemas.Quiz = new SimpleSchema({
   }
 });
 
+Schemas.HandIn = new SimpleSchema({
+  "userId": {
+    type: String
+  },
+  "fileId": {
+    type: String
+  }
+});
+
+Schemas.HandInFolder = new SimpleSchema({
+  "title": {
+    type: String
+  },
+  "handIns": {
+    type: [Schemas.HandIn]
+  },
+  "_id": {
+    type: String,
+    autoValue:function() {
+      if(this.operator !== "$pull" && this.operator !== "$set") {
+        return Meteor.uuid();
+      }
+    }
+  }
+});
+
 Schemas.Course = new SimpleSchema({
   "title": {
     type: String,
@@ -240,6 +281,10 @@ Schemas.Course = new SimpleSchema({
   },
   "studentResources": {
     type: [String],
+    optional:true
+  },
+  "handInFolders": {
+    type: [Schemas.HandInFolder],
     optional:true
   },
   "students": {
@@ -318,7 +363,8 @@ Meteor.users.attachSchema(Schemas.User);
 
 if (Meteor.isClient) {
   Meteor.subscribe("userData");
-  var courseSubscription = Meteor.subscribe("courses");
+  Meteor.subscribe("courses");
+  Meteor.subscribe("files");
 
   var lastActive;
 
@@ -370,9 +416,7 @@ if (Meteor.isClient) {
 
   Template.course.helpers({
     "teacher": function() {
-        console.log(this.doc);
-        return  (this.doc && this.doc.teachers && this.doc.teachers.indexOf(Meteor.userId()) !== -1)
-        || (Meteor.user() && Meteor.user().roles.indexOf("admin") !== -1);
+        return isAdmin() || this.doc && this.doc.teachers && this.doc.teachers.indexOf(Meteor.userId()) !== -1;
     }
   });
 
@@ -410,7 +454,6 @@ if (Meteor.isClient) {
     "click .del": function() {
       Meteor.call("removePost", this.doc._id, this.post.postId);
       Router.go("/courses/" + this.doc._id +"/blog");
-      //return false;
     }
   });
 
@@ -475,7 +518,6 @@ if (Meteor.isClient) {
 
   Template.optionForm.helpers({
     "type": function() {
-      console.log(this.no);
       return Session.get("type")[this.no];
     }
   });
@@ -497,7 +539,6 @@ if (Meteor.isClient) {
           answer:$(el).find(".part-a").val()
         })
       });
-      console.log(this.doc._id);
       Meteor.call("vocabularyQuiz", this.doc._id, data, (this.quiz ? this.quiz._id : undefined));
       Router.go("/courses/" + this.doc._id + "/vocabularyQuizzes" + (this.quiz ? "/" + this.quiz._id : ""));
       return false;
@@ -538,7 +579,8 @@ if (Meteor.isClient) {
   Template.fileUpload.helpers({
     finished: function() {
       for(var i = 0; i < this.files.length; i++) {
-        if(!Files.findOne(this.files[i]).isUploaded()) {
+        var s = Files.findOne(this.files[i]);
+        if(!s || !s.isUploaded()) {
           return false;
         }
       }
@@ -549,7 +591,6 @@ if (Meteor.isClient) {
   Template.studentResources.events({
     "click .del": function(e) {
       Files.remove(this._id);
-      Courses.update(Template.instance().data._id, {$pull:{studentResources:this._id}});
     }
   });
 
@@ -563,21 +604,25 @@ if (Meteor.isClient) {
   Template.course.events({
     "click .uploadFile": function() {
       var fileEl = document.createElement("input");
+      $("body").append(fileEl);
       fileEl.type = "file";
       fileEl.addEventListener("change", function(e) {
         var files = new ReactiveVar([]);
         Blaze.renderWithData(Template.fileUpload, function() {
+          console.log(files.get());
           return {files:files.get()};
         }, document.body);
-        console.log("here");
         FS.Utility.eachFile(event, function(file) {
+          file = new FS.File(file);
+          file.owner = this.doc._id;
+          file.category = "studentResource";
           Files.insert(file, function(err, fileObj) {
             var f = files.get();
             f.push(fileObj._id);
             files.set(f);
-            Courses.update(this.doc._id, {$push:{studentResources:fileObj._id}});
           }.bind(this));
         }.bind(this));
+        $(fileEl).remove();
       }.bind(this));
       fileEl.click();
       return false;
@@ -869,12 +914,11 @@ if (Meteor.isClient) {
     }
   });
 
-  var stub;
   Template.quizResults.rendered = function() {
     var y = Template.instance();
     console.log(this);
     var data = this.data;
-    stub = Meteor.autorun(function() {
+    this.autorun(function() {
       console.log(this);
       var doc = Courses.findOne(this.data.id);
       console.log(doc);
@@ -984,9 +1028,11 @@ if (Meteor.isClient) {
     }.bind(this));
   }
 
-  Template.quizResults.destroyed = function() {
-    stub.stop();
-  }
+  Template.randomNameGenerator.events({
+    "click .btn": function() {
+      Template.instance().find(".text-lg").innerHTML = this.students[Math.floor(Math.random() * (this.students.length))];
+    }
+  });
 
   Template.course.events({
     "click .shuffle": function() {
@@ -995,6 +1041,9 @@ if (Meteor.isClient) {
     }
   });
 
+  /**
+    * Routering Logic
+    */
   Router.onBeforeAction(function() {
     if (!Meteor.userId()) {
       this.render('login');
@@ -1023,11 +1072,7 @@ if (Meteor.isClient) {
   }, {name:"clubs"});
 
   Router.route('/courses/:id/blog', function() {
-    this.render("blog_list", {
-      data: function() {
-        return Courses.findOne(this.params.id);
-      }
-    });
+    this.render("posts", {data:  Courses.findOne(this.params.id)});
   });
 
   Router.route('/courses/:id/blog/new', function() {
@@ -1098,12 +1143,6 @@ if (Meteor.isClient) {
         }
       }
     });
-  });
-
-  Template.randomNameGenerator.events({
-    "click .btn": function() {
-      Template.instance().find(".text-lg").innerHTML = this.students[Math.floor(Math.random() * (this.students.length))];
-    }
   });
 
   Router.route("/courses/:id/randomNameGenerator", function() {
@@ -1196,6 +1235,10 @@ if (Meteor.isClient) {
     this.render("quizResults", {data: this.params});
   });
 
+  Router.route("/courses/:id/handInFolders", function() {
+    this.render("handInFolders", {data: Courses.findOne(this.params.id)});
+  });
+
   Router.route("/logout", function() {
     Meteor.logout();
     this.redirect("/");
@@ -1204,7 +1247,7 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
-    // code to run on server at startup
+    // [STUB]
   });
 
   Meteor.publish("userData", function () {
@@ -1220,6 +1263,10 @@ if (Meteor.isServer) {
         return Courses.find({$or:[{students:{$in:[this.userId]}}, {teachers: {$in:[this.userId]}}, {club:true}]});
       }
     }
+  });
+
+  Meteor.publish("files", function() {
+    return Files.find({});
   });
 
   RssFeed.publish('course', function(query) {
@@ -1250,9 +1297,42 @@ if (Meteor.isServer) {
     });
   });
 
+  var isAllowed = function(userId, doc) {
+    if(doc.category === "studentResource") {
+      var user = Meteor.users.findOne(userId);
+      if(user.roles && user.roles.indexOf("admin") !== -1) {
+        return true;
+      }
+      var course = Courses.findOne(doc.owner);
+      return course && course.teachers && course.teachers.indexOf(userId) !== -1;
+    }
+  }
+
+  Files.allow({
+    insert: isAllowed,
+    update: isAllowed,
+    remove: isAllowed
+  });
+
+  Files.on("stored", Meteor.bindEnvironment(function(doc) {
+    if(doc.category === "studentResource") {
+      Courses.update(doc.owner, {$push: {studentResources: doc._id}});
+    }
+  }));
+
+  Files.on("removed", function(doc) {
+    if(doc.category === "studentResource") {
+      Courses.update(doc.owner, {$pull: {studentResources: doc._id}});
+    }
+  });
+
   Accounts.config({restrictCreationByEmailDomain:'whsb.essex.sch.uk'});
 }
 
+/**
+  * Controls the operations the client can perform
+  * [SECURITY]
+  */
 Meteor.methods({
   "post": function(courseId, post, postId) {
     if(isTeacher(courseId)) {
@@ -1313,6 +1393,10 @@ Meteor.methods({
   }
 });
 
+/**
+  * Admin Configuration
+  * [TEMPORARY]
+  */
 this.AdminConfig = {
   name:"Pandora",
   adminEmails:["10punchihewah@whsb.essex.sch.uk"],
