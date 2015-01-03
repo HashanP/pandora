@@ -27,6 +27,14 @@ UI.registerHelper("i", function(obj) {
   return obj;
 });
 
+var isAdmin = function() {
+  return Meteor.user() && Meteor.user().roles && Meteor.user().roles.indexOf("admin") !== -1;
+}
+
+var isTeacher = function(courseId) {
+  return isAdmin() || Courses.findOne(courseId).teachers.indexOf(Meteor.userId()) !== -1;
+}
+
 var getInfo = function(attempt, quiz) {
   var corrects = [];
   var correct = 0;
@@ -272,9 +280,45 @@ Schemas.Course = new SimpleSchema({
 
 Courses.attachSchema(Schemas.Course);
 
+Schemas.User = new SimpleSchema({
+  username: {
+    type: String,
+    regEx: /^[a-z0-9A-Z_]{3,15}$/,
+    optional:true
+  },
+  emails: {
+    type: [Object],
+    // this must be optional if you also use other login services like facebook,
+    // but if you use only accounts-password, then it can be required
+    optional: true
+  },
+  "emails.$.address": {
+    type: String,
+    regEx: SimpleSchema.RegEx.Email
+  },
+  "emails.$.verified": {
+    type: Boolean
+  },
+  createdAt: {
+    type: Date
+  },
+  services: {
+    type: Object,
+    optional: true,
+    blackbox: true
+  },
+  roles: {
+    type: Object,
+    optional: true,
+    blackbox: true
+  }
+});
+
+Meteor.users.attachSchema(Schemas.User);
+
 if (Meteor.isClient) {
   Meteor.subscribe("userData");
-  Meteor.subscribe("courses");
+  var courseSubscription = Meteor.subscribe("courses");
 
   var lastActive;
 
@@ -321,11 +365,7 @@ if (Meteor.isClient) {
         return Meteor.user().emails[0].address.split("@")[0];
       }
     },
-    "admin": function() {
-      if(Meteor.user()) {
-        return Meteor.user().roles.indexOf("admin") !== -1;
-      }
-    }
+    "admin": isAdmin
   });
 
   Template.course.helpers({
@@ -368,7 +408,7 @@ if (Meteor.isClient) {
 
   Template.post.events({
     "click .del": function() {
-      Courses.update(this.doc._id, {$pull:{posts:{postId:this.post.postId}}});
+      Meteor.call("removePost", this.doc._id, this.post.postId);
       Router.go("/courses/" + this.doc._id +"/blog");
       //return false;
     }
@@ -666,7 +706,7 @@ if (Meteor.isClient) {
 
   Template.quiz.events({
     "click .del": function() {
-      Courses.update(this.doc._id, {$pull:{quizzes:{_id:this.quiz._id}}});
+      Meteor.call("removeQuiz", this.doc._id, this.quiz._id);
       Router.go("/courses/" + this.doc._id + "/quizzes");
     }
   });
@@ -803,7 +843,7 @@ if (Meteor.isClient) {
       return false;
     },
     "click .del": function() {
-      Courses.update(this._id, {$pull: {vocabularyQuizzes:{_id:this.quiz._id}}});
+      Meteor.call("removeVocabularyQuiz", this._id, this.quiz._id);
       Router.go("/courses/" + this._id + "/vocabularyQuizzes")
     }
   });
@@ -974,16 +1014,12 @@ if (Meteor.isClient) {
     this.next();
   }, {except:["subjects", "clubs"]});
 
-  Router.route('/', function() {
-    this.render("subjects", {data: function() {
-      return {courses: Courses.find({club:false}), selected: "subjects"};
-    }});
+  Router.route("/", function() {
+    return this.render("subjects", {data:{courses: Courses.find({club:false}).fetch(), selected: "subjects"}});
   }, {name:"subjects"});
 
   Router.route('/clubs', function() {
-    this.render("subjects", {data: function() {
-      return {courses: Courses.find({club:true}), selected:"clubs"};
-    }});
+    this.render("subjects", {data: {courses: Courses.find({club:true}), selected:"clubs"}});
   }, {name:"clubs"});
 
   Router.route('/courses/:id/blog', function() {
@@ -1176,10 +1212,13 @@ if (Meteor.isServer) {
   });
 
   Meteor.publish("courses", function() {
-    if(Meteor.users.findOne(this.userId).roles.indexOf("admin") === -1) {
-      return Courses.find({$or:[{students:{$in:[this.userId]}}, {teachers: {$in:[this.userId]}}, {club:true}]});
-    } else {
-      return Courses.find({});
+    var user = Meteor.users.findOne(this.userId);
+    if(user) {
+      if(user.roles && user.roles.indexOf("admin") !== -1) {
+        return Courses.find({});
+      } else {
+        return Courses.find({$or:[{students:{$in:[this.userId]}}, {teachers: {$in:[this.userId]}}, {club:true}]});
+      }
     }
   });
 
@@ -1216,28 +1255,61 @@ if (Meteor.isServer) {
 
 Meteor.methods({
   "post": function(courseId, post, postId) {
-    if(postId) {
-      Courses.update({_id:courseId,"posts.postId":postId}, {$set:{"posts.$.title": post.title, "posts.$.type":post.type,"posts.$.content":post.content}});
+    if(isTeacher(courseId)) {
+      if(postId) {
+        Courses.update({_id:courseId,"posts.postId":postId}, {$set:{"posts.$.title": post.title, "posts.$.type":post.type,"posts.$.content":post.content}});
+      } else {
+        post.date = new Date(Date.now());
+        Courses.update(courseId, {$push:{posts:post}});
+      }
     } else {
-      post.date = new Date(Date.now());
-      Courses.update(courseId, {$push:{posts:post}});
+      throw new Error("Unauthorised");
     }
   },
   "vocabularyQuiz": function(courseId, data, vocabQuizId) {
-    if(vocabQuizId) {
-      Courses.update({_id:courseId, "vocabularyQuizzes._id":vocabQuizId}, {$set:{
-        "vocabularyQuizzes.$.title":data.title, "vocabularyQuizzes.$.questions":data.questions, "vocabularyQuizzes.$.format":data.format}});
+    if(isTeacher(courseId)) {
+      if(vocabQuizId) {
+        Courses.update({_id:courseId, "vocabularyQuizzes._id":vocabQuizId}, {$set:{
+          "vocabularyQuizzes.$.title":data.title, "vocabularyQuizzes.$.questions":data.questions, "vocabularyQuizzes.$.format":data.format}});
+      } else {
+        Courses.update(courseId, {$push:{vocabularyQuizzes:data}});
+      }
     } else {
-      Courses.update(courseId, {$push:{vocabularyQuizzes:data}});
+      throw new Error("Unauthorised");
     }
   },
   "quiz": function(courseId, data) {
-    Courses.update(courseId, {$push: {quizzes: data}});
+    if(isTeacher(courseId)) {
+      Courses.update(courseId, {$push: {quizzes: data}});
+    } else {
+      throw new Error("Unauthorised");
+    }
   },
   "quizAttempt": function(courseId, quizId, data) {
     data.date = new Date(Date.now());
     data.userId = Meteor.userId();
     Courses.update({_id: courseId, "quizzes._id":quizId}, {$push:{"quizzes.$.attempts":data}});
+  },
+  "removeVocabularyQuiz": function(courseId, quizId) {
+    if(isTeacher(courseId)) {
+      Courses.update(courseId, {$pull: {vocabularyQuizzes:{_id:quizId}}});
+    } else {
+      throw new Error("Unauthorised");
+    }
+  },
+  "removeQuiz": function(courseId, quizId) {
+    if(isTeacher(courseId)) {
+      Courses.update(courseId, {$pull:{quizzes:{_id:quizId}}});
+    } else {
+      throw new Error("Unauthorised");
+    }
+  },
+  "removePost": function(courseId, postId) {
+    if(isTeacher(courseId)) {
+      Courses.update(courseId, {$pull:{posts:{postId:postId}}});
+    } else {
+      throw new Error("Unauthorised");
+    }
   }
 });
 
