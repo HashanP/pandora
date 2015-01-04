@@ -63,7 +63,7 @@
               <a href="/courses/{{_id}}/blog">
                 <img src="/icons/{{icon}}.png" alt="{{icon}}">
                 {{#if needTitle}}
-                <h2 class="title">{{title}}</h2>
+                  <h2 class="title">{{title}}</h2>
                 {{/if}}
               </a>
             </div>
@@ -294,6 +294,9 @@
                     {{/if}}
                     {{# if eq section "vocabularyQuizzes"}}
                     <button type="button" class="btn btn-xs shuffle btn-info">Shuffle</button>
+                    {{#if teacher}}<a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>{{/if}}
+                    {{/if}}
+                    {{#if eq section "handInFolders"}}
                     {{#if teacher}}<a href="/courses/{{doc._id}}/{{section}}/new"><i class="fa fa-plus"></i></a>{{/if}}
                     {{/if}}
                   {{/if}}
@@ -562,6 +565,9 @@
             <th>
               Score
             </th>
+            <th>
+
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -712,10 +718,111 @@
   {{/each}}
 </template>
 
+<template name="handInFolder">
+  <div class="panel-body">
+    {{#if isTeacher}}
+      <div class="pull-right">
+        <a href="/courses/{{doc._id}}/handInFolders/{{handInFolder._id}}/edit" class="btn btn-sm btn-info">Edit</a>
+        <button type="button" class="btn btn-sm btn-danger del">Delete</button>
+      </div>
+    {{/if}}
+    <h1>{{handInFolder.title}}</h1>
+    {{#if isTeacher}}
+      {{#if notEmpty handInFolder.handIns}}
+        <h4>All Hand Ins</h4>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>
+                User
+              </th>
+              <th>
+                Filename
+              </th>
+              <th>
+
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each sortBy handInFolder.handIns "username"}}
+              <tr>
+                <td>{{username}}</td>
+                {{#with FS.GetFile "files" fileId}}
+                <td>
+                  {{this.name}}
+                </td>
+                <td>
+                    <a href="{{this.url}}" class="btn btn-sm btn-primary">View</a>
+                </td>
+                {{/with}}
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{else}}
+        Nobody has handed in anything yet.
+      {{/if}}
+    {{else}}
+      {{#if notEmpty myHandIns}}
+      <h4>My Hand Ins</h4>
+      <button type="button" class="handIn btn btn-sm btn-primary">Hand In Another File</button>
+      <br><br>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>
+              Filename
+            </th>
+            <th>
+
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each myHandIns}}
+          <tr>
+            {{#with FS.GetFile "files" fileId}}
+            <td>{{this.name}}</td>
+            <td>
+              <a href="{{this.url}}" class="btn btn-primary btn-sm">View</a>
+              {{> FS.DeleteButton class="btn btn-danger btn-sm"}}
+            </td>
+            {{/with}}
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{else}}
+       <button type="button" class="handIn btn btn-sm btn-primary">Hand In A File</button>
+       <br><br>
+       You have not handed in anything yet.
+      {{/if}}
+    {{/if}}
+  </div>
+</template>
+
+<template name="handInFolderForm">
+  <div class="panel-body">
+    <form>
+      <fieldset>
+        <legend>
+          Create Hand In Folder
+        </legend>
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" value="{{handInFolder.title}}" name="title" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </fieldset>
+    </form>
+  </div>
+</template>
+
 <template name="handInFolders">
   <ul class="list-group">
     {{#each handInFolders}}
-      <li class="list-item-group">
+      <li class="list-group-item">
         <a href="/courses/{{../_id}}/handInFolders/{{_id}}">{{title}}</a>
       </li>
     {{/each}}
