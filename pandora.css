@@ -664,6 +664,23 @@ body {
 }
 
 /* Icons */
+.icon {
+  position:relative;
+}
+
+.icon h2 {
+  background:white;
+  color:black;
+  padding:4px;
+  opacity:0.9;
+  margin-top:0px;
+  font-size:20px;
+}
+
+.icon a {
+  text-decoration:none !important;
+}
+
 .icon img {
   width:100%;
 }
@@ -671,22 +688,32 @@ body {
 @media (min-width: 768px) {
   .icon img:hover {
     padding-top:30px;
-    padding-bottom:30px;
     padding-left:30px;
     padding-right:30px;
     -webkit-transition-property: padding;
     -webkit-transition-duration: 0.5s;
+    -webkit-transition-timing-function: ease;
+  }
+
+  .icon img:hover ~ h2 {
+    top:210px;
+    left:45px;
+    margin-left:30px;
+    margin-right:30px;
+    -webkit-transition-property: left top margin-left margin-right height;
+    -webkit-transition-duration: 0.5s;
+    -webkit-transition-timing-function: ease;
   }
 }
 
 
 
 .navbar ~ * {
-  padding-top:60px;
+  margin-top:60px;
 }
 
-.grid, .st-content {
-  padding-top:20px;
+.grid, .st-content, .list {
+  margin-top:20px;
 }
 
 .st-menu {
@@ -838,27 +865,27 @@ body {
   display: none;
 }
 
-.st-container .panel-primary > .panel-heading {
-  background-color:#694489;
-  border-color:#694489;
+.panel-primary > .panel-heading, .panel-primary > .panel-heading > .panel-title {
+  background-color:#694489 !important;
+  border-color:#694489 !important;
 }
 
-.st-container .panel-primary {
-  border-color:#694489;
-  overflow:hidden;
-  background-color:#694489;
+.panel-primary {
+  border-color:#694489 !important;
+  overflow:hidden !important;
+  background-color:#694489 !important;
 }
 
-.st-container .panel-primary > .panel-heading a:hover {
-  color:white;
+.panel-primary > .panel-heading a:hover {
+  color:white !important;
 }
 
-.st-container .panel-primary > .panel-heading a i {
+.panel-primary > .panel-heading a i {
   padding-top:9px;
 }
 
-.st-container .panel-body {
-  background-color:white;
+.panel-body {
+  background-color:white !important;
 }
 
 a {
@@ -869,11 +896,11 @@ a:hover {
   color: #295A3E;
 }
 
-.st-container .panel {
-  border-radius:7px;
+.panel {
+  border-radius:7px !important;
 }
 
-.st-container .panel h3:not(.popover-title) {
+.panel h3:not(.popover-title) {
   font-size:18px;
   font-weight:200;
   text-transform:none;

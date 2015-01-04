@@ -44,22 +44,46 @@
   <div class="main">
     {{> navbar}}
     <main class="container-fluid">
-      <div class="pull-right">
-        <br>
-        <div class="btn-group" role="group">
-          <button type="button" class="btn btn-info active">Grid</button>
-          <button type="button" class="btn btn-info">List</button>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="pull-right">
+            <br>
+            <div class="btn-group" role="group">
+              <button type="button" value="grid" class="btn btn-info {{#if grid}}active{{/if}}">Grid</button>
+              <button type="button" value="list" class="btn btn-info {{#if not grid}}active{{/if}}">List</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="grid block-grid-xl-8 block-grid-lg-8 block-grid-sm-4 block-grid-xs-2">
-        {{#each courses}}
-        <div class="block-grid-item icon">
-          <a href="/courses/{{_id}}/blog">
-            <img src="/icons/{{icon}}.png" alt="{{icon}}">
-          </a>
+
+      {{#if grid}}
+        <div class="grid block-grid-xl-8 block-grid-lg-7 block-grid-sm-4 block-grid-xs-2">
+            {{#each courses}}
+            <div class="block-grid-item icon">
+              <a href="/courses/{{_id}}/blog">
+                <img src="/icons/{{icon}}.png" alt="{{icon}}">
+                {{#if needTitle}}
+                <h2 class="title">{{title}}</h2>
+                {{/if}}
+              </a>
+            </div>
+            {{/each}}
         </div>
-        {{/each}}
-      </div>
+      {{else}}
+        <div class="row">
+          <div class="col-md-12">
+            <div class="list panel panel-primary">
+              <div class="panel-heading"><h3 class="panel-title">Subjects</h3></div>
+              <ul class="list-group">
+                {{#each courses}}
+                <li class="list-group-item"><a href="/courses/{{_id}}/blog">{{title}}</a></li>
+                {{/each}}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      {{/if}}
     </main>
   </div>
 </template>
