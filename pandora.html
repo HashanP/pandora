@@ -571,11 +571,11 @@
           </tr>
         </thead>
         <tbody>
-          {{#each i myAttempts}}
+          {{#each myAttempts}}
           <tr>
             <td>{{britishDate date}}</td>
             <td>{{getScore this ../quiz}}</td>
-            <td><a href="/courses/{{../doc._id}}/quizzes/{{../quiz._id}}/attempts/{{index}}" class="btn btn-sm btn-info">View</a></td>
+            <td><a href="/courses/{{../doc._id}}/quizzes/{{../quiz._id}}/attempts/{{_id}}" class="btn btn-sm btn-info">Review</a></td>
           </tr>
           {{/each}}
         </tbody>

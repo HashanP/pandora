@@ -125,11 +125,7 @@ Router.route("/courses/:id/quizzes", function() {
 
 Router.route("/courses/:id/quizzes/new", function() {
   Session.set("type", []);
-  this.render("quizForm", {
-    data: function() {
-      return Courses.findOne(this.params.id);
-    }
-  });
+  this.render("quizForm", {data:{doc:Courses.findOne(this.params.id)}});
 });
 
 Router.route("/courses/:id/quizzes/:quiz", function() {
@@ -165,7 +161,11 @@ Router.route("/courses/:id/quizzes/:quiz/attempt", function() {
 Router.route("/courses/:id/quizzes/:quiz/attempts/:attempt", function() {
   var data = Courses.findOne(this.params.id);
   var quiz = _.findWhere(data.quizzes, {_id:this.params.quiz});
-  var attempt = quiz.attempts[this.params.attempt];
+  if(this.params.attempt === "latest") {
+    var attempt = _.findWhere(quiz.attempts.reverse(), {userId: Meteor.userId()});
+  } else {
+    var attempt = _.findWhere(quiz.attempts, {_id: this.params.attempt});
+  }
   var info = getInfo(attempt, quiz);
   attempt.questions.forEach(function(question, i) {
     question.question = quiz.questions[i].question;
@@ -174,8 +174,11 @@ Router.route("/courses/:id/quizzes/:quiz/attempts/:attempt", function() {
     question.class = (question.correct ? "has-success" : "has-error");
     if(question.type === "radio" || question.type === "checkbox") {
       question.options = quiz.questions[i].options.map(function(c) {
-        c.correct = question.answer.indexOf(c.title) !== -1;
-        return c;
+        var l = {
+          title: c.title
+        }
+        l.correct = question.answer.indexOf(c.title) !== -1;
+        return l;
       });
       question.answer = question.answer[0];
       question.correctAnswer = _.pluck(_.where(quiz.questions[i].options, {correct:true}), "title").join(", ");

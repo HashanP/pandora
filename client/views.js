@@ -380,9 +380,8 @@ Template.quizForm.events({
         });
         data.questions.push(question);
       });
-      console.log(data);
-      Meteor.call("quiz", this._id, data);
-      Router.go("/courses/" + this._id + "/quizzes");
+      Meteor.call("quiz", this.doc._id, data, this.quiz._id);
+      Router.go("/courses/" + this.doc._id + "/quizzes");
     }
     return false;
   }
@@ -566,7 +565,7 @@ Template.quizAttempt.events({
       }
     });
     Meteor.call("quizAttempt", this.doc._id, this.quiz._id, data);
-    Router.go("/courses/" + this.doc._id + "/quizzes/" + this.quiz._id + "/attempts/" + this.quiz.attempts.length);
+    Router.go("/courses/" + this.doc._id + "/quizzes/" + this.quiz._id + "/attempts/latest");
     return false;
   }
 });
@@ -583,8 +582,7 @@ Template.quizResults.rendered = function() {
       console.log(doc);
       var quiz = _.findWhere(doc.quizzes, {_id: this.data.quiz});
       var attempts = {};
-      var indexes = {};
-      quiz.attempts.forEach(function(attempt, i) {
+      quiz.attempts.forEach(function(attempt) {
         doc.students.forEach(function(user) {
           user = Meteor.users.findOne(user, {fields:{emails:1}});
           user.name = user.emails[0].address.split("@")[0];
@@ -599,11 +597,9 @@ Template.quizResults.rendered = function() {
             }
             if(Session.equals("criterion", "best") && (!(user.name in attempts) || attempt.score > attempts[user.name].score)) {
               attempts[user.name] = attempt;
-              indexes[user.name] = i;
             }
             if(Session.get("criterion", "first") && (!(user.name in attempts) || attempt.date < attempts[user.name].date)) {
               attempts[user.name] = attempt;
-              indexes[user.name] = i;
             }
           }
         }.bind(this));
@@ -613,7 +609,7 @@ Template.quizResults.rendered = function() {
         if(Session.equals("criterion", "average")) {
           attemptsL.push({user: user, score:attempts[user].reduce(function(a, b) {return a + b}) / attempts[user].length});
         } else {
-          attemptsL.push({user: user, score:attempts[user].score, index: indexes[user]});
+          attemptsL.push({user: user, score:attempts[user].score, index: attempts[user]._id});
         }
       }
       var HEIGHT = attemptsL.length * 30;
