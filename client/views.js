@@ -700,9 +700,24 @@ Template.course.events({
 
 Template.handInFolderForm.events({
   "submit form": function(e) {
-    Meteor.call("handInFolder", this.doc._id, {title:e.target.title.value}, this.handInFolder ? this.handInFolder._id: undefined);
+    var data = {
+      title: e.target.title.value
+    };
+    if(!data.title) {
+      Session.set("titleError", "The title cannot be empty.");
+      return false;
+    } else {
+      Session.set("titleError", "");
+    }
+    Meteor.call("handInFolder", this.doc._id, data, this.handInFolder ? this.handInFolder._id: undefined);
     Router.go("/courses/" + this.doc._id + "/handInFolders");
     return false;
+  }
+});
+
+Template.handInFolderForm.helpers({
+  "titleError": function() {
+    return Session.get("titleError");
   }
 });
 

@@ -126,7 +126,9 @@
     {{#each sortBy studentResources "name"}}
       <li class="list-group-item">
         <a href="{{this.url}}">{{this.name}}</a>
-        <button type="button" class="btn btn-danger btn-xs pull-right del">Delete</button>
+        {{#if isTeacher}}
+          <button type="button" class="btn btn-danger btn-xs pull-right del">Delete</button>
+        {{/if}}
       </li>
     {{/each}}
   </ul>
@@ -807,9 +809,12 @@
         <legend>
           Create Hand In Folder
         </legend>
-        <div class="form-group">
-          <label>Title</label>
+        <div class="form-group {{#if titleError}}has-error{{/if}}">
+          <label class="control-label">Title</label>
           <input type="text" value="{{handInFolder.title}}" name="title" class="form-control">
+          {{#if titleError}}
+            <p class="text-danger">{{titleError}}</p>
+          {{/if}}
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
       </fieldset>

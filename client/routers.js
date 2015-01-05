@@ -2,6 +2,7 @@ Router.onBeforeAction(function() {
   if (!Meteor.userId()) {
     this.render('login');
   } else {
+    Session.set("titleError", "");
     this.next();
   }
 });
