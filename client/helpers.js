@@ -51,8 +51,13 @@ UI.registerHelper("not", function(val) {
   return !val;
 });
 
-UI.registerHelper("isTeacher", function() {
-  return isAdmin() || this.doc && this.doc.teachers && this.doc.teachers.indexOf(Meteor.userId()) !== -1;
+UI.registerHelper("isTeacher", function(doc) {
+  if(isAdmin()) {
+    return true;
+  } else {
+    doc = doc || this.doc;
+    return doc && doc.teachers && doc.teachers.indexOf(Meteor.userId()) !== -1;
+  }
 });
 
 UI.registerHelper("notEmpty", function(arr) {

@@ -126,7 +126,7 @@
     {{#each sortBy studentResources "name"}}
       <li class="list-group-item">
         <a href="{{this.url}}">{{this.name}}</a>
-        {{#if isTeacher}}
+        {{#if isTeacher ..}}
           <button type="button" class="btn btn-danger btn-xs pull-right del">Delete</button>
         {{/if}}
       </li>

@@ -581,10 +581,10 @@ Template.quizResults.rendered = function() {
     console.log(doc);
     if(doc) {
       console.log(doc);
-      var quiz = _.findWhere(doc.quizzes, {_id: this.data.quizId});
-
+      var quiz = _.findWhere(doc.quizzes, {_id: this.data.quiz});
       var attempts = {};
-      quiz.attempts.forEach(function(attempt) {
+      var indexes = {};
+      quiz.attempts.forEach(function(attempt, i) {
         doc.students.forEach(function(user) {
           user = Meteor.users.findOne(user, {fields:{emails:1}});
           user.name = user.emails[0].address.split("@")[0];
@@ -599,9 +599,11 @@ Template.quizResults.rendered = function() {
             }
             if(Session.equals("criterion", "best") && (!(user.name in attempts) || attempt.score > attempts[user.name].score)) {
               attempts[user.name] = attempt;
+              indexes[user.name] = i;
             }
             if(Session.get("criterion", "first") && (!(user.name in attempts) || attempt.date < attempts[user.name].date)) {
               attempts[user.name] = attempt;
+              indexes[user.name] = i;
             }
           }
         }.bind(this));
@@ -611,7 +613,7 @@ Template.quizResults.rendered = function() {
         if(Session.equals("criterion", "average")) {
           attemptsL.push({user: user, score:attempts[user].reduce(function(a, b) {return a + b}) / attempts[user].length});
         } else {
-          attemptsL.push({user: user, score:attempts[user].score, index: attempts[user].index});
+          attemptsL.push({user: user, score:attempts[user].score, index: indexes[user]});
         }
       }
       var HEIGHT = attemptsL.length * 30;
@@ -676,7 +678,7 @@ Template.quizResults.rendered = function() {
         d3.select(this).style({fill:color(d.score)})
       })
       .on('click', function(d) {
-        page("/courses/" + this.id + "/quizzes/" + this.quiz.index + "/attempts/" + d.index)
+        Router.go("/courses/" + doc._id + "/quizzes/" + quiz._id + "/attempts/" + d.index)
       }.bind(this))
       .attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
       .style('fill',function(d,i){ return color(d.score); })
