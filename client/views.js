@@ -204,7 +204,6 @@ Template.insertVocabularyQuiz.events({
       reader.readAsText(fileEl.files[0]);
     }.bind(this));
     fileEl.click();
-
   }
 });
 
@@ -215,6 +214,8 @@ Template.accents.events({
     focus.val(focus.val().substring(0, start) + $(e.target).text() + focus.val().slice(end));
     lastActive.focus();
     lastActive.setSelectionRange(start+1, start + 2);
+    var event = new Event('keyup');
+    lastActive.dispatchEvent(event);
   }
 });
 
@@ -498,7 +499,7 @@ Template.vocabularyQuiz.events({
       if(!e.target.classList.contains("correct")) {
         e.target.classList.add("correct");
         e.target.classList.remove("incorrect");
-        if(e.target.nextSibling && e.target.nextSibling.nextSibling) {
+        if(e.target.nextElementSibling && e.target.nextElementSibling.nextElementSibling) {
           e.target.nextElementSibling.nextElementSibling.focus();
         } else {
           e.target.blur();
