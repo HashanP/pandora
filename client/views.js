@@ -156,12 +156,24 @@ var addVocabularyQuestion = function(el, data) {
   Blaze.renderWithData(Template.vocabularyQuestion, data || {}, el, el.lastElementChild);
 };
 
+Template.insertVocabularyQuiz.helpers({
+  "titleError": function() {
+    return Session.get("titleError");
+  }
+});
+
 Template.insertVocabularyQuiz.events({
   "click .addQuestion": function(e) {
     addVocabularyQuestion(e.target.parentNode.parentNode.parentNode);
   },
   "submit form": function(e) {
     var data = {title:e.target.title.value, format:e.target.format.value, questions:[]};
+    if(!data.title) {
+      Session.set("titleError", "Title cannot be empty.");
+      return false;
+    } else {
+      Session.set("titleError", "");
+    }
     var el = $(e.target);
     el.find(".question").each(function(i, el) {
       data.questions.push({
