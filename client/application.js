@@ -2,7 +2,7 @@ Meteor.subscribe("userData");
 Meteor.subscribe("courses");
 Meteor.subscribe("files");
 
-var lastActive;
+this.lastActive;
 
 Meteor.startup(function() {
   MathJax.Hub.Config({
@@ -15,6 +15,6 @@ Meteor.startup(function() {
     SVG: { linebreaks: { automatic: true } }
   });
   $("body").on("blur", "input", function(e) {
-    lastActive = e.target;
-  });
-});
+    this.lastActive = e.target;
+  }.bind(this));
+}.bind(this));

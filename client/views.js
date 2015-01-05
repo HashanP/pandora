@@ -328,6 +328,12 @@ Template.questionForm.rendered = function() {
   $(Template.instance().find(".editor")).wysihtml5();
 }
 
+Template.quizForm.helpers({
+  "titleError": function() {
+    return Session.get("titleError");
+  }
+});
+
 Template.quizForm.events({
   "click .addQuestion": function() {
     addQuestion(Template.instance().find(".questions"));
@@ -338,28 +344,33 @@ Template.quizForm.events({
       title: e.target.title.value,
       questions:[]
     };
-    Template.instance().findAll(".panel").forEach(function(q) {
-      q = $(q);
-      var question = {
-        question: q.find(".editor").val(),
-        type: q.find(".type").val(),
-        options:[]
-      };
-      q.find(".option").each(function(i,option) {
-        option = $(option);
-        var o = {
-          title: option.find(".title").val()
-        }
-        if(option.find(".correct").length === 1) {
-          o.correct = option.find(".correct").prop("checked");
-        }
-        question.options.push(o);
+    if(!data.title) {
+      Session.set("titleError", "A quiz must have a title.");
+    } else {
+      Session.set("titleError", "");
+      Template.instance().findAll(".panel").forEach(function(q) {
+        q = $(q);
+        var question = {
+          question: q.find(".editor").val(),
+          type: q.find(".type").val(),
+          options:[]
+        };
+        q.find(".option").each(function(i,option) {
+          option = $(option);
+          var o = {
+            title: option.find(".title").val()
+          }
+          if(option.find(".correct").length === 1) {
+            o.correct = option.find(".correct").prop("checked");
+          }
+          question.options.push(o);
+        });
+        data.questions.push(question);
       });
-      data.questions.push(question);
-    });
-    console.log(data);
-    Meteor.call("quiz", this._id, data);
-    Router.go("/courses/" + this._id + "/quizzes");
+      console.log(data);
+      Meteor.call("quiz", this._id, data);
+      Router.go("/courses/" + this._id + "/quizzes");
+    }
     return false;
   }
 });

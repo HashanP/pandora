@@ -524,9 +524,10 @@
     <form>
       <fieldset>
         <legend>Create Quiz</legend>
-        <div class="form-group">
-          <label>Title</label>
+        <div class="form-group {{#if titleError}}has-error{{/if}}">
+          <label class="control-label">Title</label>
           <input class="form-control" name="title" value="{{quiz.title}}" type="text" placeholder="Title">
+          {{#if titleError}}<p class="text-danger">{{titleError}}</p>{{/if}}
         </div>
         <div class="form-group">
           <label>Questions</label>
