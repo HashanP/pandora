@@ -380,7 +380,7 @@ Template.quizForm.events({
         });
         data.questions.push(question);
       });
-      Meteor.call("quiz", this.doc._id, data, this.quiz._id);
+      Meteor.call("quiz", this.doc._id, data, this.quiz ? this.quiz._id : undefined);
       Router.go("/courses/" + this.doc._id + "/quizzes");
     }
     return false;
