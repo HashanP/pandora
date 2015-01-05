@@ -426,10 +426,10 @@ var rerun = function() {
   if(quiz.questions.length <= 2) {
     this.find(".crossword").innerHTML = "<p class=\"text-warning\">There must be at least 3 questions in a crossword.</p>";
     return;
-  } else if(this.grid === null) {
+  } else if(grid === null) {
     this.find(".crossword").innerHTML = "<p class=\"text-warning\">The answers do not fit the grid. Sorry. Bad words: " + cw.getBadWords().map(function(x){return x.word}).join(", ") + "</p>";
   } else {
-    this.find(".crossword").innerHTML = crosswordUtils.toHtml(grid);
+    this.find(".crossword").innerHTML =  crosswordUtils.toHtml(grid);
   }
 }
 
@@ -457,6 +457,7 @@ Template.vocabularyQuiz.rendered = function() {
       var correct = {};
       if(quiz.questions.length > 2) {
         var additional = 0;
+        grid = null;
         while((grid === null || grid === undefined) && additional < 100) {
           cw = new Crossword(quiz.questions, additional);
           grid = cw.getSquareGrid(10);
