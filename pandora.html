@@ -236,10 +236,6 @@
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{username}} <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="#">Main School Website</a></li>
-              <li><a href="#">About Us</a></li>
-              <li><a href="#">GitHub</a></li>
-              <li class="divider"></li>
               <li><a href="/logout">Sign Out</a></li>
             </ul>
           </li>
@@ -827,4 +823,285 @@
       </li>
     {{/each}}
   </ul>
+</template>
+
+<template name="userForm">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Users</h3>
+        <div class="pull-right">
+          <a href="/admin/users/new"><i class="fa fa-plus"></i></a>
+        </div>
+      </div>
+    <div class="panel-body">
+      <form>
+        <fieldset>
+          <legend>
+            {{#if user._id}}Edit{{else}}Create{{/if}} User
+          </legend>
+          <p class="text-info">All usernames/emails are converted to lowercase. Initial passwords are the same as initial emails/usernames.</p>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" value="{{getEmail}}" class="form-control" name="email">
+          </div>
+          <div class="form-group">
+            <label>Courses</label>
+            <table class="table table-condensed">
+              <tbody>
+                {{#if notEmpty courses}}
+                  {{#each courses}}
+                    <tr class="grey">
+                      <td>
+                        {{title}}
+                      </td>
+                      <td>
+                        <div class="btn-group" role="group">
+                          {{#if isStudent . ../user._id}}
+                            <button type="button" name="{{_id}}" class="btn btn-info btn-sm nothing">Not Assigned</button>
+                            <button type="button" name="{{_id}}" class="btn btn-info btn-sm student active">Student</button>
+                            <button type="button" name="{{_id}}" class="btn btn-info btn-sm teacher">Teacher</button>
+                          {{else}}
+                            {{#if isTeacher . ../user._id}}
+                              <button type="button" name="{{_id}}" class="btn btn-info btn-sm nothing">Not Assigned</button>
+                              <button type="button" name="{{_id}}" class="btn btn-info btn-sm student">Student</button>
+                              <button type="button" name="{{_id}}" class="btn btn-info btn-sm teacher active">Teacher</button>
+                            {{else}}
+                              <button type="button" name="{{_id}}" class="btn btn-info btn-sm active nothing">Not Assigned</button>
+                              <button type="button" name="{{_id}}" class="btn btn-info btn-sm student">Student</button>
+                              <button type="button" name="{{_id}}" class="btn btn-info btn-sm teacher">Teacher</button>
+                            {{/if}}
+                          {{/if}}
+                        </div>
+                      </td>
+                    </tr>
+                  {{/each}}
+                {{else}}
+                  <p class="text-info">
+                    There are no classes to add the user to.
+                  </p>
+                {{/if}}
+              </tbody>
+            </table>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </fieldset>
+      </form>
+     </div>
+    </div>
+</template>
+
+<template name="userItem">
+  <a href="/admin/users/{{_id}}">{{getUsername}}</a>
+  <button type="button" class="btn btn-xs btn-danger del pull-right">Delete</button>
+</template>
+
+<template name="users">
+  <div class="panel panel-primary users">
+    <div class="panel-heading">
+      <h3 class="panel-title">Users</h3>
+        <div class="pull-right">
+          <a href="/admin/users/new"><i class="fa fa-plus"></i></a>
+        </div>
+      </div>
+      <ul class="list-group">
+        {{#each users}}
+          <li class="list-group-item">
+            {{> userItem}}
+          </li>
+        {{/each}}
+      </ul>
+    </div>
+</template>
+
+<template name="courseItem">
+  <a href="/admin/courses/{{_id}}">{{title}}</a>
+  <button type="button" class="btn btn-xs btn-danger pull-right del">Delete</button>
+</template>
+
+<template name="listCourses">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Courses</h3>
+      <div class="pull-right">
+        <a href="/admin/courses/new"><i class="fa fa-plus"></i></a>
+      </div>
+    </div>
+    <ul class="list-group">
+      {{#each courses}}
+        <li class="list-group-item">
+          {{> courseItem}}
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<template name="courseForm">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Courses</h3>
+    </div>
+    <div class="panel-body">
+      <form>
+        <fieldset>
+          <legend>
+            {{#if _id}}Edit{{else}}Create{{/if}} Course
+          </legend>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" class="form-control" value="{{title}}" name="title">
+          </div>
+          <div class="form-group">
+            <label>Icon</label>
+            <select class="icon" name="icon">
+              {{#if eq icon "French"}}
+                <option value="French" selected>French</option>
+              {{else}}
+                <option value="French">French</option>
+              {{/if}}
+              {{#if eq icon "Latin"}}
+              <option value="Latin" selected>Latin</option>
+              {{else}}
+              <option value="Latin">Latin</option>
+              {{/if}}
+              {{#if eq icon "English"}}
+              <option value="English" selected>English</option>
+              {{else}}
+              <option value="English">English</option>
+              {{/if}}
+              {{#if eq icon "Art"}}
+              <option value="Art" selected>Art</option>
+              {{else}}
+              <option value="Art">Art</option>
+              {{/if}}
+              {{#if eq icon "Chemistry"}}
+              <option value="Chemistry" selected>Chemistry</option>
+              {{else}}
+              <option value="Chemistry">Chemistry</option>
+              {{/if}}
+              {{#if eq icon "Computing"}}
+              <option value="Computing" selected>Computing</option>
+              {{else}}
+              <option value="Computing">Computing</option>
+              {{/if}}
+              {{#if eq icon "Geography"}}
+              <option value="Geography" selected>Geography</option>
+              {{else}}
+              <option value="Geography">Geography</option>
+              {{/if}}
+              {{#if eq icon "Physics"}}
+              <option value="Physics" selected>Physics</option>
+              {{else}}
+              <option value="Physics">Physics</option>
+              {{/if}}
+              {{#if eq icon "Mathematics"}}
+              <option value="Mathematics" selected>Mathematics</option>
+              {{else}}
+              <option value="Mathematics">Mathematics</option>
+              {{/if}}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Students</label>
+            <br>
+            <input type="hidden" class="select2" name="students" value="{{joinByComma students}}" multiple>
+          </div>
+          <div class="form-group">
+            <label>Teachers</label>
+            <br>
+            <input type="hidden" class="select2" name="teachers" value="{{joinByComma teachers}}" multiple>
+          </div>
+          <div class="form-group">
+            <label>Club</label>
+            {{#if club}}
+              <input type="checkbox" checked name="club">
+            {{else}}
+              <input type="checkbox" name="club">
+            {{/if}}
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</template>
+
+<template name="admin">
+  <div class="main main-admin">
+    {{> navbar}}
+
+    <div class="container-fluid admin">
+      <div class="row">
+        <div class="col-md-2 full">
+            <section class="sidebar">
+              <ul class="sidebar-menu">
+                <li class="active">
+                  <a href="/admin"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a>
+                </li>
+                <li class="treeview">
+                  <a href="#"><i class="fa fa-users"></i> Users <i class="fa pull-right fa-angle-left"></i></a>
+                  <ul class="treeview-menu">
+                    <li>
+                      <a href="/admin/users/new" style="margin-right:10px;"><i class="fa fa-angle-right"></i> Create</a>
+                    </li>
+                    <li>
+                      <a href="/admin/users" style="margin-right:10px;"><i class="fa fa-angle-right"></i> View all</a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="treeview">
+                  <a href="#"><i class="fa fa-book"></i> Courses <i class="fa pull-right fa-angle-left"></i></a>
+                  <ul class="treeview-menu">
+                    <li>
+                      <a href="/admin/courses/new" style="margin-right:10px;"><i class="fa fa-angle-right"></i> Create</a>
+                    </li>
+                    <li>
+                      <a href="/admin/courses" style="margin-right:10px;"><i class="fa fa-angle-right"></i> View all</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="/admin/payments"><i class="fa fa-money"></i> <span>Payments</span></a>
+                </li>
+                <li>
+                  <a href="/admin/payments"><i class="fa fa-wrench"></i> <span>Settings</span></a>
+                </li>
+              </ul>
+            </section>
+        </div>
+        <div class="col-md-10 content">
+          {{> yield}}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="dashboard">
+  <div class="list">
+    <div class="col-lg-3 col-xs-6">
+      <div class="small-box bg-aqua">
+        <div class="inner">
+          <h3>{{usersCount}}</h3>
+          <p>Users</p>
+        </div>
+        <div class="icon">
+          <i class="fa fa-users"></i>
+        </div>
+        <a href="/admin/users" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
+      </div>
+    </div>
+    <div class="col-lg-3 col-xs-6">
+      <div class="small-box bg-green">
+        <div class="inner">
+          <h3>{{coursesCount}}</h3>
+          <p>Courses</p>
+        </div>
+        <div class="icon">
+          <i class="fa fa-book"></i>
+        </div>
+        <a href="/admin/courses" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
 </template>

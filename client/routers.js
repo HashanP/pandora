@@ -13,6 +13,8 @@ Router.onBeforeAction(function() {
         return {doc:Courses.findOne(this.params.id), section:this.route._path.split("/")[3]};
       }
     });
+  } else {
+    this.layout("admin")
   }
   this.next();
 }, {except:["subjects", "clubs"]});
@@ -214,6 +216,53 @@ Router.route("/courses/:id/handInFolders/:handInFolder/edit", function() {
   var doc = Courses.findOne(this.params.id);
   var handInFolder = _.findWhere(doc.handInFolders, {_id: this.params.handInFolder});
   this.render("handInFolderForm", {data: {doc: Courses.findOne(this.params.id), handInFolder:handInFolder}});
+});
+
+Router.route("/admin", function() {
+  var usersCount = Meteor.users.find({}).count();
+  var coursesCount = Courses.find({}).count();
+  this.render("dashboard", {data: {usersCount: usersCount, coursesCount: coursesCount}});
+});
+
+Router.route("/admin/users", function(e) {
+  var count = Meteor.users.find({}).count();
+  var page = parseInt(this.params.query.page, 10) || 0;
+  if(count > (page + 1) * 10) {
+    var next = page + 1;
+  } else {
+    var next = false;
+  }
+  if(page !== 0) {
+    var prev = page - 1;
+  } else {
+    var prev = false;
+  }
+  var offset = page * 10;
+//  var users = Meteor.users.find({}, {skip:offset, limit: 10});
+    this.render("users", {data: {users: Meteor.users.find(), count:count}});
+});
+
+Router.route("/admin/users/new", function(e) {
+  this.render("userForm", {data: {courses: Courses.find()}});
+});
+
+Router.route("/admin/users/:id", function(e) {
+  this.render("userForm", {data: {courses: Courses.find({club:false}), user: Meteor.users.findOne(this.params.id)}});
+});
+
+Router.route("/admin/courses", function(e) {
+  this.render("listCourses", {data: {courses: Courses.find()}});
+});
+
+Router.route("/admin/courses/new", function(e) {
+  this.render("courseForm");
+});
+
+Router.route("/admin/courses/:id", function() {
+  var course = Courses.findOne(this.params.id);
+  if(course) {
+    this.render("courseForm", {data: course});
+  }
 });
 
 Router.route("/logout", function() {

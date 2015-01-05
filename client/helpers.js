@@ -58,3 +58,9 @@ UI.registerHelper("isTeacher", function() {
 UI.registerHelper("notEmpty", function(arr) {
   return arr && arr.length !== 0;
 });
+
+UI.registerHelper("joinByComma", function(arr) {
+  if(arr) {
+    return arr.join(",");
+  }
+});

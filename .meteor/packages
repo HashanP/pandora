@@ -9,7 +9,6 @@ accounts-base
 accounts-password
 mrt:accounts-ui-bootstrap-3
 iron:router
-yogiben:admin
 linto:fontawesome
 aldeed:collection2
 aldeed:autoform
@@ -23,3 +22,5 @@ reactive-var
 lampe:rssfeed
 d3
 alanning:roles
+zimme:select2-bootstrap3-css
+natestrauser:select2

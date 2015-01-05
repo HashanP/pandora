@@ -673,7 +673,7 @@ Template.course.events({
 
 Template.handInFolderForm.events({
   "submit form": function(e) {
-    Meteor.call("handInFolder", this.doc._id, {title:e.target.title.value}, this.handInFolder._id);
+    Meteor.call("handInFolder", this.doc._id, {title:e.target.title.value}, this.handInFolder ? this.handInFolder._id: undefined);
     Router.go("/courses/" + this.doc._id + "/handInFolders");
     return false;
   }
@@ -710,5 +710,135 @@ Template.handInFolder.events({
   "click .del": function() {
     Meteor.call("removeHandInFolder", this.doc._id, this.handInFolder._id);
     Router.go("/courses/" + this.doc._id + "/handInFolders");
+  }
+});
+
+Template.userItem.helpers({
+  "getUsername": function() {
+    return this.emails[0].address.split("@")[0];
+  }
+});
+
+Template.userItem.events({
+  "click .del": function() {
+    Meteor.call("removeUser", this._id);
+  }
+});
+
+Template.userForm.events({
+  "submit form": function(e) {
+    var data = {
+      email: e.target.email.value,
+      students: [],
+      teachers: [],
+      nothing: []
+    }
+    Template.instance().findAll(".student.active").forEach(function(el) {
+      data.students.push(el.name);
+    });
+    Template.instance().findAll(".teacher.active").forEach(function(el) {
+      data.teachers.push(el.name);
+    });
+    Template.instance().findAll(".nothing.active").forEach(function(el) {
+      data.nothing.push(el.name);
+    });
+    Meteor.call("user", data, this.user ? this.user._id : undefined);
+    Router.go("/admin/users");
+    return false;
+  },
+  "click .btn-group .btn": function(e) {
+    $(e.target).siblings().removeClass("active");
+    $(e.target).addClass("active");
+  }
+});
+
+Template.userForm.helpers({
+  "getEmail": function() {
+    if(this.user) {
+      return this.user.emails[0].address;
+    }
+  },
+  "isStudent": function(course, userId) {
+    console.log(course);
+    console.log(userId);
+    return course.students && course.students.indexOf(userId) !== -1;
+  },
+  "isTeacher": function(course, userId) {
+    console.log(course);
+    console.log(userId);
+    return course.teachers && course.teachers.indexOf(userId) !== -1;
+  }
+});
+
+Template.courseForm.rendered = function() {
+  $(Template.instance().findAll(".select2")).select2({
+    minimumInputLength: 1,
+    query: function (query) {
+      var i = 0;
+      var stub = Meteor.autorun(function() {
+        var data = Meteor.users.find({"emails.0.address": new RegExp("^" + query.term)}).fetch();
+        console.log(data);
+        console.log(i);
+        if(i === 0) {
+          data = data.map(function(user) {
+            return {
+              text: user.emails[0].address.split("@")[0],
+              id: user._id
+            }
+          });
+          query.callback({results:data});
+        }
+        i++;
+      });
+    },
+    multiple:true,
+    initSelection: function(el,cb) {
+      console.log("here");
+      var ids = $(el).val().split(",");
+      Meteor.autorun(function() {
+        var data = Meteor.users.find({_id: {$in: ids}}).fetch();
+        data = data.map(function(user) {
+          return {
+            text: user.emails[0].address.split("@")[0],
+            id: user._id
+          }
+        });
+        console.log(data);
+        cb(data);
+      });
+    }
+  });
+  $(Template.instance().find(".icon")).select2({
+
+  });
+}
+
+Template.courseForm.events({
+  "submit form": function(e) {
+    var students = e.target.students.value === "" ? [] : e.target.students.value.split(",");
+    var teachers = e.target.teachers.value === "" ? [] : e.target.teachers.value.split(",");
+    console.log(students);
+    console.log(teachers);
+    Meteor.call("course", {
+      title: e.target.title.value,
+      icon: e.target.icon.value,
+      students: students,
+      teachers: teachers,
+      club:e.target.club.checked
+    }, this._id);
+    Router.go("/admin/courses");
+    return false;
+  }
+});
+
+Template.admin.events({
+  "click .treeview a": function(e) {
+    $(e.target).siblings(".treeview-menu").slideToggle();
+  }
+});
+
+Template.courseItem.events({
+  "click .del": function() {
+    Meteor.call("removeCourse", this._id);
   }
 });
