@@ -896,7 +896,7 @@ a:hover {
   color: #295A3E;
 }
 
-.panel {
+.panel.panel-primary {
   border-radius:7px !important;
 }
 
@@ -1355,4 +1355,8 @@ button:focus {
 
 .container-fluid.admin .content {
   margin-top:20px;
+}
+
+label.checkbox {
+  margin-left:20px;
 }

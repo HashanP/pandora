@@ -138,7 +138,7 @@ Template.questionForm.helpers({
 Template.questionForm.events({
   "change .type": function(e) {
     var y = Session.get("type")
-    y[this.no] = e.target.value;
+    y[this.question.no] = e.target.value;
     Session.set("type", y);
   },
   "click .del": function() {
@@ -293,6 +293,7 @@ var addQuestion = function(el, data) {
     data = {};
   }
   data.no = count;
+  console.log(data);
   Blaze.renderWithData(Template.questionForm, {question:data}, el);
   count++;
 };
@@ -330,6 +331,7 @@ Template.questionForm.rendered = function() {
 Template.quizForm.events({
   "click .addQuestion": function() {
     addQuestion(Template.instance().find(".questions"));
+    no++;
   },
   "submit form": function(e) {
     var data = {

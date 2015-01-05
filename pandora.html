@@ -464,15 +464,15 @@
 
 <template name="questionForm">
     <div class="panel panel-default">
-      <div class="panel-heading" role="tab" id="heading{{no}}">
+      <div class="panel-heading" role="tab" id="heading{{question.no}}">
         <h4 class="panel-title">
-          <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{no}}" class="collapsed" aria-expanded="false" aria-controls="collapse{{no}}">
+          <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{question.no}}" class="collapsed" aria-expanded="false" aria-controls="collapse{{question.no}}">
             Question
           </a>
           <button class="btn btn-xs btn-default pull-right handle" type="button"><i class="fa fa-bars"></i></button>
         </h4>
       </div>
-      <div id="collapse{{no}}" class="panel-collapse collapse" role="tabpanel" aria-expaned="false" aria-labelledby="heading{{no}}">
+      <div id="collapse{{question.no}}" class="panel-collapse collapse" role="tabpanel" aria-expaned="false" aria-labelledby="heading{{question.no}}">
         <div class="panel-body">
           <div class="form-group">
             <label>Question</label>
@@ -892,7 +892,9 @@
 
 <template name="userItem">
   <a href="/admin/users/{{_id}}">{{getUsername}}</a>
-  <button type="button" class="btn btn-xs btn-danger del pull-right">Delete</button>
+  {{#if not isSelf _id}}
+    <button type="button" class="btn btn-xs btn-danger del pull-right">Delete</button>
+  {{/if}}
 </template>
 
 <template name="users">

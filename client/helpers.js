@@ -64,3 +64,7 @@ UI.registerHelper("joinByComma", function(arr) {
     return arr.join(",");
   }
 });
+
+UI.registerHelper("isSelf", function(id) {
+  return id === Meteor.userId();
+});
