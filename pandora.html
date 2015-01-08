@@ -801,7 +801,7 @@
       {{#if myComment}}
       <h4>Comments</h4>
       <p>
-        
+
       </p>
       {{/if}}
     {{/if}}
@@ -1013,6 +1013,16 @@
               <option value="Mathematics" selected>Mathematics</option>
               {{else}}
               <option value="Mathematics">Mathematics</option>
+              {{/if}}
+              {{#if eq icon "German"}}
+              <option value="German" selected>German</option>
+              {{else}}
+              <option value="German">German</option>
+              {{/if}}
+              {{#if eq icon "Spanish"}}
+              <option value="Spanish" selected>Spanish</option>
+              {{else}}
+              <option value="Spanish">Spanish</option>
               {{/if}}
             </select>
           </div>
