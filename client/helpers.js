@@ -60,6 +60,10 @@ UI.registerHelper("isTeacher", function(doc) {
   }
 });
 
+UI.registerHelper("isEmpty", function(arr) {
+  return arr && arr.length === 0;
+});
+
 UI.registerHelper("notEmpty", function(arr) {
   return arr && arr.length !== 0;
 });

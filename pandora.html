@@ -228,12 +228,7 @@
           <li><a href="/admin">Admin</a></li>
           {{/if}}
         </ul>
-        <form class="navbar-form navbar-left" role="search">
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
-        </form>
+
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{username}} <span class="caret"></span></a>
@@ -718,6 +713,54 @@
   {{/each}}
 </template>
 
+<template name="handInComment">
+  {{#with FS.GetFile "files" fileId}}
+  <div class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Comment on <i>{{this.name}}</i></h4>
+        </div>
+        <form>
+          <div class="modal-body">
+              <div class="form-group">
+                <label>Grade</label>
+                <input type="text" class="form-control" value="{{this.grade}}" name="grade">
+              </div>
+              <div class="form-group">
+                <label>Comment</label>
+                <textarea class="form-control" name="comment">{{this.comment}}</textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {{/with}}
+</template>
+
+<template name="handInEntry">
+  <tr>
+    <td>{{username}}</td>
+    {{#with FS.GetFile "files" fileId}}
+    <td>
+      {{this.name}}
+    </td>
+    {{/with}}
+    <td>
+      {{#with FS.GetFile "files" fileId}}
+      <a href="{{this.url}}" class="btn btn-sm btn-primary">View</a>
+      {{/with}}
+      <button type="button" class="btn btn-sm btn-success feedback">Feedback</button>
+    </td>
+  </tr>
+</template>
+
 <template name="handInFolder">
   <div class="panel-body">
     {{#if isTeacher}}
@@ -746,17 +789,7 @@
           </thead>
           <tbody>
             {{#each sortBy handInFolder.handIns "username"}}
-              <tr>
-                <td>{{username}}</td>
-                {{#with FS.GetFile "files" fileId}}
-                <td>
-                  {{this.name}}
-                </td>
-                <td>
-                    <a href="{{this.url}}" class="btn btn-sm btn-primary">View</a>
-                </td>
-                {{/with}}
-              </tr>
+              {{> handInEntry}}
             {{/each}}
           </tbody>
         </table>
@@ -765,44 +798,38 @@
       {{/if}}
     {{else}}
       {{#if notEmpty myHandIns}}
-      <h4>My Hand Ins</h4>
-      <button type="button" class="handIn btn btn-sm btn-primary">Hand In Another File</button>
-      <br><br>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>
-              Filename
-            </th>
-            <th>
-
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#each myHandIns}}
-          <tr>
-            {{#with FS.GetFile "files" fileId}}
-            <td>{{this.name}}</td>
-            <td>
-              <a href="{{this.url}}" class="btn btn-primary btn-sm">View</a>
-              {{> FS.DeleteButton class="btn btn-danger btn-sm"}}
-            </td>
-            {{/with}}
-          </tr>
-          {{/each}}
-        </tbody>
-      </table>
+      <br>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Handed In Files</h3>
+            <button class="handIn btn-link btn-xs pull-right"><i class="fa fa-plus"></i></button>
+          </div>
+            <div class="list-group">
+              {{#each myHandIns}}
+              <div class="list-group-item">
+                {{#with FS.GetFile "files" fileId}}
+                <h4 class="list-group-item-heading">{{this.name}}</h4>
+                <p class="list-group-item-text">
+                  {{#if grade}}
+                    <br>
+                    <strong>Grade</strong><br>
+                    {{this.grade}}<br><br>
+                    <strong>Comment</strong><br>
+                    {{comment}}<br>
+                  {{/if}}
+                </p>
+                <br>
+                <a href="{{this.url}}" class="btn btn-primary btn-sm">View</a>
+                {{> FS.DeleteButton class="btn btn-danger btn-sm"}}
+                {{/with}}
+              </div>
+              {{/each}}
+            </div>
+        </div>
       {{else}}
-       <button type="button" class="handIn btn btn-sm btn-primary">Hand In A File</button>
-       <br><br>
-       You have not handed in anything yet.
-      {{/if}}
-      {{#if myComment}}
-      <h4>Comments</h4>
-      <p>
-
-      </p>
+         <button type="button" class="handIn btn btn-sm btn-primary">Hand In A File</button>
+         <br><br>
+         You have not handed in anything yet.
       {{/if}}
     {{/if}}
   </div>
@@ -1013,16 +1040,6 @@
               <option value="Mathematics" selected>Mathematics</option>
               {{else}}
               <option value="Mathematics">Mathematics</option>
-              {{/if}}
-              {{#if eq icon "German"}}
-              <option value="German" selected>German</option>
-              {{else}}
-              <option value="German">German</option>
-              {{/if}}
-              {{#if eq icon "Spanish"}}
-              <option value="Spanish" selected>Spanish</option>
-              {{else}}
-              <option value="Spanish">Spanish</option>
               {{/if}}
             </select>
           </div>

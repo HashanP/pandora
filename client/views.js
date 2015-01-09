@@ -882,3 +882,26 @@ Template.courseItem.events({
     Meteor.call("removeCourse", this._id);
   }
 });
+
+Template.handInEntry.events({
+  "click .feedback": function() {
+    console.log(this);
+    Blaze.renderWithData(Template.handInComment, this, document.body);
+  }
+});
+
+Template.handInComment.rendered = function() {
+  $(".modal").modal("show");
+  $(".modal").on('hidden.bs.modal', function() {
+    $(this).remove();
+  });
+}
+
+Template.handInComment.events({
+  "submit form": function(e) {
+    console.log(this._id);
+    Meteor.call("fileComment", this._id, e.target.grade.value, e.target.comment.value);
+    $(".modal").modal("hide");
+    return false;
+  }
+});
