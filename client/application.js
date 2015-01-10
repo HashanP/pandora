@@ -17,4 +17,12 @@ Meteor.startup(function() {
   $("body").on("blur", "input", function(e) {
     this.lastActive = e.target;
   }.bind(this));
+
+  Meteor.autorun(function(){
+    if(Meteor.userId()){
+      $("body").addClass("loggedIn");
+    } else {
+      $("body").removeClass("loggedIn");
+    }
+  });
 }.bind(this));

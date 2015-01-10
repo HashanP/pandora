@@ -191,7 +191,7 @@ body {
   }
 }
 
-.main  {
+body.loggedIn  {
   background: -webkit-linear-gradient(90deg, #136a8a 10%, #267871 90%); /* Chrome 10+, Saf5.1+ */
   background:    -moz-linear-gradient(90deg, #136a8a 10%, #267871 90%); /* FF3.6+ */
   background:     -ms-linear-gradient(90deg, #136a8a 10%, #267871 90%); /* IE10 */
@@ -307,11 +307,48 @@ body {
 
 
 .navbar ~ * {
-  margin-top:60px;
+  padding-top:60px;
 }
 
-.grid, .st-content, .list, .users {
+.st-content, .list {
   margin-top:20px;
+}
+
+.st-container {
+  position:absolute;
+  height:100%;
+  width:100%;
+}
+
+@media (max-width:767px) {
+  .st-menu {
+    position:relative;
+    left:-100%;
+    transform: translate3d(0,0,0);
+  }
+
+  .st-menu-open {
+    position:absolute;
+    left:0;
+    width:100%;
+    height:auto;
+  }
+
+  .st-content {
+    position:absolute !important;
+    top:0;
+    width:100%;
+  }
+
+  .panel.panel-primary, .panel-heading, .panel-body, .panel .list-group li {
+    border-radius:0px !important;
+  }
+
+  .st-content {
+    margin-top:0px;
+    padding-right:0px !important;
+    padding-left:0px !important;
+  }
 }
 
 .st-menu {
@@ -494,7 +531,7 @@ a:hover {
   color: #295A3E;
 }
 
-.panel.panel-primary {
+.panel-primary {
   border-radius:7px !important;
 }
 
@@ -875,6 +912,11 @@ button:focus {
   padding: 0;
   border-right: 1px solid rgb(219, 219, 219);
 }
+
+.sidebar .sidebar-menu > li.active {
+  background-color:white;
+}
+
 .sidebar .sidebar-menu > li {
   margin: 0;
   padding: 0;
@@ -885,6 +927,7 @@ button:focus {
   color:#777;
   padding: 12px 5px 12px 15px;
   display: block;
+  cursor:pointer;
 }
 
 .sidebar .sidebar-menu > li:hover > a {
@@ -941,7 +984,7 @@ button:focus {
 .container-fluid.admin {
   position:absolute;
   width:100%;
-  height:calc(100% - 64px);
+  height:calc(100% - 4px);
   top:0;
   left:0;
   display:block;
@@ -961,4 +1004,23 @@ label.checkbox {
 
 textarea {
   resize:vertical;
+}
+
+.panel-primary button {
+  margin-top:0;
+  margin-bottom:0;
+}
+
+.panel-primary .panel-title {
+  vertical-align:middle;
+}
+
+.toggle {
+  margin-right:5px;
+}
+
+.content-header {
+  background: #fbfbfb;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  width:100%;
 }

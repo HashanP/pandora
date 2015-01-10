@@ -11,7 +11,7 @@ Router.onBeforeAction(function() {
   if(this.route._path.slice(0, 6) !== "/admin") {
     this.layout("course", {
       data: function() {
-        return {doc:Courses.findOne(this.params.id), section:this.route._path.split("/")[3]};
+        return {doc:Courses.findOne(this.params.id), section:this.route._path.split("/")[3], sidenav:true};
       }
     });
   } else {
@@ -243,7 +243,7 @@ Router.route("/admin/users", function(e) {
   }
   var offset = page * 10;
 //  var users = Meteor.users.find({}, {skip:offset, limit: 10});
-    this.render("users", {data: {users: Meteor.users.find(), count:count}});
+    this.render("users", {data: {users: Meteor.users.find({}, {sort:{"emails.0.address":1}}), count:count}});
 });
 
 Router.route("/admin/users/new", function(e) {
@@ -255,7 +255,7 @@ Router.route("/admin/users/:id", function(e) {
 });
 
 Router.route("/admin/courses", function(e) {
-  this.render("listCourses", {data: {courses: Courses.find()}});
+  this.render("listCourses", {data: {courses: Courses.find({}, {sort: {title:1}})}});
 });
 
 Router.route("/admin/courses/new", function(e) {

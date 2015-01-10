@@ -874,6 +874,10 @@ Template.courseForm.events({
 Template.admin.events({
   "click .treeview a": function(e) {
     $(e.target).siblings(".treeview-menu").slideToggle();
+    $(e.target).closest(".treeview").toggleClass("active");
+  },
+  "click a[href]": function() {
+    Template.instance().$(".treeview-menu").hide();
   }
 });
 
@@ -903,5 +907,14 @@ Template.handInComment.events({
     Meteor.call("fileComment", this._id, e.target.grade.value, e.target.comment.value);
     $(".modal").modal("hide");
     return false;
+  }
+});
+
+Template.course.events({
+  "click .toggle": function() {
+    Template.instance().$(".st-menu").addClass("st-menu-open");
+  },
+  "click .st-menu a": function() {
+    Template.instance().$(".st-menu").removeClass("st-menu-open");
   }
 });

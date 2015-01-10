@@ -251,7 +251,7 @@
       <!-- content push wrapper -->
       <div class="st-pusher row">
 
-        <nav class="st-menu col-md-3 col-lg-2 col-xl-1" id="menu-1">
+        <nav class="st-menu col-sm-3 col-md-3 col-lg-2 col-xl-1" id="menu-1">
           <h2><i class="fa fa-flash"></i> {{doc.title}}
             <br><small>{{doc.icon}}</small>
           </h2>
@@ -266,10 +266,13 @@
           </ul>
         </nav>
 
-        <div class="st-content col-md-9 col-lg-10  col-xl-11"><!-- this is the wrapper for the content -->
+        <div class="st-content col-sm-9 col-md-9 col-lg-10 col-xl-11"><!-- this is the wrapper for the content -->
           <div class="st-content-inner"><!-- extra div for emulating position:fixed of the menu -->
             <div class="panel panel-primary">
               <div class="panel-heading">
+                <div class="visible-xs-inline-block">
+                  <button class="btn btn-xs btn-info toggle"><i class="fa fa-bars"></i></button>
+                </div>
                 <h3 class="panel-title">
                   {{titleCase section}}
                 </h3>
@@ -947,7 +950,7 @@
 </template>
 
 <template name="users">
-  <div class="panel panel-primary users">
+  <div class="panel panel-primary">
     <div class="panel-heading">
       <h3 class="panel-title">Users</h3>
         <div class="pull-right">
@@ -1096,11 +1099,11 @@
         <div class="col-md-2 full">
             <section class="sidebar">
               <ul class="sidebar-menu">
-                <li class="active">
+                <li>
                   <a href="/admin"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a>
                 </li>
                 <li class="treeview">
-                  <a href="#"><i class="fa fa-users"></i> Users <i class="fa pull-right fa-angle-left"></i></a>
+                  <a><i class="fa fa-users"></i> Users <i class="fa pull-right fa-angle-left"></i></a>
                   <ul class="treeview-menu">
                     <li>
                       <a href="/admin/users/new" style="margin-right:10px;"><i class="fa fa-angle-right"></i> Create</a>
@@ -1111,7 +1114,7 @@
                   </ul>
                 </li>
                 <li class="treeview">
-                  <a href="#"><i class="fa fa-book"></i> Courses <i class="fa pull-right fa-angle-left"></i></a>
+                  <a><i class="fa fa-book"></i> Courses <i class="fa pull-right fa-angle-left"></i></a>
                   <ul class="treeview-menu">
                     <li>
                       <a href="/admin/courses/new" style="margin-right:10px;"><i class="fa fa-angle-right"></i> Create</a>
@@ -1139,30 +1142,35 @@
 </template>
 
 <template name="dashboard">
-  <div class="list">
-    <div class="col-lg-3 col-xs-6">
-      <div class="small-box bg-aqua">
-        <div class="inner">
-          <h3>{{usersCount}}</h3>
-          <p>Users</p>
-        </div>
-        <div class="icon">
-          <i class="fa fa-users"></i>
-        </div>
-        <a href="/admin/users" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
-      </div>
-    </div>
-    <div class="col-lg-3 col-xs-6">
-      <div class="small-box bg-green">
-        <div class="inner">
-          <h3>{{coursesCount}}</h3>
-          <p>Courses</p>
-        </div>
-        <div class="icon">
-          <i class="fa fa-book"></i>
-        </div>
-        <a href="/admin/courses" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
-      </div>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title"><i class="fa fa-cogs"></i> Admin Interface</h3>
     </div>
   </div>
+        <div class="row">
+          <div class="col-lg-3 col-xs-6">
+            <div class="small-box bg-aqua">
+              <div class="inner">
+                <h3>{{usersCount}}</h3>
+                <p>Users</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-users"></i>
+              </div>
+              <a href="/admin/users" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="col-lg-3 col-xs-6">
+            <div class="small-box bg-green">
+              <div class="inner">
+                <h3>{{coursesCount}}</h3>
+                <p>Courses</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-book"></i>
+              </div>
+              <a href="/admin/courses" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
 </template>
