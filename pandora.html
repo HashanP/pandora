@@ -758,6 +758,11 @@
       {{/with}}
       <button type="button" class="btn btn-sm btn-success feedback">Feedback</button>
     </td>
+    <td>
+      {{#with FS.GetFile "files" fileId}}
+        {{grade}}
+      {{/with}}
+    </td>
   </tr>
 </template>
 
@@ -784,6 +789,9 @@
               </th>
               <th>
 
+              </th>
+              <th>
+                Grade
               </th>
             </tr>
           </thead>
@@ -814,11 +822,12 @@
                     <br>
                     <strong>Grade</strong><br>
                     {{this.grade}}<br><br>
+                  {{/if}}
+                  {{#if comment}}
                     <strong>Comment</strong><br>
-                    {{comment}}<br>
+                    {{comment}}<br><br>
                   {{/if}}
                 </p>
-                <br>
                 <a href="{{this.url}}" class="btn btn-primary btn-sm">View</a>
                 {{> FS.DeleteButton class="btn btn-danger btn-sm"}}
                 {{/with}}
