@@ -321,7 +321,7 @@ body.loggedIn  {
 }
 
 @media (max-width:767px) {
-  .st-menu {
+  .st-menu, .sidebar {
     position:relative;
     left:-100%;
     transform: translate3d(0,0,0);
@@ -606,8 +606,6 @@ a:hover {
 .vocab-quiz input {
   outline:none;
 }
-
-
 
 .vocab-quiz div {
   line-height:30px;
@@ -899,7 +897,16 @@ button:focus {
   margin-bottom: 5px;
   background-color: rgb(244, 244, 244);
   height:100%;
+  transition:left 0.5s;
+  z-index:100;
 }
+
+.sidebar-open {
+  position:relative;
+  left:0;
+  width:100%;
+ }
+
 .sidebar .sidebar-form input:focus {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
@@ -979,15 +986,6 @@ button:focus {
 
 .select2-container {
   width:100% !important;
-}
-
-.container-fluid.admin {
-  position:absolute;
-  width:100%;
-  height:calc(100% - 4px);
-  top:0;
-  left:0;
-  display:block;
 }
 
 .container-fluid.admin > .row {

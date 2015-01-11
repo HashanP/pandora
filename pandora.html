@@ -880,6 +880,7 @@
 <template name="userForm">
   <div class="panel panel-primary">
     <div class="panel-heading">
+      {{> adminToggle}}
       <h3 class="panel-title">Users</h3>
         <div class="pull-right">
           <a href="/admin/users/new"><i class="fa fa-plus"></i></a>
@@ -952,6 +953,7 @@
 <template name="users">
   <div class="panel panel-primary">
     <div class="panel-heading">
+      {{> adminToggle}}
       <h3 class="panel-title">Users</h3>
         <div class="pull-right">
           <a href="/admin/users/new"><i class="fa fa-plus"></i></a>
@@ -975,6 +977,7 @@
 <template name="listCourses">
   <div class="panel panel-primary">
     <div class="panel-heading">
+      {{> adminToggle}}
       <h3 class="panel-title">Courses</h3>
       <div class="pull-right">
         <a href="/admin/courses/new"><i class="fa fa-plus"></i></a>
@@ -993,6 +996,7 @@
 <template name="courseForm">
   <div class="panel panel-primary">
     <div class="panel-heading">
+      {{> adminToggle}}
       <h3 class="panel-title">Courses</h3>
     </div>
     <div class="panel-body">
@@ -1094,9 +1098,9 @@
   <div class="main main-admin">
     {{> navbar}}
 
-    <div class="container-fluid admin">
-      <div class="row">
-        <div class="col-md-2 full">
+    <div class="st-container container-fluid admin">
+        <div class="st-pusher row">
+          <div class="col-md-2 col-sm-3 full">
             <section class="sidebar">
               <ul class="sidebar-menu">
                 <li>
@@ -1132,45 +1136,53 @@
                 </li>
               </ul>
             </section>
-        </div>
-        <div class="col-md-10 content">
-          {{> yield}}
+          </div>
+          <div class="col-md-10 col-sm-9 st-content">
+            <div class="st-content-inner">
+              {{> yield}}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+  </div>
+</template>
+
+<template name="adminToggle">
+  <div class="visible-xs-inline-block">
+    <button class="btn btn-xs btn-info toggle"><i class="fa fa-bars"></i></button>
   </div>
 </template>
 
 <template name="dashboard">
-  <div class="panel panel-primary">
-    <div class="panel-heading">
-      <h3 class="panel-title"><i class="fa fa-cogs"></i> Admin Interface</h3>
-    </div>
-  </div>
-        <div class="row">
-          <div class="col-lg-3 col-xs-6">
-            <div class="small-box bg-aqua">
-              <div class="inner">
-                <h3>{{usersCount}}</h3>
-                <p>Users</p>
-              </div>
-              <div class="icon">
-                <i class="fa fa-users"></i>
-              </div>
-              <a href="/admin/users" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          {{> adminToggle}}
+          <i class="fa fa-cogs"></i> Admin Interface</h3>
+        </div>
+      </div>
+        <div class="col-lg-3 col-xs-6">
+          <div class="small-box bg-aqua">
+            <div class="inner">
+              <h3>{{usersCount}}</h3>
+              <p>Users</p>
             </div>
+            <div class="icon">
+              <i class="fa fa-users"></i>
+            </div>
+            <a href="/admin/users" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
           </div>
-          <div class="col-lg-3 col-xs-6">
-            <div class="small-box bg-green">
-              <div class="inner">
-                <h3>{{coursesCount}}</h3>
-                <p>Courses</p>
-              </div>
-              <div class="icon">
-                <i class="fa fa-book"></i>
-              </div>
-              <a href="/admin/courses" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
+        </div>
+        <div class="col-lg-3 col-xs-6">
+          <div class="small-box bg-green">
+            <div class="inner">
+              <h3>{{coursesCount}}</h3>
+              <p>Courses</p>
             </div>
+            <div class="icon">
+              <i class="fa fa-book"></i>
+            </div>
+            <a href="/admin/courses" class="small-box-footer">More info <i class="fa fa-arrow-right"></i></a>
           </div>
         </div>
 </template>

@@ -878,6 +878,7 @@ Template.admin.events({
   },
   "click a[href]": function() {
     Template.instance().$(".treeview-menu").hide();
+    Template.instance().$(".treeview").removeClass("active");
   }
 });
 
