@@ -5,7 +5,7 @@ Router.onBeforeAction(function() {
     Session.set("titleError", "");
     this.next();
   }
-});
+}, {except: ["pricing"]});
 
 Router.onBeforeAction(function() {
   if(this.route._path.slice(0, 6) !== "/admin") {
@@ -18,11 +18,13 @@ Router.onBeforeAction(function() {
     this.layout("admin")
   }
   this.next();
-}, {except:["subjects", "clubs"]});
+}, {except:["subjects", "clubs", "pricing"]});
 
 Router.route("/", function() {
   return this.render("subjects", {data:{courses: Courses.find({club:false}).fetch(), selected: "subjects"}});
 }, {name:"subjects"});
+
+Router.route("/pricing", {name:"pricing"});
 
 Router.route('/clubs', function() {
   this.render("subjects", {data: {courses: Courses.find({club:true}), selected:"clubs"}});
