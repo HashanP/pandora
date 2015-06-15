@@ -1,0 +1,133 @@
+<head>
+  <title>pandora</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<template name="base">
+	<div class="page-wrapper">
+		<nav class="sidebar">
+			<ul class="sidebar-nav">
+				<li class="header">Subjects</li>
+				<li><a href="#">Maths</a></li>
+				<li><a href="#">English</a></li>
+				<li><a href="#">French</a></li>
+				<li><a href="#">Geography</a></li>
+				<li><a href="#">History</a></li>
+				<li><a href="#">Art</a></li>
+				<li><a href="#">Computing</a></li>
+				<li><a href="#">Latin</a></li>
+				<li><a href="#">Egyptology</a></li>
+				{{#if admin}}
+					<li class="header">Admin</li>
+					<li><a href="/admin/users">Users</a></li>
+					<li><a href="/admin/rooms">Rooms</a></li>
+					<li><a href="/admin/billing">Billing</a></li>
+				{{/if}}
+			</ul>
+		</nav>
+		<div class="contents">
+			{{> yield}}
+		</div>
+	</div>
+</template>
+
+<template name="admin/users">
+	<div class="row">
+		<div class="col-md-8 col-lg-9">
+			<button class="btn btn-success"><i class="fa fa-plus"></i> Add</button>
+		</div>
+		<div class="col-md-4 col-lg-3">
+			<input type="text" class="form-control" placeholder="Search...">
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table users">
+				<thead>
+					<tr>
+						<th>Username</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{{#each users}}
+						<tr>
+							<td>
+								<span class="username">{{username}}</span>
+								{{#if isAdmin}}
+									<span class="label label-primary">Admin</span>
+								{{/if}}
+							</td>
+							<td class="pull-right">
+								<a href="/admin/users/{{_id}}" class="btn btn-primary"><i class="fa fa-pencil"></i> Edit</a>
+								<button class="btn btn-warning"><i class="fa fa-times"></i> Delete</button>
+							</td>
+						</tr>
+					{{/each}}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</template>
+
+<template name="room">
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-tabs">
+				<li role="presentation" class="active"><a href="#">Notices</a></li>
+				<li role="presentation"><a href="#">Resources</a></li>	
+			</ul>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<br/>
+			<button class="btn btn-success">Add <i class="fa fa-plus"></i></button>
+		</div>
+	</div>
+</template>
+
+<template name="login">
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Pandora</a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#">About</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div class="row">
+		<div class="col-md-4 col-sm-12 col-md-push-4">
+			<div class="well login-container">
+        <h2 class="text-center school-title">Westcliff High School for Boys</h2>
+        <p class="text-center login-info">
+          Enter your <b>username</b> and <b>password</b>.
+        </p>
+        <br>
+				<form>
+					<div class="form-group">
+						<input type="text" placeholder="Username" class="username form-control input-lg">
+					</div>
+					<div class="form-group">
+						<input type="password" placeholder="Password" class="password form-control input-lg">
+					</div>
+					<button type="submit" class="btn btn-success btn-block btn-lg login-button">
+            <i class="fa fa-lock"></i>
+            Login
+          </button>
+				</form>
+			</div>
+		</div>
+	</div>
+</template>
