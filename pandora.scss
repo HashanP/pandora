@@ -164,3 +164,8 @@ table.users .label {
 	position:relative;
 	top:-2px;
 }
+
+table.users tr:last-child {
+	border-bottom:1px solid $table-border-color;
+}
+

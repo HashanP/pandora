@@ -32,10 +32,10 @@
 	</div>
 </template>
 
-<template name="admin/users">
+<template name="/admin/users">
 	<div class="row">
 		<div class="col-md-8 col-lg-9">
-			<button class="btn btn-success"><i class="fa fa-plus"></i> Add</button>
+			There is a total of {{count}} {{#if pluralCount}}users{{else}}user{{/if}}.	
 		</div>
 		<div class="col-md-4 col-lg-3">
 			<input type="text" class="form-control" placeholder="Search...">
@@ -47,7 +47,12 @@
 				<thead>
 					<tr>
 						<th>Username</th>
-						<th></th>
+						<th>
+							<div class="pull-right">			
+								<a href="/admin/users/create" class="btn btn-success"><i class="fa fa-plus"></i> Add</a>
+								<a href="/admin/users/massUserCreation" class="btn btn-success"><i class="fa fa-users"></i> Mass User Creation</a>
+							</div>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -59,14 +64,121 @@
 									<span class="label label-primary">Admin</span>
 								{{/if}}
 							</td>
-							<td class="pull-right">
-								<a href="/admin/users/{{_id}}" class="btn btn-primary"><i class="fa fa-pencil"></i> Edit</a>
-								<button class="btn btn-warning"><i class="fa fa-times"></i> Delete</button>
+							<td>
+								<div class="pull-right">
+									<a href="/admin/users/{{_id}}" class="btn btn-primary"><i class="fa fa-pencil"></i> Edit</a>
+									<button class="btn btn-warning del"><i class="fa fa-times"></i> Delete</button>
+								</div>
 							</td>
 						</tr>
 					{{/each}}
 				</tbody>
 			</table>
+			<nav class="text-center">
+				<ul class="pagination">
+					<li class="{{firstPage}}">
+						<a href="/admin/users?page={{prevPage}}" class="prev" aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+						</a>
+					</li>
+					{{#each pages}}
+						{{#if isPage .}}
+							<li class="active"><a href="/admin/users?page={{.}}">{{.}}</a></li>
+						{{else}}
+							<li><a href="/admin/users?page={{.}}">{{.}}</a></li>
+						{{/if}}
+					{{/each}}
+					<li class="{{lastPage}}">
+						<a href="/admin/users?page={{nextPage}}" class="next" aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</template>
+
+<template name="/admin/rooms">
+	<div class="row">
+		<div class="col-md-8 col-lg-9">
+			There is a total of {{count}} {{#if pluralCount}}rooms{{else}}room{{/if}}.	
+		</div>
+		<div class="col-md-4 col-lg-3">
+			<input type="text" class="form-control" placeholder="Search...">
+		</div>
+	</div>	
+</template>
+
+<template name="/admin/users/create">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						Create User
+						<div class="pull-right">
+							<a href="/admin/users"><i class="fa fa-times"></i></a>
+						</div>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<form>
+						<div class="form-group">
+							<label>Username</label>
+							<input type="text" class="username form-control">
+						</div>
+						<div class="form-group">
+							<label>Initial Password</label>
+							<div class="radio">
+								<label>
+									<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="username" checked>
+									Same as username
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="dateOfBirth">
+									Date of birth (DD/MM/YYYY)
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="custom">
+									Custom
+								</label>
+							</div>
+						</div>
+						{{#if eq howToChoosePassword "dateOfBirth"}}
+							<div class="form-group">	
+								<label>Date of birth</label>
+								<input type="date" class="dataOfBirth form-control">
+							</div>
+						{{/if}}	
+						{{#if eq howToChoosePassword "custom"}}
+							<div class="form-group">
+								<label>Custom Password</label>
+								<input type="text" class="password form-control">
+							</div>
+						{{/if}}
+						<div class="form-group">
+							<label>Rooms with read access</label>
+							<select class="subjects-read form-control" multiple="multiple">
+								<option value="10a/Ma1">Maths</option>
+								<option value="10a/En1">English</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Rooms with write access</label>
+							<select class="subjects-write form-control" multiple="multiple">
+								<option value="10a/Ma1">Maths</option>
+								<option value="10a/En1">English</option>
+							</select>
+						</div>	
+						<button type="button" class="btn btn-success create">Create</button>
+					</form>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
