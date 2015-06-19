@@ -1,9 +1,9 @@
 if (Meteor.isClient) {
 	var UsersAdmin = new Mongo.Collection("/admin/users");
+	var RoomsAdmin = new Mongo.Collection("/admin/rooms");
 	var school = new ReactiveVar();
 
 	Meteor.subscribe("users");
-	Meteor.subscribe("/admin/users/count");
 
 	Router.onBeforeAction(function() {
 		if(!school.get()) {
@@ -34,13 +34,13 @@ if (Meteor.isClient) {
 	});
 
 	Router.route("/admin/users", function() {
-		var limit = 10;
 		var offset = (this.params.query.page ? parseInt(this.params.query.page, 10)  - 1 : 0) * 10;
-		Session.set("limit", limit);
+		Session.set("limit", 10);
 		Session.set("offset", offset);
+		Session.set("count", Counts.get("users"));
 		Session.set("page", this.params.query.page ? parseInt(this.params.query.page) : 1);
-		var count = Counts.get("users");
-		this.render("/admin/users", {data: {count: count, pluralCount:count !== 1, pages: _.range(1, Math.ceil(count/10)+1), firstPage: offset === 0 ? "disabled": "", lastPage: offset >= count - 10? "disabled" : ""}});
+		Session.set("search", this.params.query.search ? this.params.query.search : "");
+		this.render("/admin/users");
 	});
 
 	Router.route("/admin/users/create", function() {
@@ -49,11 +49,18 @@ if (Meteor.isClient) {
 	});
 
 	Router.route("/admin/rooms", function() {
-		var limit = 10;
-		var offset = (this.params.page ? parseInt(this.params.page, 10)  - 1 : 0) * 10;
-		this.render("/admin/rooms", {data: {pluralCount: true, count: 4, offset: offset, limit: limit}});
+		Session.set("limit", 10);
+		Session.set("count", Counts.get("rooms"));
+		Session.set("offset", (this.params.page ? parseInt(this.params.page, 10)  - 1 : 0) * 10);
+		Session.set("page", this.params.query.page ? parseInt(this.params.query.page) : 1);
+		Session.set("search", this.params.query.search ? this.params.query.search : "");
+		this.render("/admin/rooms");
 	});
 
+	Router.route("/admin/rooms/create", function() {
+		this.render("/admin/rooms/create");
+	});
+	
 	Template.login.events({
 		"form submit": function(e) {
 			e.preventDefault();
@@ -83,29 +90,93 @@ if (Meteor.isClient) {
 		"users": function() {
 			return UsersAdmin.find({}, {sort: ["username"]});
 		},
-		"isPage": function(n) {
-			return Session.equals("page", n);	
+		"count": function() {
+			return Counts.get("users");
+		}
+	});
+
+	Template["/admin/rooms"].helpers({
+		"rooms": function() {
+			return RoomsAdmin.find({}, {sort: ["title"]});
 		},
+		"count": function() {
+			return Counts.get("rooms");
+		}	
+	});
+	
+	Template.pagination.helpers({
 		"nextPage": function() {
 			return Session.get("page") + 1;
 		},
 		"prevPage": function() {
 			return Session.get("page") - 1;
+		},
+		"isPage": function(n) {
+			return Session.equals("page", n);	
+		},
+		"pages": function() {
+			return _.range(1, Math.ceil(Session.get("count")/10)+1);
+		},
+		"firstPage": function() {
+			return Session.get("offset") === 0 ? "disabled": "";
+		},
+		"lastPage": function() { 
+			return Session.get("offset") >= Session.get("count") - 10? "disabled" : "";
 		}
 	});
 	
 	Template["/admin/users"].events({
 		"click .del": function() {
 			Meteor.users.remove(this._id);
+		},
+		"keyup .search": function(e) {
+			if(e.target.value.trim() !== Session.get("search").trim()) {
+				if(e.target.value.trim() === "") {
+					Router.go("/admin/users");
+				} else {
+					Router.go("/admin/users?search=" + e.target.value.trim());
+				}
+			}
+		}
+	});
+
+	Template["/admin/rooms"].events({
+		"keyup .search": function(e) {
+			if(e.target.value.trim() !== Session.get("search").trim()) {
+				if(e.target.value.trim() === "") {
+					Router.go("/admin/rooms");
+				} else {
+					Router.go("/admin/rooms?search=" + e.target.value.trim());
+				}
+			}
+		},
+		"click .del": function() {
+			Rooms.remove(this._id);
 		}
 	});
 
 	Template["/admin/users"].onCreated(function() {
 		Tracker.autorun(function() {
-			this.subscribe("/admin/users", Session.get("offset"), Session.get("limit"));
+			this.subscribe("/admin/users", Session.get("offset"), Session.get("limit"), Session.get("search"));	
+			this.subscribe("/admin/users/count", Session.get("search"));
 		}.bind(this));
 	});
 	
+	Template["/admin/rooms"].onCreated(function() {
+		Tracker.autorun(function() {
+			this.subscribe("/admin/rooms", Session.get("offset"), Session.get("limit"), Session.get("search"));
+			this.subscribe("/admin/rooms/count", Session.get("search"));
+		}.bind(this));
+	});
+
+	Template["/admin/rooms/create"].events({
+		"submit form": function(e) {
+			e.preventDefault();
+			Rooms.insert({schoolId: Meteor.user().schoolId, title: Template.instance().$(".title").val(), type: Template.instance().$(".type").val()});
+			Router.go("/admin/rooms");
+		}
+	});
+
 	Template["/admin/users/create"].onRendered(function() {
 		Template.instance().$(".subjects-read").select2({
 			placeholder:"None"
@@ -114,10 +185,6 @@ if (Meteor.isClient) {
 		Template.instance().$(".subjects-write").select2({
 			placeholder:"None"
 		});
-	});
-
-	Template["/admin/rooms"].onCreated(function() {
-		Template.subscribe("/admin/rooms", this.data.offset, this.data.limit);
 	});
 
 	var formatDate = function(date) {
@@ -167,19 +234,21 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
 	Meteor.publish("users", function() {
 		if(this.userId) {
-			return Meteor.users.find(this.userId, {fields: {username: 1, roles: 1}});
+			return Meteor.users.find(this.userId, {fields: {username: 1, roles: 1, schoolId: 1}});
 		}
 	});	
 
-	Meteor.publish("/admin/users", function(offset, limit) {
+	Meteor.publish("/admin/users", function(offset, limit, search) {
 		if(!this.userId) {
 			return [];
 		}
 		var user = Meteor.users.findOne(this.userId);
+		var query = {schoolId: user.schoolId};
+		if(search) {
+			query.username = new RegExp(search, "i");
+		}
 		if(user.roles.indexOf("admin") !== -1) { 
-			Mongo.Collection._publishCursor(Meteor.users.find({
-				schoolId: user.schoolId
-			}, {
+			Mongo.Collection._publishCursor(Meteor.users.find(query, {
 				skip: offset,
 				limit: limit
 			}), this, "/admin/users");
@@ -188,61 +257,88 @@ if (Meteor.isServer) {
 		}	
 	});
 
-	Meteor.publish("/admin/users/count", function() {
+	Meteor.publish("/admin/users/count", function(search) {
 		if(!this.userId) {
 			return [];
 		}
 		var user = Meteor.users.findOne(this.userId);
 		if(user.roles.indexOf("admin") !== -1) {
-			Counts.publish(this, "users", Meteor.users.find({schoolId: user.schoolId}));
-		}
-	});
-
-	Meteor.publish("/admin/rooms", function(offset, limit) {
-		if(!this.userId) {
-			return [];
-		}
-		var user = Meteor.users.findOne(this.userId);
-		if(user.roles.indexOf("admin") !== -1) {
-			return Rooms.find({schoolId: user.schoolId}, {offset: offset, limit: limit});
-		}
-	});
-
-	Meteor.methods({
-		getUsers: function(offset, limit) {
-			if(Meteor.user().roles.indexOf("admin") !== -1) {
-				return [Meteor.users.find({schoolId: Meteor.user().schoolId}, {skip:offset, limit:limit, fields: {_id: 1}}).fetch(), Meteor.users.find().count()];
+			if(!search) {
+				Counts.publish(this, "users", Meteor.users.find({schoolId: user.schoolId}));
+			} else {
+				Counts.publish(this, "users", Meteor.users.find({schoolId: user.schoolId, username: new RegExp(search, "i")}));
 			}
 		}
 	});
 
-	Meteor.users.allow({
+	Meteor.publish("/admin/rooms/count", function(search) {
+		if(!this.userId) {
+			return [];
+		} 
+		var user = Meteor.users.findOne(this.userId);
+		var query = {schoolId: user.schoolId};
+		if(search) {
+			query.title = new RegExp(search, "i");
+		}
+		if(user.roles.indexOf("admin") !== -1) {
+			Counts.publish(this, "rooms", Rooms.find(query));
+		}
+	});
+
+	Meteor.publish("/admin/rooms", function(offset, limit, search) {
+		if(!this.userId) {
+			return [];
+		}
+		var user = Meteor.users.findOne(this.userId);
+		var query = {schoolId: user.schoolId};
+		if(search) {
+			query.title = new RegExp(search, "i");
+		}
+		if(user.roles.indexOf("admin") !== -1) {
+			Mongo.Collection._publishCursor(Rooms.find(query, {
+				skip: offset,
+				limit: limit
+			}), this, "/admin/rooms");
+			
+			this.ready();
+		}
+	});
+
+	Meteor.users.allow({ 
+		remove: function() { 
+			return true; 
+		} 
+	}); 
+
+	Rooms.allow({
+		insert: function(userId, doc) {
+			if(!userId) {
+				return false;
+			} else {
+				var user = Meteor.users.findOne(userId);
+				return (user.roles && user.roles.indexOf("admin") !== -1 && doc.schoolId === user.schoolId);
+			}
+		}, 
 		remove: function() {
 			return true;
 		}
-	});
+	}); 
+						
+	Accounts.onCreateUser(function(options, user) { 
+		user.schoolId = options.profile.schoolId; 
+		return user; 
+	}); 
+} 
 
-	Accounts.onCreateUser(function(options, user) {
-		user.schoolId = options.profile.schoolId;
-		return user;
-	});
-}
-
-Meteor.methods({
-	findSchool: function(hostname) {
-		return Schools.findOne({hostname: hostname});
+Meteor.methods({ 
+	findSchool: function(hostname) { 
+		return Schools.findOne({hostname: hostname}); 
 	}, 
-	createUser2: function(username, password) {
-		if(Meteor.user() && Meteor.user().roles.indexOf("admin") !== -1) {
-			Accounts.createUser({
-				username: username, 
-				password: password,
-				profile: {
-					schoolId: Meteor.user().schoolId
-				}
-			});	
-		} else {
-			throw Meteor.Error(403, "Access Denied");
-		}
-	}
+	createUser2: function(username, password) { 
+		if(Meteor.user() && Meteor.user().roles.indexOf("admin") !== -1) { 
+			Accounts.createUser({ username: username, password: password, profile: { schoolId: Meteor.user().schoolId } });	
+		} else { 
+			throw Meteor.Error(403, "Access Denied"); 
+		} 
+	} 
 });

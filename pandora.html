@@ -34,86 +34,119 @@
 
 <template name="/admin/users">
 	<div class="row">
-		<div class="col-md-8 col-lg-9">
-			There is a total of {{count}} {{#if pluralCount}}users{{else}}user{{/if}}.	
-		</div>
 		<div class="col-md-4 col-lg-3">
-			<input type="text" class="form-control" placeholder="Search...">
+			<input type="text" class="form-control search" placeholder="Search...">
+		</div>
+		<div class="col-md-8 col-lg-9">
+			<div class="pull-right">
+				<a href="/admin/users/create" class="btn btn-success"><i class="fa fa-plus"></i> Add</a>
+				<a href="/admin/users/massUserCreation" class="btn btn-success"><i class="fa fa-users"></i> Mass User Creation</a>	
+			</div>
 		</div>
 	</div>
+	<br>
 	<div class="row">
-		<div class="col-md-12">
-			<table class="table users">
-				<thead>
-					<tr>
-						<th>Username</th>
-						<th>
-							<div class="pull-right">			
-								<a href="/admin/users/create" class="btn btn-success"><i class="fa fa-plus"></i> Add</a>
-								<a href="/admin/users/massUserCreation" class="btn btn-success"><i class="fa fa-users"></i> Mass User Creation</a>
-							</div>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
+		<div class="col-md-12">	
+			<div class="panel panel-default users">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<span class="panel-sup">Users</span>
+						<div class="pull-right">
+							<a class="btn btn-link active">All Users ({{count}})</a>
+							<a class="btn btn-link">Disabled Users (3)</a>
+							<a class="btn btn-link">Recently Deleted (0)</a>
+						</div>
+					</h3>
+				</div>
+				<ul class="list-group">
 					{{#each users}}
-						<tr>
-							<td>
-								<span class="username">{{username}}</span>
-								{{#if isAdmin}}
-									<span class="label label-primary">Admin</span>
-								{{/if}}
-							</td>
-							<td>
-								<div class="pull-right">
-									<a href="/admin/users/{{_id}}" class="btn btn-primary"><i class="fa fa-pencil"></i> Edit</a>
-									<button class="btn btn-warning del"><i class="fa fa-times"></i> Delete</button>
-								</div>
-							</td>
-						</tr>
-					{{/each}}
-				</tbody>
-			</table>
-			<nav class="text-center">
-				<ul class="pagination">
-					<li class="{{firstPage}}">
-						<a href="/admin/users?page={{prevPage}}" class="prev" aria-label="Previous">
-							<span aria-hidden="true">&laquo;</span>
-						</a>
-					</li>
-					{{#each pages}}
-						{{#if isPage .}}
-							<li class="active"><a href="/admin/users?page={{.}}">{{.}}</a></li>
-						{{else}}
-							<li><a href="/admin/users?page={{.}}">{{.}}</a></li>
-						{{/if}}
-					{{/each}}
-					<li class="{{lastPage}}">
-						<a href="/admin/users?page={{nextPage}}" class="next" aria-label="Next">
-							<span aria-hidden="true">&raquo;</span>
-						</a>
-					</li>
+						<li class="list-group-item">
+							{{username}}
+							{{#if isAdmin}}
+								<span class="label label-info">Admin</span>
+							{{/if}}
+							<div class="pull-right">
+								<a href="/admin/users/{{_id}}" class="btn btn-edit btn-xs"><i class="fa fa-pencil"></i> Edit</a>
+								<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+							</div>
+						</li>
+					{{/each}}	
 				</ul>
-			</nav>
+			</div>
+			{{> pagination route="users"}}
 		</div>
 	</div>
 </template>
 
+<template name="pagination">
+	<nav class="text-center">
+		<ul class="pagination">
+			<li class="{{firstPage}}">
+				<a href="/admin/{{route}}?page={{prevPage}}" class="prev" aria-label="Previous">
+					<span aria-hidden="true">&laquo;</span>
+				</a>
+			</li>
+			{{#each pages}}
+				{{#if isPage .}}
+					<li class="active"><a href="/admin/{{../route}}?page={{.}}">{{.}}</a></li>
+				{{else}}
+					<li><a href="/admin/{{../route}}?page={{.}}">{{.}}</a></li>
+				{{/if}}
+			{{/each}}
+			<li class="{{lastPage}}">
+				<a href="/admin/{{route}}?page={{nextPage}}" class="next" aria-label="Next">
+					<span aria-hidden="true">&raquo;</span>
+				</a>
+			</li>
+		</ul>
+	</nav>
+</template>
+	
 <template name="/admin/rooms">
 	<div class="row">
-		<div class="col-md-8 col-lg-9">
-			There is a total of {{count}} {{#if pluralCount}}rooms{{else}}room{{/if}}.	
-		</div>
 		<div class="col-md-4 col-lg-3">
-			<input type="text" class="form-control" placeholder="Search...">
+			<input type="text" class="form-control search" placeholder="Search...">
+		</div>
+		<div class="col-md-8 col-lg-9">
+			<div class="pull-right">
+				<a class="btn btn-success" href="/admin/rooms/create"><i class="fa fa-plus"></i> Add</a>
+			</div>	
 		</div>
 	</div>	
+	<br>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="panel panel-default users">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<span class="panel-sup">Rooms</span>
+						<div class="pull-right">
+							<a href="#" class="btn btn-link active">All Rooms ({{count}})</a>
+							<a href="#" class="btn btn-link">Disabled Rooms (3)</a>
+							<a href="#" class="btn btn-link">Recently Deleted (0)</a>
+						</div>
+					</h3>
+				</div>
+				<ul class="list-group">
+					{{#each rooms}}
+						<li class="list-group-item">
+							{{title}}
+							<div class="pull-right">
+								<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+							</div>
+						</li>
+					{{/each}}
+				</ul>
+			</div>
+			{{> pagination route="rooms"}}
+		</div>
+	</div>
 </template>
 
 <template name="/admin/users/create">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="panel panel-info">
+			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
 						Create User
@@ -175,7 +208,41 @@
 								<option value="10a/En1">English</option>
 							</select>
 						</div>	
-						<button type="button" class="btn btn-success create">Create</button>
+						<button type="button" class="btn btn-success create">Submit</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="/admin/rooms/create">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						Create Room
+						<div class="pull-right">
+							<a href="/admin/rooms"><i class="fa fa-times"></i></a>
+						</div>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<form>
+						<div class="form-group">
+							<label>Title</label>
+							<input type="text" class="form-control title">
+						</div>
+						<div class="form-group">
+							<label>Type</label>
+							<select class="type form-control">
+								<option value="subject" selected>Subject</option>
+								<option value="club">Club</option>
+								<option value="other">Other</option>
+							</select>
+						</div>
+						<button type="submit" class="btn btn-primary">Submit</button>
 					</form>
 				</div>
 			</div>

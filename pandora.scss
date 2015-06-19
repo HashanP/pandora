@@ -19,13 +19,6 @@
 	margin-top:70px;
 }
 
-.login-button {
-}
-
-body {
-	background-color:whitesmoke;
-}
-
 .topbar {
 	background-color:white;
 	border-bottom:1px solid #b3b3b3;
@@ -45,10 +38,14 @@ body {
 	font-size:18px;
 }
 
-body {
+html, body, .contents, .page-wrapper {
 	height:100%;
+}
+
+body {
   overflow-y: hidden;
   overflow-x: hidden;
+	background-color:whitesmoke;
 }
 
 $sidebar-width: 270px;
@@ -56,7 +53,6 @@ $sidebar-width: 270px;
 .page-wrapper {
 	padding-left:$sidebar-width;
 	width:100%;
-	height:100%;
 	background-color:white;
 }
 
@@ -83,7 +79,6 @@ $sidebar-width: 270px;
 
 .sidebar-nav li a, .sidebar-nav .header {
 	color:rgba(255,255,255,0.73);;
-	font-family: "Arial";
 	padding-top:8px;
 }
 
@@ -143,29 +138,33 @@ $sidebar-width: 270px;
 
 .contents {
 	width:100%;
-	height:100%;
 	padding-top:17px;
 }
 
-html {
-	height:100%;
+.users .btn-link:hover {
+	text-decoration:none;
 }
 
-table.users tr td {
-	font-size:16px;
+.users .btn-link.active {
+	font-weight:bold;
 }
 
-.username {
-	margin-top:5px;
+.btn-edit {
+	background-color:#6F7F80;
+	border-color:#6A6868;
+	color:white;
+}
+
+.btn-edit:hover {
+	color:white;
+	background-color:#5E6768;
+}
+
+.panel-sup {
+	padding-top:7px;
 	display:inline-block;
-}
+ }
 
-table.users .label {
-	position:relative;
-	top:-2px;
+.users .panel-heading {
+	height:50px;
 }
-
-table.users tr:last-child {
-	border-bottom:1px solid $table-border-color;
-}
-
