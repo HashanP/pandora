@@ -128,6 +128,9 @@ if (Meteor.isClient) {
 	Template["/admin/users"].events({
 		"click .del": function() {
 			Meteor.users.remove(this._id);
+			if(Session.get("offset") === Counts.get("users") - 1 && Session.get("page") !== 1) {
+				Router.go("/admin/users?page=" + (Session.get("page") -1));
+			}
 		},
 		"keyup .search": function(e) {
 			if(e.target.value.trim() !== Session.get("search").trim()) {
@@ -152,6 +155,9 @@ if (Meteor.isClient) {
 		},
 		"click .del": function() {
 			Rooms.remove(this._id);
+			if(Session.get("offset") === Counts.get("rooms") - 1 && Session.get("page") !== 1) {
+				Router.go("/admin/rooms?page=" + (Session.get("page")-1));
+			}
 		}
 	});
 
