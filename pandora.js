@@ -51,7 +51,7 @@ if (Meteor.isClient) {
 	Router.route("/admin/rooms", function() {
 		Session.set("limit", 10);
 		Session.set("count", Counts.get("rooms"));
-		Session.set("offset", (this.params.page ? parseInt(this.params.page, 10)  - 1 : 0) * 10);
+		Session.set("offset", (this.params.query.page ? parseInt(this.params.query.page, 10)  - 1 : 0) * 10);
 		Session.set("page", this.params.query.page ? parseInt(this.params.query.page) : 1);
 		Session.set("search", this.params.query.search ? this.params.query.search : "");
 		this.render("/admin/rooms");
