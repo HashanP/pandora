@@ -93,7 +93,11 @@ Template["/admin/rooms"].onCreated(function() {
 Template["/admin/rooms/create"].events({
 	"submit form": function(e) {
 		e.preventDefault();
-		Rooms.insert({schoolId: Meteor.user().schoolId, title: Template.instance().$(".title").val(), type: Template.instance().$(".type").val()});
+		if(this._id) {
+			Rooms.update({_id: this._id}, {$set: {title:Template.instance().$(".title").val(), type: Template.instance().$(".type").val()}});
+		} else {
+			Rooms.insert({schoolId: Meteor.user().schoolId, title: Template.instance().$(".title").val(), type: Template.instance().$(".type").val()});
+		}
 		Router.go("/admin/rooms");
 	}
 });
@@ -142,5 +146,3 @@ Template["/admin/users/create"].helpers({
 		return Session.get("howToChoosePassword");
 	}
 });
-
-

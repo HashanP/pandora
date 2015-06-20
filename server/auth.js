@@ -4,15 +4,18 @@ Meteor.users.allow({
 	} 
 }); 
 
+var isAdmin = function(userId, doc) {
+	if(!userId) {
+		return false;
+	} else {
+		var user = Meteor.users.findOne(userId);
+		return (user.roles && user.roles.indexOf("admin") !== -1 && doc.schoolId === user.schoolId);
+	}
+}
+
 Rooms.allow({
-	insert: function(userId, doc) {
-		if(!userId) {
-			return false;
-		} else {
-			var user = Meteor.users.findOne(userId);
-			return (user.roles && user.roles.indexOf("admin") !== -1 && doc.schoolId === user.schoolId);
-		}
-	}, 
+	insert: isAdmin,
+	update: isAdmin, 
 	remove: function() {
 		return true;
 	}

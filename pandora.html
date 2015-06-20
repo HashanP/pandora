@@ -132,6 +132,7 @@
 						<li class="list-group-item">
 							{{title}}
 							<div class="pull-right">
+								<a class="btn btn-xs btn-edit" href="/admin/rooms/{{_id}}/edit"><i class="fa fa-pencil"></i> Edit</a>
 								<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
 							</div>
 						</li>
@@ -232,7 +233,7 @@
 					<form>
 						<div class="form-group">
 							<label>Title</label>
-							<input type="text" class="form-control title">
+							<input type="text" value="{{title}}" class="form-control title">
 						</div>
 						<div class="form-group">
 							<label>Type</label>

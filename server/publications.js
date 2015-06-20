@@ -16,7 +16,8 @@ Meteor.publish("/admin/users", function(offset, limit, search) {
 	if(user.roles.indexOf("admin") !== -1) { 
 		Mongo.Collection._publishCursor(Meteor.users.find(query, {
 			skip: offset,
-			limit: limit
+			limit: limit,
+			sort: ["username"]
 		}), this, "/admin/users");
 	
 		this.ready();
@@ -63,9 +64,19 @@ Meteor.publish("/admin/rooms", function(offset, limit, search) {
 	if(user.roles.indexOf("admin") !== -1) {
 		Mongo.Collection._publishCursor(Rooms.find(query, {
 			skip: offset,
-			limit: limit
+			limit: limit,
+			sort: ["title"]
 		}), this, "/admin/rooms");
 		
 		this.ready();
+	}
+});
+
+Meteor.methods({
+	"findRoom": function(userId) {
+		var user = Meteor.users.findOne(this.userId);
+		if(user.roles.indexOf("admin") !== -1) {
+			return Rooms.findOne(userId);
+		}
 	}
 });
