@@ -78,5 +78,29 @@ Meteor.methods({
 		if(user.roles.indexOf("admin") !== -1) {
 			return Rooms.findOne(userId);
 		}
+	},
+	"findRooms": function(term) {
+		var user = Meteor.users.findOne(this.userId);
+		if(user.roles.indexOf("admin") !== -1) {
+			return Rooms.find({title: new RegExp(term, "i")}, {sort: ["title"]}).fetch();
+		}
+	},
+	"findUser": function(userId) {
+		var user = Meteor.users.findOne(this.userId);
+		if(user.roles.indexOf("admin") !== -1) {
+			return Meteor.users.findOne(userId);
+		}
+	},
+	"findUsers": function(term) {
+		var user = Meteor.users.findOne(this.userId);
+		if(user.roles.indexOf("admin") !== -1) {
+			return Meteor.users.find({username: RegExp(term, "i")}, {sort: ["username"]}).fetch();
+		}
+	},
+	"findRoomsByUser": function(userId) {
+		var user = Meteor.users.findOne(this.userId);
+		if(user.roles.indexOf("admin") !== -1) {
+			return [Rooms.find({students: {$in: [userId]}}, {fields: {title: 1}}).fetch(), Rooms.find({teachers: {$in: [userId]}}, {fields: {title: 1}}).fetch()];
+		}
 	}
 });

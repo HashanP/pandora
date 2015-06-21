@@ -93,24 +93,97 @@ Template["/admin/rooms"].onCreated(function() {
 Template["/admin/rooms/create"].events({
 	"submit form": function(e) {
 		e.preventDefault();
+		var obj = {
+			title: Template.instance().$(".title").val(),
+			type: Template.instance().$(".type").val(),
+			students: $(".students").select2("val"),
+			teachers: $(".teachers").select2("val")
+		};
 		if(this._id) {
-			Rooms.update({_id: this._id}, {$set: {title:Template.instance().$(".title").val(), type: Template.instance().$(".type").val()}});
+			Rooms.update({_id: this._id}, {$set: obj});
 		} else {
-			Rooms.insert({schoolId: Meteor.user().schoolId, title: Template.instance().$(".title").val(), type: Template.instance().$(".type").val()});
-		}
+			obj.schoolId = Meteor.user().schoolId;
+			Rooms.insert(obj);
+		}	
 		Router.go("/admin/rooms");
 	}
 });
 
 Template["/admin/users/create"].onRendered(function() {
-	Template.instance().$(".subjects-read").select2({
-		placeholder:"None"
-	});
-	
-	Template.instance().$(".subjects-write").select2({
-		placeholder:"None"
-	});
+	var opts = {
+		placeholder:"None",
+		minimumInputLength:1,
+		multiple:true,
+		query: function(params) {
+			Meteor.call("findRooms", params.term, function(err, results) {
+				params.callback({
+					results: _.map(results, function(result) {
+						return {id: result._id, text: result.title};
+					})
+				});
+			});
+		},
+		initSelection: function(el, cb) {
+			var ids = $(el).val().split(",");
+			if($(el).val() === "") {
+				return cb([]);
+			}
+			cb(ids.map(function(id) {
+				var x = _.findWhere(this.data.students, {_id: id}) || _.findWhere(this.data.teachers, {_id: id});
+				return {id: id, text: x.title};
+			}.bind(this)));
+		}.bind(this)
+	};
+
+	Template.instance().$(".subjects-read").select2(opts).select2("val", this.data ? _.pluck(this.data.students, "_id") : []);
+	Template.instance().$(".subjects-write").select2(opts).select2("val", this.data ? _.pluck(this.data.teachers, "_id") : []);
+
+	Template.instance().$(".subjects-read, .subjects-write").on("select2-close", function() {
+		$(".select2-focused").blur();
+	});	
 });
+
+Template["/admin/rooms/create"].onRendered(function() {
+	var opts = {
+		placeholder: "None",
+		minimumInputLength:1,
+		multiple:true,
+		query: function(params) {
+			Meteor.call("findUsers", params.term, function(err, results) {
+				params.callback({
+					results: _.map(results, function(result) {
+						return {id: result._id, text: result.username};
+					})
+				});
+			});
+		},
+		initSelection: function(el, cb) {
+			if($(el).val() === "") {
+				return cb([]);
+			}
+			var ids = $(el).val().split(",");
+			var results = [];
+			var count = 0;
+			console.log(ids);
+			ids.forEach(function(id) {
+				Meteor.call("findUser", id, function(err, user) {
+					results.push({id: id, text: user.username});
+					count++;
+					if(count === ids.length) {
+						cb(results);
+					}
+				});
+			});	
+		}
+	};
+
+	Template.instance().$(".students").select2(opts).select2("val", this.data ? this.data.students : []);
+	Template.instance().$(".teachers").select2(opts).select2("val", this.data ? this.data.teachers : []);
+
+	Template.instance().$(".students, .teachers").on("select2-close", function() {
+		$(".select2-focused").blur();
+	});
+});	
 
 var formatDate = function(date) {
 	var month = '' + (d.getMonth() + 1),
@@ -136,7 +209,9 @@ Template["/admin/users/create"].events({
 		} else if(Session.equals("howToChoosePassword", "custom")) {
 			var password = Template.instance().$(".password").val();
 		}
-		Meteor.call("createUser2", username, password);
+		var readSubjects = $(".subjects-read").select2("val");
+		var writeSubjects = $(".subjects-write").select2("val");
+		Meteor.call("createUser2", username, password, readSubjects, writeSubjects, Template.instance().data._id);
 		Router.go("/admin/users");
 	}
 });

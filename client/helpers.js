@@ -5,3 +5,11 @@ Handlebars.registerHelper("admin", function() {
 Handlebars.registerHelper("eq", function(a, b) { 
 	return a === b;
 });
+
+Handlebars.registerHelper("not", function(a) {
+	return !a;
+});
+
+Handlebars.registerHelper("formatArray", function(a) {
+	return JSON.stringify(a);
+});

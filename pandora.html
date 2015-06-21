@@ -66,7 +66,7 @@
 								<span class="label label-info">Admin</span>
 							{{/if}}
 							<div class="pull-right">
-								<a href="/admin/users/{{_id}}" class="btn btn-edit btn-xs"><i class="fa fa-pencil"></i> Edit</a>
+								<a href="/admin/users/{{_id}}/edit" class="btn btn-edit btn-xs"><i class="fa fa-pencil"></i> Edit</a>
 								<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
 							</div>
 						</li>
@@ -150,7 +150,7 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
-						Create User
+						{{#if _id}}Edit{{else}}Create{{/if}} User
 						<div class="pull-right">
 							<a href="/admin/users"><i class="fa fa-times"></i></a>
 						</div>
@@ -160,55 +160,51 @@
 					<form>
 						<div class="form-group">
 							<label>Username</label>
-							<input type="text" class="username form-control">
+							<input type="text" value="{{username}}" class="username form-control">
 						</div>
-						<div class="form-group">
-							<label>Initial Password</label>
-							<div class="radio">
-								<label>
-									<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="username" checked>
-									Same as username
-								</label>
-							</div>
-							<div class="radio">
-								<label>
-									<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="dateOfBirth">
-									Date of birth (DD/MM/YYYY)
-								</label>
-							</div>
-							<div class="radio">
-								<label>
-									<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="custom">
-									Custom
-								</label>
-							</div>
-						</div>
-						{{#if eq howToChoosePassword "dateOfBirth"}}
-							<div class="form-group">	
-								<label>Date of birth</label>
-								<input type="date" class="dataOfBirth form-control">
-							</div>
-						{{/if}}	
-						{{#if eq howToChoosePassword "custom"}}
+						{{#if not _id}}
 							<div class="form-group">
-								<label>Custom Password</label>
-								<input type="text" class="password form-control">
-							</div>
+								<label>Initial Password</label>
+								<div class="radio">
+									<label>
+										<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="username" checked>
+										Same as username
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="dateOfBirth">
+										Date of birth (DD/MM/YYYY)
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="custom">
+										Custom
+									</label>
+								</div>
+							</div>	
+							{{#if eq howToChoosePassword "dateOfBirth"}}
+								<div class="form-group">	
+									<label>Date of birth</label>
+									<input type="date" class="dataOfBirth form-control">
+								</div>
+							{{/if}}	
+							{{#if eq howToChoosePassword "custom"}}
+								<div class="form-group">
+									<label>Custom Password</label>
+									<input type="text" class="password form-control">
+								</div>
+							{{/if}}
 						{{/if}}
 						<div class="form-group">
 							<label>Rooms with read access</label>
-							<select class="subjects-read form-control" multiple="multiple">
-								<option value="10a/Ma1">Maths</option>
-								<option value="10a/En1">English</option>
-							</select>
+							<input type="hidden" class="subjects-read form-control">
 						</div>
 						<div class="form-group">
 							<label>Rooms with write access</label>
-							<select class="subjects-write form-control" multiple="multiple">
-								<option value="10a/Ma1">Maths</option>
-								<option value="10a/En1">English</option>
-							</select>
-						</div>	
+							<input type="hidden" class="subjects-write form-control">
+						</div>
 						<button type="button" class="btn btn-success create">Submit</button>
 					</form>
 				</div>
@@ -223,7 +219,7 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
-						Create Room
+						{{#if _id}}Edit{{else}}Create{{/if}} Room
 						<div class="pull-right">
 							<a href="/admin/rooms"><i class="fa fa-times"></i></a>
 						</div>
@@ -242,6 +238,14 @@
 								<option value="club">Club</option>
 								<option value="other">Other</option>
 							</select>
+						</div>
+						<div class="form-group">
+							<label>Students</label>
+							<input type="hidden" class="students form-control">
+						</div>
+						<div class="form-group">
+							<label>Teachers</label>
+							<input type="hidden" class="teachers form-control">
 						</div>
 						<button type="submit" class="btn btn-primary">Submit</button>
 					</form>

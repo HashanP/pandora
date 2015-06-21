@@ -41,6 +41,14 @@ Router.route("/admin/users/create", function() {
 	this.render("/admin/users/create");
 });
 
+Router.route("/admin/users/:user/edit", function() {
+	Meteor.call("findUser", this.params.user, function(err, user) {
+		Meteor.call("findRoomsByUser", this.params.user, function(err, data) {
+			this.render("/admin/users/create", {data: _.extend(user, {students: data[0], teachers: data[1]})});
+		}.bind(this));
+	}.bind(this));
+});
+
 Router.route("/admin/rooms", function() {
 	Session.set("limit", 10);
 	Session.set("count", Counts.get("rooms"));

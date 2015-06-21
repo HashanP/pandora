@@ -5,6 +5,7 @@ Meteor.users.allow({
 }); 
 
 var isAdmin = function(userId, doc) {
+	console.log("here");
 	if(!userId) {
 		return false;
 	} else {
@@ -20,6 +21,10 @@ Rooms.allow({
 		return true;
 	}
 }); 
+
+Meteor.users.before.remove(function(userId, doc) {
+	Rooms.update({}, {$pull: {students: doc._id, teachers: doc._id}}, {multi:true});
+});
 					
 Accounts.onCreateUser(function(options, user) { 
 	user.schoolId = options.profile.schoolId; 
