@@ -378,13 +378,24 @@
 				<tbody>
 				{{#each files}}
 						{{#if isFolder}}
-							<tr>
+							<tr class="folder">
+								{{#if isActive name}}
+								<td class="bb">
+									<i class="fa fa-2x fa-folder-o"></i>
+									<input type="text" class="form-control input-rename-folder">
+								</td>
+								{{else}}
 								<td>
 									<i class="fa fa-2x fa-folder-o"></i>
 									<span class="filename"><a href="/rooms/{{../_id}}/files{{path}}{{name}}">{{name}}</a></span>
 								</td>
+								{{/if}}
 								<td></td>
 								<td>
+									<div class="pull-right">
+										<button class="btn btn-edit btn-sm rename-folder">Rename</button>
+										<button class="btn btn-danger btn-sm del"><i class="fa fa-trash-o"></i> Delete</button>	
+									</div>
 								</td>
 							</tr>
 						{{else}}
@@ -414,7 +425,6 @@
 									<td><span class="filesize">{{humanFileSize this.size}}</span></td>
 									<td>
 										<div class="pull-right">
-											<a href="{{this.url}}" class="btn btn-primary btn-sm" target="_blank"><i class="fa fa-download"></i> Download</a>
 											<button class="btn btn-edit btn-sm rename">Rename</button>
 											{{#FS.DeleteButton class="btn btn-danger btn-sm"}}<i class="fa fa-trash-o"></i> Delete{{/FS.DeleteButton}}
 										</div>
@@ -431,7 +441,7 @@
 						</td>
 						<td></td>
 						<td>
-					</td>
+								</td>
 					</tr>
 					{{/if}}
 				</tbody>

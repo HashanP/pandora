@@ -129,16 +129,36 @@ Template.files.events({
 	},
 	"click .rename": function() {
 		Session.set("active", this._id);
+		var x = this.name();
 		window.setTimeout(function() {
-			$(".input-rename").focus();
+			$(".input-rename").val(x).focus();
+			$(".input-rename").get(0).selectionStart = 0;
+			$(".input-rename").get(0).selectionEnd = x.split(".")[0].length;
 		}, 0);
+	},
+	"click .rename-folder": function() {
+		Session.set("active", this.name);
+		var x = this.name;
+		window.setTimeout(function() {
+			$(".input-rename-folder").val(x).focus();
+			$(".input-rename-folder").get(0).selectionStart = 0;
+			$(".input-rename-folder").get(0).selectionEnd = x.length;
+		});
 	},
 	"blur .input-rename": function() {
 		if($(".input-rename").val() !== "") {
-			console.log(this);
 			Meteor.call("fileRename", this._id, $(".input-rename").val());	
 		}
 		Session.set("active", undefined);
+	},
+	"blur .input-rename-folder": function() {
+		if($(".input-rename-folder").val() !== "") {
+			Meteor.call("folderRename", Template.instance().data._id, Session.get("path"), this.name, $(".input-rename-folder").val());	
+		}
+		Session.set("active", undefined);
+	},
+	"click .del": function() {
+		Meteor.call("delFolder", Template.instance().data._id, Session.get("path"), this.name);
 	}
 });
 
