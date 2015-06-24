@@ -329,7 +329,7 @@
 <template name="files">
 	<div class="row">
 		<div class="col-lg-3 col-md-4">
-			<input type="text" placeholder="Search..." class="form-control">
+			<input type="text" placeholder="Search..." value="{{search}}" class="form-control search">
 		</div>
 		<div class="col-lg-9 col-md-8">
 			<div class="pull-right">
@@ -376,13 +376,13 @@
 					</tr>
 				</thead>-->
 				<tbody>
-				{{#each files}}
+				{{#each filesF}}
 						{{#if isFolder}}
 							<tr class="folder">
 								{{#if isActive name}}
 								<td class="bb">
 									<i class="fa fa-2x fa-folder-o"></i>
-									<input type="text" class="form-control input-rename-folder">
+									<input type="text"  class="form-control input-rename-folder">
 								</td>
 								{{else}}
 								<td>

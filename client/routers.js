@@ -49,6 +49,7 @@ Router.route("/rooms/:room/files/:path*", function() {
 	Session.set("newFolder", false);
 	Session.set("path", this.params.path ? this.params.path : "/");
 	var room = Rooms.findOne(this.params.room);
+	Session.set("search", this.params.query.search);
 	if(!this.params.path) {
 		var files = room.files;
 	} else {

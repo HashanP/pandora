@@ -35,6 +35,21 @@ Template["/notices/create/post"].events({
 	}
 });
 
+var search = function(folder, searc) {
+	var results = [];
+	folder.forEach(function(n) {
+		if(n.type === "file") {
+			var p = Files.findOne(n._id);
+			if(p && p.name().match(new RegExp(searc, "i"))) {
+				results.push(n);
+			} 
+		} else {
+			results = results.concat(search(n.files, searc));
+		}
+	});
+	return results;
+};
+
 Template.files.helpers({
 	filesBeingUploaded: function() {
 		return Session.get("filesBeingUploaded");
@@ -83,6 +98,16 @@ Template.files.helpers({
 	isActive: function(a) {
 			console.log(a);
 			return Session.equals("active", a);
+	},
+	filesF: function() {
+		if(!Session.get("search")) {
+			return Template.instance().data.files;
+		} else {
+			return search(Template.instance().data.files, Session.get("search"));
+		}
+	},
+	search: function() {
+		return Session.get("search");
 	}
 });
 
@@ -159,6 +184,14 @@ Template.files.events({
 	},
 	"click .del": function() {
 		Meteor.call("delFolder", Template.instance().data._id, Session.get("path"), this.name);
+	},
+	"keyup .search": function() {
+		var y =	Template.instance().$(".search").val();
+		if(y === "") {
+			Router.go("/rooms/" + Template.instance().data._id + "/files");
+		} else {
+			Router.go("/rooms/" + Template.instance().data._id + "/files?search=" + Template.instance().$(".search").val());
+		}
 	}
 });
 
