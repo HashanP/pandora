@@ -9,15 +9,9 @@
 		<nav class="sidebar">
 			<ul class="sidebar-nav">
 				<li class="header">Subjects</li>
-				<li><a href="#">Maths</a></li>
-				<li><a href="#">English</a></li>
-				<li><a href="#">French</a></li>
-				<li><a href="#">Geography</a></li>
-				<li><a href="#">History</a></li>
-				<li><a href="#">Art</a></li>
-				<li><a href="#">Computing</a></li>
-				<li><a href="#">Latin</a></li>
-				<li><a href="#">Egyptology</a></li>
+				{{#each subjects}}
+					<li><a href="/rooms/{{_id}}">{{title}}</a></li>
+				{{/each}}
 				{{#if admin}}
 					<li class="header">Admin</li>
 					<li><a href="/admin/users">Users</a></li>
@@ -255,23 +249,265 @@
 	</div>
 </template>
 
-<template name="room">
+<template name="notices">
 	<div class="row">
 		<div class="col-md-12">
 			<ul class="nav nav-tabs">
-				<li role="presentation" class="active"><a href="#">Notices</a></li>
-				<li role="presentation"><a href="#">Resources</a></li>	
+				<li role="presentation" class="active"><a href="/rooms/{{_id}}/notices">Notices</a></li>
+				<li role="presentation"><a href="/rooms/{{_id}}/files">Resources</a></li>	
+				<li role="presentation"><a href="#">Gradebook</a></li>
+				<li role="presentation"><a href="#">Students</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-12">
-			<br/>
-			<button class="btn btn-success">Add <i class="fa fa-plus"></i></button>
+			<div class="dropdown pull-right">
+				<button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus"></i> Add <span class="caret"></span></button>
+				<ul class="dropdown-menu">
+					<li><a href="/rooms/{{_id}}/notices/create/post">Post</a></li>
+					<li><a href="/rooms/{{_id}}/notices/create/poll">Poll</a></li>
+					<li><a href="#">Survey</a></li>
+				</ul>
+			</div>
+				<br><br><br>
+				{{#if notices}}
+					<div class="list-group">
+					{{#each notices}}
+							<a href="/rooms/{{../_id}}/notices/{{_id}}" class="list-group-item">
+								<h4 class="list-group-item-heading">{{title}}</h4>
+								<p class="list-group-item-text">{{britishDate dateCreated}}</p>
+							</a>
+					{{/each}}
+					</div>
+				{{else}}
+
+			<div class="fixed">
+				<div class="jumbotron">
+					<h2 class="text-center"><i class="fa fa-exclamation-circle fa-2x"></i></h2>
+					<p class="text-center"><strong>There isn't anything here yet.</strong></p>
+					<p>
+						<ul>
+							<li>To add a notice, click on the add button. You can also add a class poll or a survey.</li>
+							<li>To upload a file for your students to access go to resources and click <i>Add</i></li>
+							<li>To create a quiz, vocabulary quiz or crossword go to resources and click <i>Add</i> from there.</li>
+							<li>To add students' grades to a database go to <i>Gradebook</i></li>
+							<li><i>Gradebook</i> also displays students' grades collated from quizzes you have set them.</li>
+							<li>To get a list of all the students in your class, go to <i>Students</i></li>
+							<li>From here, you can print out a class register.</li>
+							<li>There is also a random name generator that lets you randomly select a student.</li>
+						</ul>
+					</p>
+				</div>
+			</div>
+				{{/if}}
+		</div>	
+	</div>
+</template>
+
+<template name="post">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						Notices
+						<div class="pull-right">
+							<a href="/rooms/{{room._id}}/notices"><i class="fa fa-times"></i></a>
+						</div>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<h2>{{post.title}}</h2>
+					<p>{{{post.content}}}</p>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
 
+<template name="files">
+	<div class="row">
+		<div class="col-lg-3 col-md-4">
+			<input type="text" placeholder="Search..." class="form-control">
+		</div>
+		<div class="col-lg-9 col-md-8">
+			<div class="pull-right">
+				<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
+				<button class="btn btn-success create-folder"><i class="fa fa-folder-o"></i> New Folder</button>
+			</div>
+		</div>
+		<br><br><br>
+		{{#if filesBeingUploaded}}
+		<div class="col-md-12">
+			<div class="well file-uploads">
+				{{#each filesBeingUploaded}}
+					{{#with FS.GetFile "files" this}}
+						<h4>{{this.name}}</h4>
+						{{> FS.UploadProgressBar bootstrap=true class="progress-bar-success progress-bar-striped active" showPercent=true}}					
+					{{/with}}
+				{{/each}}
+				{{#if finished}}
+					<button class="btn btn-primary done">Done</button>
+				{{/if}}
+			</div>
+		</div>
+		{{/if}}
+		<div class="col-md-12">
+			<div class="panel panel-default files">
+				<div class="panel-heading">
+					<ol class="breadcrumb">
+						{{#each pathSplit}}
+							{{#if active}}
+								<li class="active">{{name}}</li>
+							{{else}}
+								<li><a href="/rooms/{{../_id}}/files{{p}}">{{name}}</a></li>
+							{{/if}}
+						{{/each}}
+					</ol>
+				</div>
+				
+			<table class="table files">
+				<!--<thead>
+					<tr>
+						<th>Filename</th>
+						<th>File Size</th>
+						<th></th>
+					</tr>
+				</thead>-->
+				<tbody>
+				{{#each files}}
+						{{#if isFolder}}
+							<tr>
+								<td>
+									<i class="fa fa-2x fa-folder-o"></i>
+									<span class="filename"><a href="/rooms/{{../_id}}/files{{path}}{{name}}">{{name}}</a></span>
+								</td>
+								<td></td>
+								<td>
+								</td>
+							</tr>
+						{{else}}
+							{{#with FS.GetFile "files" _id}}
+								<tr>
+								{{#if isActive _id}}
+								<td class="bb">
+									{{#if isImage}}
+										<i class="fa fa-2x fa-file-image-o"></i>
+									{{else}}
+										<i class="fa fa-2x fa-file-o"></i>
+									{{/if}}	
+									<input type="text" class="form-control input-rename">
+								</td>
+								{{else}}			
+									<td>
+									{{#if isImage}}
+											<i class="fa fa-2x fa-file-image-o"></i>
+									{{else}}
+											<i class="fa fa-2x fa-file-o"></i>
+									{{/if}}
+									<span class="filename">
+										<a href="{{this.url}}" target="_blank">{{this.name}}</a>
+									</span>
+									</td>
+								{{/if}}
+									<td><span class="filesize">{{humanFileSize this.size}}</span></td>
+									<td>
+										<div class="pull-right">
+											<a href="{{this.url}}" class="btn btn-primary btn-sm" target="_blank"><i class="fa fa-download"></i> Download</a>
+											<button class="btn btn-edit btn-sm rename">Rename</button>
+											{{#FS.DeleteButton class="btn btn-danger btn-sm"}}<i class="fa fa-trash-o"></i> Delete{{/FS.DeleteButton}}
+										</div>
+									</td>
+								</tr>
+							{{/with}}
+						{{/if}}
+					{{/each}}
+					{{#if newFolder}}
+					<tr class="create-new-folder">
+						<td>
+								<i class="fa fa-2x fa-folder-o"></i> 
+								<input type="text" placeholder="Enter folder name" class="pull-right input-create-folder form-control">
+						</td>
+						<td></td>
+						<td>
+					</td>
+					</tr>
+					{{/if}}
+				</tbody>
+			</table>
+			</div>
+		</div>
+	</div>
+</template>	
+
+<template name="/notices/create/post">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						Create Post
+						<div class="pull-right">
+							<a href="/rooms/{{_id}}/notices"><i class="fa fa-times"></i></a>
+						</div>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<form>
+						<div class="form-group">
+							<input placeholder="Title" type="text" class="form-control title">
+						</div>
+						<div class="form-group">
+							<div id="summernote"></div>
+						</div>
+						<button type="submit" class="btn btn-success">Submit</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="/notices/create/poll">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						Create Poll
+						<div class="pull-right">
+							<a href="/rooms/{{_id}}/notices"><i class="fa fa-times"></i></a>
+						</div>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<form>
+						<div class="form-group">
+							<label>Title</label>
+							<input type="text" class="form-control">
+						</div>
+						<div class="form-group">
+							<label>Options</label>
+							<br>
+							<button class="btn btn-default btn-xs">Add Option</button>
+							<br><br>
+							<div class="input-group">
+								<span class="input-group-addon">1. </span>
+								<input type="text" class="form-control">
+								<span class="input-group-btn">
+									<button class="btn btn-default"><i class="fa fa-times"></i></button>
+								</span>
+							</div>
+						</div>
+						<button type="submit" class="btn btn-primary">Submit</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+			
 <template name="login">
 	<nav class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">

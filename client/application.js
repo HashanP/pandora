@@ -4,3 +4,4 @@ school = new ReactiveVar();
 wnd = new ReactiveVar(window.location);
 
 Meteor.subscribe("users");
+Meteor.subscribe("rooms");

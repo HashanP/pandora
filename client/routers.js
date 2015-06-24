@@ -26,6 +26,41 @@ Router.route("/", function() {
 	this.render("room");
 });
 
+Router.route("/rooms/:room", function() {
+	var room = Rooms.findOne(this.params.room);
+	room.notices = _.sortBy(room.notices, function(notice) {return notice.dateCreated;}).reverse();
+	this.render("notices", {data: room});
+});
+
+Router.route("/rooms/:room/notices/:notice", function() {
+	this.render("post", {data: {room: Rooms.findOne(this.params.room), post: _.findWhere(Rooms.findOne(this.params.room).notices, {_id: this.params.notice})}});
+});
+
+Router.route("/rooms/:room/notices/create/post", function() {
+	this.render("/notices/create/post", {data: Rooms.findOne(this.params.room)});
+});
+
+Router.route("/rooms/:room/notices/create/poll", function() {
+	this.render("/notices/create/poll", {data: Rooms.findOne(this.params.room)});
+});
+
+Router.route("/rooms/:room/files/:path*", function() {
+	Session.set("filesBeingUploaded", []);
+	Session.set("newFolder", false);
+	Session.set("path", this.params.path ? this.params.path : "/");
+	var room = Rooms.findOne(this.params.room);
+	if(!this.params.path) {
+		var files = room.files;
+	} else {
+		var files = room.files;
+		var pathSplit = this.params.path.split("/");
+		pathSplit.forEach(function(p) {
+			files = _.findWhere(files, {name: p}).files;
+		});
+	}
+	this.render("files", {data:{_id: room._id, files: files}});
+});
+
 Router.route("/admin/users", function() {
 	var offset = (this.params.query.page ? parseInt(this.params.query.page, 10)  - 1 : 0) * 10;
 	Session.set("limit", 10);

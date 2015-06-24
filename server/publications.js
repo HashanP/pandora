@@ -72,6 +72,13 @@ Meteor.publish("/admin/rooms", function(offset, limit, search) {
 	}
 });
 
+Meteor.publish("rooms", function() {
+	if(!this.userId) {
+		return [];
+	}
+	return Rooms.find({$or: [{students: {$in: [this.userId]}}, {teachers: {$in: [this.userId]}}]});
+});
+
 Meteor.methods({
 	"findRoom": function(userId) {
 		var user = Meteor.users.findOne(this.userId);
