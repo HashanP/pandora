@@ -86,12 +86,20 @@ var isTeacher = function(userId, doc) {
 	return room.teachers.indexOf(userId) !== -1 || isAdmin(userId);
 }
 
+var isStudent = function(userId, doc) {
+	var room = Rooms.findOne(doc);
+	return room.students.indexOf(userId) !== -1 || room.teachers.indexOf(userId) !== -1 || isAdmin(userId);
+}
+
 Files.allow({
 	insert: function() {
 		return true;
 	},
 	remove: function(userId, doc) {
 		return isTeacher(userId, doc.owner);
+	},
+	download: function(userId, doc) {
+		return isStudent(userId, doc.owner);
 	}
 });
 
