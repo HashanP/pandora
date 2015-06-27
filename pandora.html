@@ -249,18 +249,69 @@
 	</div>
 </template>
 
-<template name="notices">
+<template name="navigation">
 	<div class="row">
 		<div class="col-md-12">
 			<ul class="nav nav-tabs">
-				<li role="presentation" class="active"><a href="/rooms/{{_id}}/notices">Notices</a></li>
-				<li role="presentation"><a href="/rooms/{{_id}}/files">Resources</a></li>	
+				{{#if isNavActive "notices"}}
+				<li role="presentation" class="active"><a href="/rooms/{{_id}}">Notices</a></li>
+				{{else}}
+				<li role="presentation"><a href="/rooms/{{_id}}">Notices</a></li>
+				{{/if}}
+				{{#if isNavActive "files"}}
+				<li role="presentation" class="active"><a href="/rooms/{{_id}}/files">Files</a></li>	
+				{{else}}
+				<li role="presentation"><a href="/rooms/{{_id}}/files">Files</a></li>	
+				{{/if}}
 				<li role="presentation"><a href="#">Gradebook</a></li>
 				<li role="presentation"><a href="#">Students</a></li>
 			</ul>
 		</div>
 	</div>
-	<div class="row">
+</template>	
+
+<template name="notices">
+	{{> navigation}}
+	<br>
+	<div class="container-notices">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="btn-group hey" role="group">
+					<button class="btn btn-default">
+						<i class="fa fa-font fa-3x"></i>
+						<span class="space"></span>
+						Insert Text
+					</button>
+					<button class="btn btn-default">
+						<i class="fa fa-picture-o fa-3x"></i>
+						<span class="space"></span>
+						Insert Picture
+					</button>
+					<button class="btn btn-default">
+						<i class="fa fa-video-camera fa-3x"></i>
+						<span class="space"></span>
+						Insert Video
+					</button>
+					<button class="btn btn-default">
+						<i class="fa fa-link fa-3x"></i>
+						<span class="space"></span>
+						Insert Link
+					</button>
+					<button class="btn btn-default">
+						<i class="fa fa-music fa-3x"></i>
+						<span class="space"></span>
+						Insert Audio
+					</button>
+					<button class="btn btn-default">
+						<i class="fa fa-question fa-3x"></i>
+						<span class="space"></span>
+						Insert Poll	
+					</button>
+				</div>
+			</div>
+		</div>	
+	</div>
+	<!--<div class="row">
 		<div class="col-md-12">
 			<div class="dropdown pull-right">
 				<button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus"></i> Add <span class="caret"></span></button>
@@ -302,7 +353,7 @@
 			</div>
 				{{/if}}
 		</div>	
-	</div>
+	</div>-->
 </template>
 
 <template name="post">
@@ -326,7 +377,21 @@
 	</div>
 </template>
 
+<template name="icon">
+	{{#if isImage}}
+		<i class="fa fa-2x fa-file-image-o"></i>
+	{{else}}
+		{{#if isAudio}}
+			<i class="fa fa-2x fa-file-sound-o"></i>
+		{{else}}
+			<i class="fa fa-2x fa-file-o"></i>
+		{{/if}}
+	{{/if}}	
+</template>
+	
 <template name="files">
+	{{> navigation}}
+	<br>
 	<div class="row">
 		<div class="col-lg-3 col-md-4">
 			<input type="text" placeholder="Search..." value="{{search}}" class="form-control search">
@@ -368,13 +433,6 @@
 				</div>
 				
 			<table class="table files">
-				<!--<thead>
-					<tr>
-						<th>Filename</th>
-						<th>File Size</th>
-						<th></th>
-					</tr>
-				</thead>-->
 				<tbody>
 				{{#each filesF}}
 						{{#if isFolder}}
@@ -403,21 +461,13 @@
 								<tr>
 								{{#if isActive _id}}
 								<td class="bb">
-									{{#if isImage}}
-										<i class="fa fa-2x fa-file-image-o"></i>
-									{{else}}
-										<i class="fa fa-2x fa-file-o"></i>
-									{{/if}}	
-									<input type="text" class="form-control input-rename">
+								{{> icon}}
+								<input type="text" class="form-control input-rename">
 								</td>
 								{{else}}			
 									<td>
-									{{#if isImage}}
-											<i class="fa fa-2x fa-file-image-o"></i>
-									{{else}}
-											<i class="fa fa-2x fa-file-o"></i>
-									{{/if}}
-									<span class="filename">
+									{{> icon}}										
+								<span class="filename">
 										<a href="{{this.url}}" target="_blank">{{this.name}}</a>
 									</span>
 									</td>

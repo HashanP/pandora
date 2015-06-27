@@ -27,6 +27,7 @@ Router.route("/", function() {
 });
 
 Router.route("/rooms/:room", function() {
+	Session.set("navActive", "notices");
 	var room = Rooms.findOne(this.params.room);
 	room.notices = _.sortBy(room.notices, function(notice) {return notice.dateCreated;}).reverse();
 	this.render("notices", {data: room});
@@ -45,6 +46,7 @@ Router.route("/rooms/:room/notices/create/poll", function() {
 });
 
 Router.route("/rooms/:room/files/:path*", function() {
+	Session.set("navActive", "files");
 	Session.set("filesBeingUploaded", []);
 	Session.set("newFolder", false);
 	Session.set("path", this.params.path ? this.params.path : "/");

@@ -239,3 +239,22 @@ $sidebar-width: 270px;
 	position:relative;
 	top:5px;
 }
+
+textarea {
+	resize: vertical;
+}
+
+.container-notices {
+	max-width:760px;
+	margin-left:auto;
+	margin-right:auto;	
+}
+
+.space {
+	margin-top:6px;
+	display:block;
+}
+
+.hey .btn {
+	padding:10px;
+}

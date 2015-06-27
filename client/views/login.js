@@ -198,3 +198,9 @@ Template.files.events({
 Template.files.onCreated(function() {
 	this.subscribe("files", this.data._id);
 });
+
+Template.navigation.helpers({
+	"isNavActive": function(a) {
+		return Session.equals("navActive", a);
+	}
+});
