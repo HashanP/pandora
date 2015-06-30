@@ -211,7 +211,7 @@ Template["/admin/users/create"].events({
 		}
 		var readSubjects = $(".subjects-read").select2("val");
 		var writeSubjects = $(".subjects-write").select2("val");
-		Meteor.call("createUser2", username, password, readSubjects, writeSubjects, Template.instance().data._id);
+		Meteor.call("createUser2", username, password, readSubjects, writeSubjects, Template.instance().data ? Template.instance().data._id : undefined);
 		Router.go("/admin/users");
 	}
 });

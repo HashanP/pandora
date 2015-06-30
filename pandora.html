@@ -8,15 +8,19 @@
 	<div class="page-wrapper">
 		<nav class="sidebar">
 			<ul class="sidebar-nav">
+				<li class="header">General</li>
+				<li><a><i class="fa fa-home"></i> Home</a></li>
 				<li class="header">Subjects</li>
 				{{#each subjects}}
-					<li><a href="/rooms/{{_id}}">{{title}}</a></li>
+					<li>
+						<a href="/rooms/{{_id}}"><i class="fa fa-graduation-cap"></i> {{title}}</a>
+					</li>
 				{{/each}}
 				{{#if admin}}
 					<li class="header">Admin</li>
-					<li><a href="/admin/users">Users</a></li>
-					<li><a href="/admin/rooms">Rooms</a></li>
-					<li><a href="/admin/billing">Billing</a></li>
+					<li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
+					<li><a href="/admin/rooms"><i class="fa fa-server"></i> Rooms</a></li>
+					<li><a href="/admin/billing"><i class="fa fa-credit-card"></i> Billing</a></li>
 				{{/if}}
 			</ul>
 		</nav>
@@ -250,65 +254,70 @@
 </template>
 
 <template name="navigation">
-	<div class="row">
-		<div class="col-md-12">
-			<ul class="nav nav-tabs">
-				{{#if isNavActive "notices"}}
-				<li role="presentation" class="active"><a href="/rooms/{{_id}}">Notices</a></li>
-				{{else}}
-				<li role="presentation"><a href="/rooms/{{_id}}">Notices</a></li>
-				{{/if}}
-				{{#if isNavActive "files"}}
-				<li role="presentation" class="active"><a href="/rooms/{{_id}}/files">Files</a></li>	
-				{{else}}
-				<li role="presentation"><a href="/rooms/{{_id}}/files">Files</a></li>	
-				{{/if}}
-				<li role="presentation"><a href="#">Gradebook</a></li>
-				<li role="presentation"><a href="#">Students</a></li>
-			</ul>
+	<div class="topbar">
+		<div class="row">
+			<div class="col-md-12">
+				<nav class="text-center">
+					<ul>
+						{{#if isNavActive "notices"}}
+							<li class="active"><a href="/rooms/{{_id}}/">Notices</a></li>
+						{{else}}
+							<li><a href="/rooms/{{_id}}/">Notices</a></li>
+						{{/if}}
+						{{#if isNavActive "files"}}
+							<li class="active"><a href="/rooms/{{_id}}/files">Files</a></li>
+						{{else}}
+							<li><a href="/rooms/{{_id}}/files">Files</a></li>
+						{{/if}}
+						{{#if isNavActive "quizzes"}}
+							<li class="active"><a href="/rooms/{{_id}}/quizzes">Quizzes</a></li>
+						{{else}}
+							<li><a href="/rooms/{{_id}}/quizzes">Quizzes</a></li>
+						{{/if}}
+						{{#if isNavActive "gradebook"}}
+							<li class="active"><a href="/rooms/{{_id}}/gradebook">Gradebook</a></li>
+						{{else}}
+							<li><a href="/rooms/{{_id}}/gradebook">Gradebook</a></li>
+						{{/if}}
+					</ul>
+				</nav>
+			</div>
 		</div>
 	</div>
 </template>	
 
 <template name="notices">
 	{{> navigation}}
-	<br>
-	<div class="container-notices">
+			
 		<div class="row">
-			<div class="col-md-12">
-				<div class="btn-group hey" role="group">
-					<button class="btn btn-default">
-						<i class="fa fa-font fa-3x"></i>
-						<span class="space"></span>
-						Insert Text
-					</button>
-					<button class="btn btn-default">
-						<i class="fa fa-picture-o fa-3x"></i>
-						<span class="space"></span>
-						Insert Picture
-					</button>
-					<button class="btn btn-default">
-						<i class="fa fa-video-camera fa-3x"></i>
-						<span class="space"></span>
-						Insert Video
-					</button>
-					<button class="btn btn-default">
-						<i class="fa fa-link fa-3x"></i>
-						<span class="space"></span>
-						Insert Link
-					</button>
-					<button class="btn btn-default">
-						<i class="fa fa-music fa-3x"></i>
-						<span class="space"></span>
-						Insert Audio
-					</button>
-					<button class="btn btn-default">
-						<i class="fa fa-question fa-3x"></i>
-						<span class="space"></span>
-						Insert Poll	
-					</button>
+			<div class="col-md-4 col-lg-3">
+				<input type="text" placeholder="Search..." class="form-control">
+			</div>
+			<div class="col-md-8 col-lg-9">
+				<div class="pull-right">
+					<div class="dropdown">
+						<button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus"></i> Add <span class="caret"></span></button>
+						<ul class="dropdown-menu dropdown-menu-right">
+							<li><a href="/rooms/{{_id}}/notices/create/text"><i class="fa fa-font"></i> Text</a></li>
+							<li><a href="/rooms/{{_id}}/notices/create/image"><i class="fa fa-picture-o"></i> Image</a></li>
+							<li><a href="/rooms/{{_id}}/notices/create/audio"><i class="fa fa-music"></i> Audio</a></li>
+							<li><a href="/rooms/{{_id}}/notices/create/video"><i class="fa fa-video-camera"></i> Video</a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
+	<br><br><br>
+<div class="row">
+				{{#each notices}}
+					<div class="col-md-4 col-lg-3">
+						<div class="thumbnail">
+							<div class="caption">
+								<h3>{{title}}</h3>
+								{{content}}
+							</div>
+						</div>
+					</div>
+				{{/each}}			
 		</div>	
 	</div>
 	<!--<div class="row">
@@ -391,7 +400,6 @@
 	
 <template name="files">
 	{{> navigation}}
-	<br>
 	<div class="row">
 		<div class="col-lg-3 col-md-4">
 			<input type="text" placeholder="Search..." value="{{search}}" class="form-control search">

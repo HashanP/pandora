@@ -1,4 +1,4 @@
-@import ".meteor/local/build/programs/server/assets/packages/reywood_bootstrap3-sass/_bootstrap.scss";
+@import ".meteor/local/build/programs/server/assets/packages/reywood_bootstrap3-sass/bootstrap";
 @import "http://fonts.googleapis.com/css?family=Lobster|Titillium+Web";
 @import url(http://fonts.googleapis.com/css?family=Raleway:400,300);
 
@@ -73,11 +73,21 @@ $sidebar-width: 270px;
 	padding-right:25px;
 }
 
-.sidebar-nav li {
-	height:33px;
+.sidebar-nav > li {
+	min-height:33px;
 }
 
-.sidebar-nav li a, .sidebar-nav .header {
+.sidebar-nav > li > ul {
+	padding-left:27px;
+	padding-top:5px;
+}
+
+.sidebar-nav > li > ul > li > a {
+	font-size:15px;
+	color: rgba(255, 255, 255, 0.73);
+}
+
+.sidebar-nav > li > a, .sidebar-nav .header {
 	color:rgba(255,255,255,0.73);;
 	padding-top:8px;
 }
@@ -85,19 +95,28 @@ $sidebar-width: 270px;
 .sidebar-nav li.header {
 	font-family: "Arial";
 	text-transform:uppercase;
-	font-size:14px;
-}
-
-.sidebar-nav li {
-	font-weight:300;
+	font-size:13px;
 	padding-left:20px;
 	padding-right:20px;
+}
+
+.sidebar-nav > li {
+	font-weight:300;
 	position:relative;
-	padding-top:4px;
+	padding-top:5px;
 	border-radius:5px;
 }
 
-.sidebar-nav li.active::before {
+.sidebar-nav > li > a {
+	padding-left:20px;
+	padding-right:20px;
+	padding-top:0;
+	display:inline-block;
+	width:100%;
+	height:100%;
+}
+
+.sidebar-nav > li.active::before {
 	background-color:rgba(244,106,106,0.84);
 	width:100%;
 	height:31px;
@@ -109,12 +128,16 @@ $sidebar-width: 270px;
 	left:0;
 }
 
-.sidebar-nav li.active a {
+.sidebar-nav li.header {
+	padding-top:14px;
+}
+
+.sidebar-nav > li.active > a {
 	color:white;
 	z-index:20;
 }
 
-.sidebar-nav li:not(.header):not(.active):hover::before {
+.sidebar-nav > li:not(.header):not(.active):hover::before {
 	width:100%;
 	height:31px;
 	z-index:-10;
@@ -126,14 +149,14 @@ $sidebar-width: 270px;
 	background-color:rgba(255,255,255,0.15);
 }
 
-.sidebar-nav li.header, .sidebar-nav li a {
+.sidebar-nav li.header, .sidebar-nav > li a {
 	text-decoration:none;
 }
 
-.sidebar-nav li a {
-	font-size:18px;
+.sidebar-nav > li a {
+	font-size:17px;
 	font-family:"Helvetica";
-	padding-left:17px;
+	/*padding-left:17px;*/
 }
 
 .contents {
@@ -257,4 +280,52 @@ textarea {
 
 .hey .btn {
 	padding:10px;
+}
+
+.topbar {
+	height: 59px;
+	width:100%;
+	background-color:rgba(13,45,79,0.26);
+	border-bottom:1px solid #0D2D4F;
+	position:relative;
+	top:-17px;
+}
+
+.topbar ul {
+	list-style-type:none;
+}
+
+.topbar ul li {
+	margin-top:14px;
+	margin-left:20px;
+	margin-right:20px;
+	font-size:16px;
+	display:inline-block;
+	width:120px;
+	border-radius:4px;
+}
+
+.topbar ul li a {
+	color:black;
+	padding:4px;
+	display:inline-block;
+	height:100%;
+	width:100%;
+}
+
+.topbar ul li.active a {
+	font-weight:bold;
+}
+
+.topbar ul li:not(.active):hover {
+	background-color:rgba(13,45,79,0.34);
+	text-decoration:none;
+}
+
+.topbar ul li a:hover, .topbar ul li a:active {
+	text-decoration:none;
+}
+
+.thumbnail h3 {
+	margin-top:0px;
 }
