@@ -26,19 +26,25 @@ Router.route("/", function() {
 	this.render("room");
 });
 
+Router.route("/subjects", function() {
+	console.log("here");
+	this.render("/subjects");
+});
+
 Router.route("/rooms/:room", function() {
 	Session.set("navActive", "notices");
 	var room = Rooms.findOne(this.params.room);
 	room.notices = _.sortBy(room.notices, function(notice) {return notice.dateCreated;}).reverse();
+	Session.set("isNotEmpty", false);
+	Session.set("post", "");
 	this.render("notices", {data: room});
 });
 
-Router.route("/rooms/:room/notices/:notice", function() {
-	this.render("post", {data: {room: Rooms.findOne(this.params.room), post: _.findWhere(Rooms.findOne(this.params.room).notices, {_id: this.params.notice})}});
-});
-
-Router.route("/rooms/:room/notices/create/post", function() {
-	this.render("/notices/create/post", {data: Rooms.findOne(this.params.room)});
+Router.route("/rooms/:room/notices/announcement", function() {
+	window.images = new ReactiveArray();	
+	window.youtubes = new ReactiveArray();
+	var room = Rooms.findOne(this.params.room);
+	this.render("/announcement", {data: room});
 });
 
 Router.route("/rooms/:room/notices/create/poll", function() {

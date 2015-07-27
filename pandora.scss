@@ -1,3 +1,4 @@
+$table-bg-active: #4285F4;
 @import ".meteor/local/build/programs/server/assets/packages/reywood_bootstrap3-sass/bootstrap";
 @import "http://fonts.googleapis.com/css?family=Lobster|Titillium+Web";
 @import url(http://fonts.googleapis.com/css?family=Raleway:400,300);
@@ -59,7 +60,6 @@ $sidebar-width: 270px;
 .sidebar {
 	width:$sidebar-width;
 	margin-left:-$sidebar-width;
-	left:$sidebar-width;
 	position:fixed;
 	height:100%;
 	background-color:#0D2D4F;
@@ -87,7 +87,7 @@ $sidebar-width: 270px;
 	color: rgba(255, 255, 255, 0.73);
 }
 
-.sidebar-nav > li > a, .sidebar-nav .header {
+.sidebar-nav > li > a, .sidebar-nav > li > span > a, .sidebar-nav .header {
 	color:rgba(255,255,255,0.73);;
 	padding-top:8px;
 }
@@ -137,7 +137,7 @@ $sidebar-width: 270px;
 	z-index:20;
 }
 
-.sidebar-nav > li:not(.header):not(.active):hover::before {
+.sidebar-nav > li:not(.header):not(.active):not(.all):hover::before {
 	width:100%;
 	height:31px;
 	z-index:-10;
@@ -160,8 +160,8 @@ $sidebar-width: 270px;
 }
 
 .contents {
-	width:100%;
 	padding-top:17px;
+	width:100%;
 }
 
 .users .btn-link:hover {
@@ -297,8 +297,8 @@ textarea {
 
 .topbar ul li {
 	margin-top:14px;
-	margin-left:20px;
-	margin-right:20px;
+	margin-left:15px;
+	margin-right:15px;
 	font-size:16px;
 	display:inline-block;
 	width:120px;
@@ -307,7 +307,10 @@ textarea {
 
 .topbar ul li a {
 	color:black;
-	padding:4px;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-left:12px;
+	padding-right:12px;
 	display:inline-block;
 	height:100%;
 	width:100%;
@@ -318,7 +321,7 @@ textarea {
 }
 
 .topbar ul li:not(.active):hover {
-	background-color:rgba(13,45,79,0.34);
+	background-color:rgba(13,45,79,0.27);
 	text-decoration:none;
 }
 
@@ -326,6 +329,150 @@ textarea {
 	text-decoration:none;
 }
 
+.container-small {
+	margin-left:auto;
+	margin-right:auto;
+	max-width:760px;
+}
+
 .thumbnail h3 {
 	margin-top:0px;
+}
+
+.super {
+	overflow:auto;
+}
+
+.icon {
+	height:100%;
+	width:100%;
+}
+
+.first {
+	padding-left:0px;
+	padding-right:0px;
+}
+
+.panel-super {
+	border-color:#0D2D4F;
+}
+
+.contents.contents-other {
+	background-color:rgba(55, 134, 168,0.6);
+}
+
+.contents.contents-other .search {
+	background-color:rgba(224, 222,222,1);
+	border-color:black;
+}
+
+.contents.contents-other .btn-success {
+	background:rgba(62,179,60,0.63);
+	border-color:rgba(50,49,49,0.98);
+}
+
+.contents.contents-other .search, .contents.contents-other .search::-webkit-input-placeholder, .contents.contents-other .search:-moz-placeholder, .contents.contents-other .search::-moz-placeholder, .contents.contents-other .search:-ms-input-placeholder {
+	color:black;
+	opacity:1;
+}
+
+.panel-super {
+	background:none;
+}
+
+.panel-super .panel-body, .panel-super table {
+	background-color:white;
+}
+
+.panel-super div:first-child {
+	border-top-left-radius:4px;
+	border-top-right-radius:4px;
+}
+
+.panel-super .panel-heading {
+	background:rgba(215,215,215,0.81);
+	border-color:black;
+}
+
+.contents.contents-other input:focus {
+	background-color:white;
+}
+
+.panel-super .breadcrumb {
+	background:none;
+}
+
+.panel-super .panel-footer {
+	background-color:rgba(215,215,215,0.81);
+	border-color:#0D2D4F;
+	padding-top:7px;
+	padding-bottom:6px;
+}
+
+.panel-super .panel-footer .btn.btn-link {
+	padding-top:0;
+	padding-bottom:0;
+	padding-left:0;
+	color: rgba(0,0,0,0.73);
+}
+
+.panel-super div:last-child {
+	border-bottom-left-radius:4px;
+	border-bottom-right-radius:4px;
+}
+
+.media-object {
+	max-height:64px;
+}
+
+.show-image, .show-youtube {
+	cursor: pointer;
+}
+
+#show-image img {
+	max-width:100%;
+}
+
+#show-image .modal-body {
+	text-align:center;
+}
+
+#show-youtube .modal-body .videoContainer {
+	position: relative;
+	padding-bottom: 56.25%; /* 16:9 */
+	padding-top: 25px;
+	height: 0;
+}
+
+#show-youtube .modal-body .videoContainer iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+button {
+	outline:none	!important;
+}
+
+.circle {
+	display:none;
+	background-color:#F05D5D !important;
+	width:20px !important;
+	height:20px !important;
+	border-radius:10px !important;
+	text-align:center;
+	color:white;
+	font-size:14px;
+	padding-top:1px;
+}
+
+.files tr.folder:not(.active).ui-hover {
+	background-color:#DAFCC1;
+	border-color: #84B47C;
+}
+
+.files tr.folder:not(.active).ui-hover ~ tr {
+	border-color:#84B47C;
 }

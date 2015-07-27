@@ -16,6 +16,7 @@
 						<a href="/rooms/{{_id}}"><i class="fa fa-graduation-cap"></i> {{title}}</a>
 					</li>
 				{{/each}}
+				<li><a href="/subjects"><i class="fa fa-plus"></i> All Subjects</a></li>
 				{{#if admin}}
 					<li class="header">Admin</li>
 					<li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
@@ -24,7 +25,7 @@
 				{{/if}}
 			</ul>
 		</nav>
-		<div class="contents">
+		<div class="contents contents-{{yp}}">
 			{{> yield}}
 		</div>
 	</div>
@@ -79,11 +80,17 @@
 <template name="pagination">
 	<nav class="text-center">
 		<ul class="pagination">
-			<li class="{{firstPage}}">
-				<a href="/admin/{{route}}?page={{prevPage}}" class="prev" aria-label="Previous">
+			{{#if firstPage}}
+				<li class="disabled">
 					<span aria-hidden="true">&laquo;</span>
-				</a>
-			</li>
+				</li>
+			{{else}}
+				<li>
+					<a href="/admin/{{route}}?page={{prevPage}}" class="prev" aria-label="Previous">
+						<span aria-hidden="true">&laquo;</span>
+					</a>
+				</li>
+			{{/if}}
 			{{#each pages}}
 				{{#if isPage .}}
 					<li class="active"><a href="/admin/{{../route}}?page={{.}}">{{.}}</a></li>
@@ -91,11 +98,17 @@
 					<li><a href="/admin/{{../route}}?page={{.}}">{{.}}</a></li>
 				{{/if}}
 			{{/each}}
-			<li class="{{lastPage}}">
-				<a href="/admin/{{route}}?page={{nextPage}}" class="next" aria-label="Next">
+			{{#if lastPage}}
+				<li class="disabled">
 					<span aria-hidden="true">&raquo;</span>
-				</a>
-			</li>
+				</li>
+			{{else}}
+				<li>
+					<a href="/admin/{{route}}?page={{nextPage}}" class="next" aria-label="Next">
+						<span aria-hidden="true">&raquo;</span>
+					</a>
+				</li>
+			{{/if}}
 		</ul>
 	</nav>
 </template>
@@ -258,68 +271,144 @@
 		<div class="row">
 			<div class="col-md-12">
 				<nav class="text-center">
-					<ul>
-						{{#if isNavActive "notices"}}
-							<li class="active"><a href="/rooms/{{_id}}/">Notices</a></li>
-						{{else}}
-							<li><a href="/rooms/{{_id}}/">Notices</a></li>
-						{{/if}}
-						{{#if isNavActive "files"}}
-							<li class="active"><a href="/rooms/{{_id}}/files">Files</a></li>
-						{{else}}
-							<li><a href="/rooms/{{_id}}/files">Files</a></li>
-						{{/if}}
-						{{#if isNavActive "quizzes"}}
-							<li class="active"><a href="/rooms/{{_id}}/quizzes">Quizzes</a></li>
-						{{else}}
-							<li><a href="/rooms/{{_id}}/quizzes">Quizzes</a></li>
-						{{/if}}
-						{{#if isNavActive "gradebook"}}
-							<li class="active"><a href="/rooms/{{_id}}/gradebook">Gradebook</a></li>
-						{{else}}
-							<li><a href="/rooms/{{_id}}/gradebook">Gradebook</a></li>
-						{{/if}}
-					</ul>
-				</nav>
+						<ul>
+							{{#if isNavActive "notices"}}
+								<li class="active"><a href="/rooms/{{_id}}/">Notices</a></li>
+							{{else}}
+								<li><a href="/rooms/{{_id}}/">Notices</a></li>
+							{{/if}}
+							{{#if isNavActive "files"}}
+								<li class="active"><a href="/rooms/{{_id}}/files">Files</a></li>
+							{{else}}
+								<li><a href="/rooms/{{_id}}/files">Files</a></li>
+							{{/if}}
+							{{#if isNavActive "quizzes"}}
+								<li class="active"><a href="/rooms/{{_id}}/quizzes">Quizzes</a></li>
+							{{else}}
+								<li><a href="/rooms/{{_id}}/quizzes">Quizzes</a></li>
+							{{/if}}
+							{{#if isNavActive "gradebook"}}
+								<li class="active"><a href="/rooms/{{_id}}/gradebook">Gradebook</a></li>
+							{{else}}
+								<li><a href="/rooms/{{_id}}/gradebook">Gradebook</a></li>
+							{{/if}}
+						</ul>
+					</nav>
 			</div>
 		</div>
 	</div>
 </template>	
 
+<template name="/subjects">
+	<div class="row">
+		{{#each subjects}}
+			<div class="col-md-3 col-lg-2">
+				<img class="icon" src='{{GeoPattern title}}'/>
+			</div>
+		{{/each}}
+	</div>
+</template>
+
 <template name="notices">
 	{{> navigation}}
-			
-		<div class="row">
-			<div class="col-md-4 col-lg-3">
-				<input type="text" placeholder="Search..." class="form-control">
+	<div class="container-small">
+		<div class="super">
+		<div class="col-md-12">
+			<div class="panel panel-default panel-super">
+				<div class="panel-body">
+					<a href="/rooms/{{_id}}/notices/announcement" class="btn btn-primary">Announcement</a>
 			</div>
-			<div class="col-md-8 col-lg-9">
-				<div class="pull-right">
-					<div class="dropdown">
-						<button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus"></i> Add <span class="caret"></span></button>
-						<ul class="dropdown-menu dropdown-menu-right">
-							<li><a href="/rooms/{{_id}}/notices/create/text"><i class="fa fa-font"></i> Text</a></li>
-							<li><a href="/rooms/{{_id}}/notices/create/image"><i class="fa fa-picture-o"></i> Image</a></li>
-							<li><a href="/rooms/{{_id}}/notices/create/audio"><i class="fa fa-music"></i> Audio</a></li>
-							<li><a href="/rooms/{{_id}}/notices/create/video"><i class="fa fa-video-camera"></i> Video</a></li>
-						</ul>
+				{{#if isNotEmpty}}
+				<div class="panel-footer">
+					<button class="btn btn-link">Add Image</button>
+					<button class="btn btn-link youtube" data-toggle="modal" data-target="#youtube">Add YouTube Video</button>
+					<div class="pull-right">
+							<button class="btn btn-link submit">Submit</button>
+					</div>
+				</div>
+				{{/if}}
+      </div>
+				</div>
+		{{#each notices}}
+			<div class="col-md-12">
+				<div class="panel panel-default panel-super">
+					<div class="panel-body">
+						{{#if eq type "post"}}
+							<div class="row">
+							<div class="col-md-1 first">
+								<img class="icon" src='{{GeoPattern "Mr Davey"}}'>
+							</div>
+							<div class="col-md-11">
+								<b>Mr Davey</b>
+								<br>
+								{{content}}
+								{{> imageList images=images}}
+								{{> youtubeList youtubes=youtubes}}
+							</div>
+							</div>
+						{{/if}}
+					</div>
+					<div class="panel-footer">
+						<button class="btn btn-link">Reply</button>
+						<button class="btn btn-link del">Delete</button>
+						<div class="pull-right">
+							{{fullDate dateCreated}}
+						</div>
 					</div>
 				</div>
 			</div>
-	<br><br><br>
-<div class="row">
-				{{#each notices}}
-					<div class="col-md-4 col-lg-3">
-						<div class="thumbnail">
-							<div class="caption">
-								<h3>{{title}}</h3>
-								{{content}}
-							</div>
-						</div>
-					</div>
-				{{/each}}			
-		</div>	
+		{{/each}}
+		</div>
 	</div>
+<div class="modal fade" id="youtube">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        <p>One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal create-text fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Create Post</h4>
+      </div>
+      <div class="modal-body">
+				<div class="text-center">
+					<div class="btn-group">
+						<button class="btn btn-default">Text</button>
+						<button class="btn btn-default">Image</button>
+						<button class="btn btn-default">Poll</button>
+						<button class="btn btn-default">Video</button>
+					</div>
+				</div>
+				<br>
+				<form>
+					<div class="form-group">
+						<input type="text" placeholder="Title" class="form-control">
+					</div>
+					<div class="form-group">
+						<textarea class="form-control" rows="5"></textarea>
+					</div>
+				</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Publish</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 	<!--<div class="row">
 		<div class="col-md-12">
 			<div class="dropdown pull-right">
@@ -335,12 +424,8 @@
 					<div class="list-group">
 					{{#each notices}}
 							<a href="/rooms/{{../_id}}/notices/{{_id}}" class="list-group-item">
-								<h4 class="list-group-item-heading">{{title}}</h4>
-								<p class="list-group-item-text">{{britishDate dateCreated}}</p>
-							</a>
-					{{/each}}
-					</div>
-				{{else}}
+								<h4 class="list-group-item-heading">{{title}}</h4> <p class="list-group-item-text">{{britishDate dateCreated}}</p> </a>
+					{{/each}} </div> {{else}}
 
 			<div class="fixed">
 				<div class="jumbotron">
@@ -397,20 +482,79 @@
 		{{/if}}
 	{{/if}}	
 </template>
-	
+
+<template name="item">
+	{{#if isFolder}}
+		<tr class="folder">
+			{{#if isActive name}}
+				<td class="bb">
+					<i class="fa fa-2x fa-folder-o"></i>
+					<input type="text"  class="form-control input-rename-folder">
+				</td>
+			{{else}}
+						<td>
+							<i class="fa fa-2x fa-folder-o"></i>
+							<span class="filename"><a href="/rooms/{{../_id}}/files{{path}}{{name}}">{{name}}</a></span>
+						</td>
+						{{/if}}
+						<td></td>
+						<td>
+							<div class="pull-right">
+								<button class="btn btn-edit btn-sm rename-folder">Rename</button>
+								<button class="btn btn-danger btn-sm del"><i class="fa fa-trash-o"></i> Delete</button>	
+							</div>
+						</td>
+					</tr>
+				{{else}}
+					<tr>
+							{{#if isActive _id}}
+							<td class="bb">
+							{{> icon}}
+							<input type="text" class="form-control input-rename">
+							</td>
+							{{else}}			
+								<td>
+								{{> icon}}										
+							<span class="filename">
+									{{name}}
+								</span>
+								</td>
+							{{/if}}
+								{{#with FS.GetFile "files" _id}}
+								<td><span class="filesize">{{humanFileSize this.size}}</span></td>
+								<td>
+									<div class="pull-right">
+										<button class="btn btn-edit btn-sm rename">Rename</button>
+										{{#FS.DeleteButton class="btn btn-danger btn-sm"}}<i class="fa fa-trash-o"></i> Delete{{/FS.DeleteButton}}
+									</div>
+								</td>
+								{{/with}}
+						</tr>
+					{{/if}}
+</template>
+
 <template name="files">
 	{{> navigation}}
+	<div class="circle"></div>
 	<div class="row">
-		<div class="col-lg-3 col-md-4">
-			<input type="text" placeholder="Search..." value="{{search}}" class="form-control search">
-		</div>
-		<div class="col-lg-9 col-md-8">
-			<div class="pull-right">
-				<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
-				<button class="btn btn-success create-folder"><i class="fa fa-folder-o"></i> New Folder</button>
+		<div class="col-md-12">
+	<div class="panel panel-super panel-default">
+		<div class="panel-heading">
+			<div class="col-lg-3 col-md-4">
+				<input type="text" placeholder="Search..." value="{{search}}" class="form-control search">
+			</div>
+			<div class="col-lg-9 col-md-8">
+				<div class="pull-right">
+					<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
+					<button class="btn btn-success create-folder"><i class="fa fa-folder-o"></i> New Folder</button>
+				</div>
 			</div>
 		</div>
-		<br><br><br>
+	</div>
+	</div>
+	</div>
+	<div class="row">
+				<br><br><br>
 		{{#if filesBeingUploaded}}
 		<div class="col-md-12">
 			<div class="well file-uploads">
@@ -427,7 +571,7 @@
 		</div>
 		{{/if}}
 		<div class="col-md-12">
-			<div class="panel panel-default files">
+			<div class="panel panel-default panel-super files">
 				<div class="panel-heading">
 					<ol class="breadcrumb">
 						{{#each pathSplit}}
@@ -443,54 +587,8 @@
 			<table class="table files">
 				<tbody>
 				{{#each filesF}}
-						{{#if isFolder}}
-							<tr class="folder">
-								{{#if isActive name}}
-								<td class="bb">
-									<i class="fa fa-2x fa-folder-o"></i>
-									<input type="text"  class="form-control input-rename-folder">
-								</td>
-								{{else}}
-								<td>
-									<i class="fa fa-2x fa-folder-o"></i>
-									<span class="filename"><a href="/rooms/{{../_id}}/files{{path}}{{name}}">{{name}}</a></span>
-								</td>
-								{{/if}}
-								<td></td>
-								<td>
-									<div class="pull-right">
-										<button class="btn btn-edit btn-sm rename-folder">Rename</button>
-										<button class="btn btn-danger btn-sm del"><i class="fa fa-trash-o"></i> Delete</button>	
-									</div>
-								</td>
-							</tr>
-						{{else}}
-							{{#with FS.GetFile "files" _id}}
-								<tr>
-								{{#if isActive _id}}
-								<td class="bb">
-								{{> icon}}
-								<input type="text" class="form-control input-rename">
-								</td>
-								{{else}}			
-									<td>
-									{{> icon}}										
-								<span class="filename">
-										<a href="{{this.url}}" target="_blank">{{this.name}}</a>
-									</span>
-									</td>
-								{{/if}}
-									<td><span class="filesize">{{humanFileSize this.size}}</span></td>
-									<td>
-										<div class="pull-right">
-											<button class="btn btn-edit btn-sm rename">Rename</button>
-											{{#FS.DeleteButton class="btn btn-danger btn-sm"}}<i class="fa fa-trash-o"></i> Delete{{/FS.DeleteButton}}
-										</div>
-									</td>
-								</tr>
-							{{/with}}
-						{{/if}}
-					{{/each}}
+					{{>item .}}
+				{{/each}}
 					{{#if newFolder}}
 					<tr class="create-new-folder">
 						<td>
@@ -509,31 +607,125 @@
 	</div>
 </template>	
 
-<template name="/notices/create/post">
-	<div class="row">
-		<div class="col-md-12">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">
-						Create Post
-						<div class="pull-right">
-							<a href="/rooms/{{_id}}/notices"><i class="fa fa-times"></i></a>
-						</div>
-					</h3>
+<template name="fileSizeTooBig">
+	<div class="modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+						The file size of that image was too big. Image uploads must be smaller than 3MB.
 				</div>
-				<div class="panel-body">
-					<form>
-						<div class="form-group">
-							<input placeholder="Title" type="text" class="form-control title">
-						</div>
-						<div class="form-group">
-							<div id="summernote"></div>
-						</div>
-						<button type="submit" class="btn btn-success">Submit</button>
-					</form>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
 				</div>
 			</div>
 		</div>
+	</div>
+</template>
+
+<template name="youtubeList">
+	{{#each withIndex youtubes}}
+		<div class="media">
+			<div class="media-left">
+				<img class="media-object show-youtube" src="https://img.youtube.com/vi/{{id}}/1.jpg">
+			</div>
+			<div class="media-body">
+				<h4 class="media-heading show-youtube"><i class="fa fa-youtube-play"></i> {{title}}</h4>
+				{{#if ../can}}
+				<button class="btn btn-xs btn-warning remove-youtube">Remove</button>
+				{{/if}}
+			</div>
+		</div>
+	{{/each}}
+	<div class="modal" id="show-youtube">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">{{youtubeTitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<div class="videoContainer">
+						<iframe allowfullscreen src="http://www.youtube.com/embed/{{youtubeId}}" frameborder="0"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="imageList">
+	{{#each withIndex images}}
+		<div class="media">
+			<div class="media-left">
+				<img class="media-object show-image" src="{{data}}">
+			</div>
+			<div class="media-body">
+				<h4 class="media-heading show-image">{{title}}</h4>
+				{{#if ../can}}
+					<button class="btn btn-xs btn-warning remove-image">Remove</button>
+				{{/if}}
+			</div>
+		</div>
+	{{/each}}
+	<div class="modal" id="show-image">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">{{imageTitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<img src="{{imageSrc}}">
+				</div>
+			</div>
+		</div>
+	</div>	
+</template>
+
+<template name="/announcement">
+	{{> navigation}}
+	<div class="container-small">
+		<div class="panel panel-default panel-super">
+			<div class="panel-heading">
+				Create Post
+				<div class="pull-right">
+					<a href="/rooms/{{_id}}">
+						<i class="fa fa-times"></i>
+					</a>
+				</div>
+			</div>
+			<div class="panel-body">
+				<textarea class="form-control text" rows="3" placeholder="Type post here..."></textarea>
+				{{> imageList images=images can=true}}
+				{{> youtubeList youtubes=youtubes can=true}}
+				<br>
+				Add:&nbsp;  
+				<button class="btn btn-default add-image">Image <i class="fa fa-image"></i></button>
+				<button class="btn btn-default" data-toggle="modal" data-target="#youtube">YouTube <i class="fa fa-youtube"></i></button>
+		 </div>
+			<div class="panel-footer">
+				<button class="btn btn-link submit">Submit</button>
+			</div>
+		</div>
+	</div>	
+	<div class="modal" id="youtube">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="gridSystemModalLabel">Add YouTube video</h4>
+      </div>
+      <div class="modal-body">
+				{{#if isInvalidURL}}
+					<span class="text-danger">URL is not a valid YouTube URL</span>
+				{{/if}}
+				<input class="form-control youtube-url">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary add-youtube">Submit</button>
+      </div>
+		</div>
+		</div>	
 	</div>
 </template>
 

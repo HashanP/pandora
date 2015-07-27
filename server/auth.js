@@ -53,7 +53,7 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 		console.log(path);
 		console.log(doc.path);
 		if(path === doc.path) {
-			b.push({type: "file", _id: doc._id});
+			b.push({type: "file", _id: doc._id, name: doc.name()});
 			Rooms.update(doc.owner, {$set: {files: room.files}});
 		} else {
 			console.log("hell");

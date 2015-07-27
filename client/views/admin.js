@@ -10,6 +10,12 @@ Template["/admin/users"].helpers({
 	}
 });
 
+Template.base.helpers({
+	"yp": function() {
+		return wnd.get().pathname.indexOf("/admin") === 0 ? "admin" : "other";
+	}
+});
+
 Template["/admin/rooms"].helpers({
 	"rooms": function() {
 		return RoomsAdmin.find({}, {sort: ["title"]});
@@ -33,10 +39,10 @@ Template.pagination.helpers({
 		return _.range(1, Math.ceil(Session.get("count")/10)+1);
 	},
 	"firstPage": function() {
-		return Session.get("offset") === 0 ? "disabled": "";
+		return Session.get("offset") === 0;
 	},
 	"lastPage": function() { 
-		return Session.get("offset") >= Session.get("count") - 10? "disabled" : "";
+		return Session.get("offset") >= Session.get("count") - 10;
 	}
 });
 

@@ -31,3 +31,20 @@ UI.registerHelper("humanFileSize", function(bytes) {
     } while(Math.abs(bytes) >= thresh && u < units.length - 1);
     return bytes.toFixed(1)+' '+units[u];
 });
+
+UI.registerHelper("GeoPattern", function(title) {
+	return new Spacebars.SafeString(GeoPattern.generate(title).toDataUri());
+});
+
+var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+UI.registerHelper("fullDate", function(date) {
+	return date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear();
+});
+
+UI.registerHelper('withIndex', function(x) {
+	console.log(x);
+	return x.map(function(y, i) {
+		return _.extend(y, {index: i});
+	}); 
+});
