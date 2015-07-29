@@ -476,3 +476,12 @@ button {
 .files tr.folder:not(.active).ui-hover ~ tr {
 	border-color:#84B47C;
 }
+
+.zeplin {
+	display:inline;
+	width:300px;
+}
+
+.filename {
+	cursor:default;
+}

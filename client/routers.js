@@ -56,6 +56,7 @@ Router.route("/rooms/:room/files/:path*", function() {
 	Session.set("filesBeingUploaded", []);
 	Session.set("newFolder", false);
 	Session.set("path", this.params.path ? this.params.path : "/");
+	Session.set("noOfActive", 0);
 	var room = Rooms.findOne(this.params.room);
 	Session.set("search", this.params.query.search);
 	if(!this.params.path) {
@@ -68,6 +69,26 @@ Router.route("/rooms/:room/files/:path*", function() {
 		});
 	}
 	this.render("files", {data:{_id: room._id, files: files}});
+});
+
+Router.route("/rooms/:room/quizzes/:path*", function() {
+	Session.set("navActive", "quizzes");
+	Session.set("newFolder", false);
+	Session.set("path", this.params.path ? this.params.path : "/");
+	Session.set("noOfActive", 0);
+	var room = Rooms.findOne(this.params.room);
+	Session.set("search", this.params.query.search);
+	if(!this.params.path) {
+		var files = room.quizzes;
+	} else {
+		var files = room.quizzes;
+		var pathSplit = this.params.path.split("/");
+		pathSplit.forEach(function(p) {
+			files = _.findWhere(files, {name: p}).files;
+		});
+	}
+	console.log(files);
+	this.render("quizzes", {data:{_id: room._id, files: files}});
 });
 
 Router.route("/admin/users", function() {

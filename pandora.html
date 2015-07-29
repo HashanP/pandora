@@ -489,22 +489,18 @@
 			{{#if isActive name}}
 				<td class="bb">
 					<i class="fa fa-2x fa-folder-o"></i>
-					<input type="text"  class="form-control input-rename-folder">
+					<input type="text"  class="form-control input-rename">
 				</td>
 			{{else}}
 						<td>
 							<i class="fa fa-2x fa-folder-o"></i>
-							<span class="filename"><a href="/rooms/{{../_id}}/files{{path}}{{name}}">{{name}}</a></span>
+							<span class="filename">{{name}}</span>
 						</td>
 						{{/if}}
-						<td></td>
-						<td>
-							<div class="pull-right">
-								<button class="btn btn-edit btn-sm rename-folder">Rename</button>
-								<button class="btn btn-danger btn-sm del"><i class="fa fa-trash-o"></i> Delete</button>	
-							</div>
-						</td>
-					</tr>
+						{{#if isNavActive "files"}}
+						<td>--</td>
+						{{/if}}
+						</tr>
 				{{else}}
 					<tr>
 							{{#if isActive _id}}
@@ -521,16 +517,88 @@
 								</td>
 							{{/if}}
 								{{#with FS.GetFile "files" _id}}
-								<td><span class="filesize">{{humanFileSize this.size}}</span></td>
-								<td>
-									<div class="pull-right">
-										<button class="btn btn-edit btn-sm rename">Rename</button>
-										{{#FS.DeleteButton class="btn btn-danger btn-sm"}}<i class="fa fa-trash-o"></i> Delete{{/FS.DeleteButton}}
-									</div>
-								</td>
+									<td><span class="filesize">{{humanFileSize this.size}}</span></td>
 								{{/with}}
-						</tr>
+		</tr>
+	{{/if}}
+</template>
+
+<template name="tools">
+	{{#if eq noOfActive 0}}
+		{{else}}
+		{{#if eq noOfActive 1}}
+			<button class="btn btn-edit rename">Rename</button>
+		{{/if}}
+		<button class="btn btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+	{{/if}}
+	<button class="btn btn-success create-folder"><i class="fa fa-folder-o"></i> New Folder</button>
+</template>
+
+<template name="quizzes">
+	{{> navigation}}
+	<div class="circle"></div>
+	<div class="col-md-12">
+		<div class="panel panel-super panel-primary files">
+			<div class="panel-heading">
+				{{> breadcrumb}}		
+				<div class="pull-right">
+				{{> tools}}
+				<button class="btn btn-success create-quiz"><i class="fa fa-upload"></i> Create Quiz</button>
+				{{> search}}
+			 </div>
+			</div>
+		</div>
+	</div>
+	{{> explorer files=files _id=_id}}
+</template>
+
+<template name="breadcrumb">
+	<ol class="breadcrumb">
+		{{#each pathSplit}}
+			{{#if active}}
+				<li class="active">{{name}}</li>
+			{{else}}
+				<li><a href="/rooms/{{../_id}}/{{navActive}}{{p}}">{{name}}</a></li>
+			{{/if}}
+		{{/each}}
+	</ol>
+</template>
+
+<template name="explorer">
+	<div class="col-md-12">
+		<div class="panel panel-default panel-super files">
+			<div class="panel-heading">
+			 </div>
+			<table class="table files">
+				<thead>
+					<tr>
+						<th>Name</th>
+						{{#if isNavActive "files"}}
+							<th>Size</th>
+						{{/if}}
+					</tr>
+				</thead>
+				<tbody>
+				{{#each filesF}}
+					{{>item .}}
+				{{/each}}
+					{{#if newFolder}}
+					<tr class="create-new-folder">
+						<td>
+							<i class="fa fa-2x fa-folder-o"></i> 
+							<input type="text" placeholder="Enter folder name" class="pull-right input-create-folder form-control">
+						</td>
+						<td></td>
+					</tr>
 					{{/if}}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</template>
+
+<template name="search">
+	<input type="text" placeholder="Search..." value="{{search}}" class="form-control search zeplin">
 </template>
 
 <template name="files">
@@ -541,12 +609,13 @@
 	<div class="panel panel-super panel-default">
 		<div class="panel-heading">
 			<div class="col-lg-3 col-md-4">
-				<input type="text" placeholder="Search..." value="{{search}}" class="form-control search">
+				{{> breadcrumb}}
 			</div>
 			<div class="col-lg-9 col-md-8">
 				<div class="pull-right">
-					<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
-					<button class="btn btn-success create-folder"><i class="fa fa-folder-o"></i> New Folder</button>
+				{{> tools}}
+				<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
+				{{> search}}
 				</div>
 			</div>
 		</div>
@@ -570,40 +639,7 @@
 			</div>
 		</div>
 		{{/if}}
-		<div class="col-md-12">
-			<div class="panel panel-default panel-super files">
-				<div class="panel-heading">
-					<ol class="breadcrumb">
-						{{#each pathSplit}}
-							{{#if active}}
-								<li class="active">{{name}}</li>
-							{{else}}
-								<li><a href="/rooms/{{../_id}}/files{{p}}">{{name}}</a></li>
-							{{/if}}
-						{{/each}}
-					</ol>
-				</div>
-				
-			<table class="table files">
-				<tbody>
-				{{#each filesF}}
-					{{>item .}}
-				{{/each}}
-					{{#if newFolder}}
-					<tr class="create-new-folder">
-						<td>
-								<i class="fa fa-2x fa-folder-o"></i> 
-								<input type="text" placeholder="Enter folder name" class="pull-right input-create-folder form-control">
-						</td>
-						<td></td>
-						<td>
-								</td>
-					</tr>
-					{{/if}}
-				</tbody>
-			</table>
-			</div>
-		</div>
+		{{> explorer files=files _id=_id}}
 	</div>
 </template>	
 
