@@ -534,6 +534,73 @@
 	<button class="btn btn-success create-folder"><i class="fa fa-folder-o"></i> New Folder</button>
 </template>
 
+<template name="create_quiz">
+	{{>navigation}}
+	<div class="container-small">
+		<div class="col-md-12">
+			<div class="panel panel-primary">
+				<div class="panel-body questions">
+					<div class="question-list">
+					{{#each withIndex questions}}
+						{{#if isActive index}}
+						<div class="question active" data-index="{{index}}">
+							<form class="form-horizontal">
+								<div class="form-group">
+									<label class="col-sm-2">Question Title</label>
+									<div class="col-sm-10">
+										<input type="text" value="{{title}}" class="form-control question-title">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2">Help Text</label>
+									<div class="col-sm-10">
+										<input type="text" value="{{help_text}}" class="form-control help-text">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2">Question Type</label>
+									<div class="col-sm-10">
+										<select class="form-control type" value="{{type}}">
+											<option value="text">Text</option>
+											<option value="fill_in_the_blanks">Fill in the Blanks</option>
+											<option value="number">Number</option>
+											<option value="list">Select from list</option>
+											<option value="checkboxes">Checkboxes</option>
+											<option value="date">Date</option>
+										</select>
+									</div>
+								</div> 
+								<button class="btn btn-primary done" type="button">Done</button>
+							</form>
+						</div>
+						{{else}}
+							<div class="question" data-index="{{index}}">
+								<div class="row">
+									<div class="col-md-10">
+										{{#if eq type "text"}}
+											<strong>{{title}}</strong>
+											<input type="text" disabled class="form-control">
+										{{/if}}
+									</div>
+									<div class="col-md-2">
+										<div class="pull-right">
+											<button class="btn btn-default btn-sm edit"><i class="fa fa-pencil"></i></button>
+										</div>	
+									</div>
+								</div>
+							</div>
+						{{/if}}	
+					{{/each}}
+					</div>
+					<div class="form-bottom">
+						<button class="btn btn-default add-question">Add Question</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
 <template name="quizzes">
 	{{> navigation}}
 	<div class="circle"></div>
@@ -543,7 +610,17 @@
 				{{> breadcrumb}}		
 				<div class="pull-right">
 				{{> tools}}
-				<button class="btn btn-success create-quiz"><i class="fa fa-upload"></i> Create Quiz</button>
+				<div class="btn-group">
+					<button type="button" class="btn btn-default btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Create Quiz <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="?create=quiz">Standard Quiz</a></li>
+						<li><a href="?create=vocab_quiz">Vocabulary Quiz</a></li>
+						<li><a href="?create=crossword">Crossword</a></li>
+						<li><a href="?create=wordsearch">Wordsearch</a></li>
+					</ul>
+				</div>
 				{{> search}}
 			 </div>
 			</div>

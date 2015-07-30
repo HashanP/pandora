@@ -485,3 +485,50 @@ button {
 .filename {
 	cursor:default;
 }
+
+.questions.panel-body {
+	padding:0px;
+	padding-top:15px;
+}
+
+.question {
+	padding-left:15px;
+	padding-right:15px;
+	padding-top:15px;
+	padding-bottom:15px;
+}
+
+.question.active {
+	background:#f5f5f5;
+}
+
+.question:hover {
+	background:#f5f5f5;
+}
+
+.form-bottom {
+	padding-left:15px;
+	padding-right:15px;
+	padding-bottom:15px;
+	padding-top:15px;
+}
+
+.question:not(.active) {
+	cursor:move;
+}
+
+.question:not(.active) input[disabled] {
+	cursor: move !important;
+}
+
+.question input.form-control[disabled] {
+	background-color:white;
+}
+
+.question:not(:hover) .btn.edit {
+	display:none;	
+}
+
+.question .btn.edit {
+	background: #f5f5f5;
+}

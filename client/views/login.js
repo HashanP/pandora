@@ -114,6 +114,51 @@ Template.explorer.helpers({
 	}
 });
 
+Template.create_quiz.helpers({
+	questions: function() {
+		return questions.list();
+	},
+	isActive: function(x) {
+		return Session.equals("active", x);
+	}
+});
+
+Template.create_quiz.events({
+	"click .add-question": function() {
+		questions.push({
+			title: "",
+			help_text: "",
+			type: "text",
+			_id: Meteor.uuid()
+		});
+		Session.set("active", questions.length -1);
+	},
+	"click .done": function() {
+		console.log($(".question-title").val());
+		questions.splice(this.index, 1, {
+			title: $(".question-title").val(),
+			help_text: $(".help-text").val(),
+			type: $(".type").val(),
+		});
+		Session.set("active", undefined);
+	},
+	"click .edit": function() {
+		Session.set("active", this.index);
+	},
+}); 
+
+Template.create_quiz.onRendered(function() {
+	$(".question-list").sortable({
+		update: function(e, ui) {
+			var i = $(ui.item).index();
+			var c = parseInt($(ui.item).data("index"));
+			$(this).sortable("cancel");
+			var p = questions.splice(i, 0, questions.splice(c, 1)[0]);
+			Deps.flush();
+		}
+	});
+});
+
 Template.search.helpers({
 	search: function() {
 		return Session.get("search");

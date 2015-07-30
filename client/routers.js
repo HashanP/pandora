@@ -53,12 +53,10 @@ Router.route("/rooms/:room/notices/create/poll", function() {
 
 Router.route("/rooms/:room/files/:path*", function() {
 	Session.set("navActive", "files");
+	Session.set("path", this.params.path ? this.params.path : "/");
 	Session.set("filesBeingUploaded", []);
 	Session.set("newFolder", false);
-	Session.set("path", this.params.path ? this.params.path : "/");
 	Session.set("noOfActive", 0);
-	var room = Rooms.findOne(this.params.room);
-	Session.set("search", this.params.query.search);
 	if(!this.params.path) {
 		var files = room.files;
 	} else {
@@ -68,16 +66,15 @@ Router.route("/rooms/:room/files/:path*", function() {
 			files = _.findWhere(files, {name: p}).files;
 		});
 	}
+	var room = Rooms.findOne(this.params.room);
+	Session.set("search", this.params.query.search);
 	this.render("files", {data:{_id: room._id, files: files}});
 });
 
 Router.route("/rooms/:room/quizzes/:path*", function() {
 	Session.set("navActive", "quizzes");
-	Session.set("newFolder", false);
 	Session.set("path", this.params.path ? this.params.path : "/");
-	Session.set("noOfActive", 0);
 	var room = Rooms.findOne(this.params.room);
-	Session.set("search", this.params.query.search);
 	if(!this.params.path) {
 		var files = room.quizzes;
 	} else {
@@ -87,8 +84,15 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 			files = _.findWhere(files, {name: p}).files;
 		});
 	}
-	console.log(files);
-	this.render("quizzes", {data:{_id: room._id, files: files}});
+	if(this.params.query.create === "quiz") {
+		window.questions = new ReactiveArray();
+		this.render("create_quiz", {data: {files: files}});	
+	} else {
+		Session.set("search", this.params.query.search);
+		Session.set("newFolder", false);
+		Session.set("noOfActive", 0);
+		this.render("quizzes", {data:{_id: room._id, files: files}});
+	}
 });
 
 Router.route("/admin/users", function() {
