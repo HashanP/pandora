@@ -534,6 +534,36 @@
 	<button class="btn btn-success create-folder"><i class="fa fa-folder-o"></i> New Folder</button>
 </template>
 
+<template name="option">
+	<div class="opt">
+		<div class="input-group">
+			{{#if list}}
+				<span class="input-group-addon">
+					{{#if active}}
+						<input name="inly" class="active" type="radio" checked>
+					{{else}}
+						<input name="inly" class="active" type="radio">
+					{{/if}}
+				</span>
+			{{/if}}
+			{{#if checkboxes}}
+				<span class="input-group-addon">
+					{{#if active}}
+						<input name="inly" class="active" type="checkbox" checked>
+					{{else}}
+						<input name="inly" class="active" type="checkbox">
+					{{/if}}	
+				</span>
+			{{/if}}
+			<input class="form-control option" type="{{type}}" value="{{value}}">	
+			<span class="input-group-btn">
+				<button type="button" class="btn btn-default remove"><i class="fa fa-times"></i></button>
+			</span>
+		</div>
+		<br>
+	</div>
+</template>
+
 <template name="create_quiz">
 	{{>navigation}}
 	<div class="container-small">
@@ -561,30 +591,132 @@
 									<label class="col-sm-2">Question Type</label>
 									<div class="col-sm-10">
 										<select class="form-control type" value="{{type}}">
-											<option value="text">Text</option>
+											{{#if eq activeType "text"}}
+												<option value="text" selected>Text</option>
+											{{else}}
+												<option value="text">Text</option>
+											{{/if}}
 											<option value="fill_in_the_blanks">Fill in the Blanks</option>
-											<option value="number">Number</option>
-											<option value="list">Select from list</option>
-											<option value="checkboxes">Checkboxes</option>
+											{{#if eq activeType "number"}}
+												<option value="number" selected>Number</option>
+											{{else}}
+												<option value="number">Number</option>
+											{{/if}}
+											{{#if eq activeType "list"}}
+												<option value="list" selected>Select from list</option>
+											{{else}}
+												<option value="list">Select from list</option>
+											{{/if}}
+											{{#if eq activeType "checkboxes"}}
+												<option value="checkboxes" selected>Checkboxes</option>
+											{{else}}
+												<option value="checkboxes">Checkboxes</option>
+											{{/if}}
 											<option value="date">Date</option>
 										</select>
 									</div>
 								</div> 
+								{{#if eq activeType "text"}}
+									<div class="form-group">
+										<label class="col-sm-2">Correct Answer(s)</label>
+										<div class="col-sm-10">
+											{{#each options}}
+												{{>option type="text" value=.}}
+											{{/each}}	
+											<div class="add-option-container">
+												<input class="form-control add-option" placeholder="Add valid answer" disabled>
+											</div>
+										</div>
+									</div>
+									{{else}}{{#if eq activeType "number"}}
+									<div class="form-group">
+										<label class="col-sm-2">Correct Answer(s)</label>
+										<div class="col-sm-10">
+											{{#each options}}
+												{{>option type="number" value=.}}
+											{{/each}}	
+											<div class="add-option-container">
+												<input class="form-control add-option" placeholder="Add valid answer" disabled>
+											</div>
+										</div>
+									</div>
+									{{else}}
+									{{#if eq activeType "list"}}
+									<div class="form-group">
+										<label class="col-sm-2">Options</label>
+										<div class="col-sm-10">
+											{{#each options}}
+												{{>option type="text" value=value list=true active=active}}
+											{{/each}}
+											<div class="add-option-container">
+												<input class="form-control add-option" placeholder="Add option" disabled>
+											</div>
+										</div>
+									</div>
+									{{/if}}
+									{{/if}}
+								{{/if}}
+								{{#if eq activeType "checkboxes"}}
+									<div class="form-group">
+										<label class="col-sm-2">Options</label>
+										<div class="col-sm-10">
+											{{#each options}}
+												{{>option type="text" value=value checkboxes=true active=active}}
+											{{/each}}
+											<div class="add-option-container">
+												<input class="form-control add-option" placeholder="Add option" disabled>
+											</div>
+										</div>
+									</div>
+								{{/if}}
+								{{#if eq activeType "fill_in_the_blanks"}}
+									<div class="form-group">
+										<div class="col-md-12">
+											<div contenteditable="true" class="form-control fill-in-the-blanks"></div>
+										</div>
+									</div>
+								{{/if}}
+								{{#if error}}
+									<p><strong><span class="text-danger">{{error}}</span></strong></p>
+								{{/if}}
 								<button class="btn btn-primary done" type="button">Done</button>
-							</form>
+								<button class="cancel btn btn-default" type="button">Cancel</button>
+							 </form>
 						</div>
 						{{else}}
 							<div class="question" data-index="{{index}}">
 								<div class="row">
 									<div class="col-md-10">
+										<strong>{{title}}</strong>
+										<p>{{help_text}}</p>
 										{{#if eq type "text"}}
-											<strong>{{title}}</strong>
 											<input type="text" disabled class="form-control">
+										{{/if}}
+										{{#if eq type "number"}}
+											<input type="number" disabled class="form-control">
+										{{/if}}
+										{{#if eq type "list"}}
+											{{#each options}}
+												<input type="radio" name="inly{{index}}" disabled>
+												{{value}}
+												<br>
+											{{/each}}
+										{{/if}}	
+										{{#if eq type "checkboxes"}}
+											{{#each options}}
+												<input type="checkbox" name="inly{{index}}" disabled>
+												{{value}}
+												<br>
+											{{/each}}
+										{{/if}}
+										{{#if eq type "fill_in_the_blanks"}}
+											{{{fillInTheBlanks text}}}
 										{{/if}}
 									</div>
 									<div class="col-md-2">
 										<div class="pull-right">
 											<button class="btn btn-default btn-sm edit"><i class="fa fa-pencil"></i></button>
+											<button class="btn btn-default btn-sm del"><i class="fa fa-times"></i></button>
 										</div>	
 									</div>
 								</div>

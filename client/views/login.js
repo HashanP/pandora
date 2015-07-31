@@ -1,3 +1,73 @@
+var saveSelection, restoreSelection;
+
+if (window.getSelection && document.createRange) {
+    saveSelection = function(containerEl) {
+        var range = window.getSelection().getRangeAt(0);
+        var preSelectionRange = range.cloneRange();
+        preSelectionRange.selectNodeContents(containerEl);
+        preSelectionRange.setEnd(range.startContainer, range.startOffset);
+        var start = preSelectionRange.toString().length;
+
+        return {
+            start: start,
+            end: start + range.toString().length
+        };
+    };
+
+    restoreSelection = function(containerEl, savedSel) {
+        var charIndex = 0, range = document.createRange();
+        range.setStart(containerEl, 0);
+        range.collapse(true);
+        var nodeStack = [containerEl], node, foundStart = false, stop = false;
+
+        while (!stop && (node = nodeStack.pop())) {
+            if (node.nodeType == 3) {
+                var nextCharIndex = charIndex + node.length;
+                if (!foundStart && savedSel.start >= charIndex && savedSel.start <= nextCharIndex) {
+                    range.setStart(node, savedSel.start - charIndex);
+                    foundStart = true;
+                }
+                if (foundStart && savedSel.end >= charIndex && savedSel.end <= nextCharIndex) {
+                    range.setEnd(node, savedSel.end - charIndex);
+                    stop = true;
+                }
+                charIndex = nextCharIndex;
+            } else {
+                var i = node.childNodes.length;
+                while (i--) {
+                    nodeStack.push(node.childNodes[i]);
+                }
+            }
+        }
+
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+} else if (document.selection) {
+    saveSelection = function(containerEl) {
+        var selectedTextRange = document.selection.createRange();
+        var preSelectionTextRange = document.body.createTextRange();
+        preSelectionTextRange.moveToElementText(containerEl);
+        preSelectionTextRange.setEndPoint("EndToStart", selectedTextRange);
+        var start = preSelectionTextRange.text.length;
+
+        return {
+            start: start,
+            end: start + selectedTextRange.text.length
+        }
+    };
+
+    restoreSelection = function(containerEl, savedSel) {
+        var textRange = document.body.createTextRange();
+        textRange.moveToElementText(containerEl);
+        textRange.collapse(true);
+        textRange.moveEnd("character", savedSel.end);
+        textRange.moveStart("character", savedSel.start);
+        textRange.select();
+    };
+}
+
 Template.login.events({
 	"form submit": function(e) {
 		e.preventDefault();
@@ -120,6 +190,17 @@ Template.create_quiz.helpers({
 	},
 	isActive: function(x) {
 		return Session.equals("active", x);
+	},
+	activeType: function() {
+		return Session.get("activeType");
+	},
+	error: function() {
+		return Session.get("error");
+	},
+	fillInTheBlanks: function(y) {
+		return y.replace(/\[[a-zA-Z,\s\d]+\]/g, function(match) {
+			return "<input type=\"text\" class=\"form-control fill-me\" disabled>";
+		});
 	}
 });
 
@@ -129,23 +210,101 @@ Template.create_quiz.events({
 			title: "",
 			help_text: "",
 			type: "text",
-			_id: Meteor.uuid()
+			_id: Meteor.uuid(),
+			options: [""]
 		});
+		Session.set("activeType", "text");
 		Session.set("active", questions.length -1);
 	},
 	"click .done": function() {
-		console.log($(".question-title").val());
-		questions.splice(this.index, 1, {
+		var p = {
 			title: $(".question-title").val(),
 			help_text: $(".help-text").val(),
 			type: $(".type").val(),
-		});
+		};
+		if(Session.equals("activeType", "fill_in_the_blanks")) {
+			p.text = $(".fill-in-the-blanks").text();
+		} else {
+			p.options = _.map($(".opt"), function(el) {
+				if(Session.equals("activeType", "list") || Session.equals("activeType", "checkboxes")) {
+					if($(el).find(".active").is(":checked")) {
+						return {value: $(el).find(".option").val(), active: true};
+					} else {
+						return {value: $(el).find(".option").val()};
+					}
+				} else {
+					return $(el).find(".option").val();
+				}
+			});
+		}
+		if(p.title === "") {
+			return Session.set("error", "Question title cannot be blank.");
+		} else if(p.options && p.options.length === 0) {
+			return Session.set("error", "There must be at least one correct answer.");
+		} 
+		console.log($(".question-title").val());
+		questions.splice(this.index, 1, p);
 		Session.set("active", undefined);
+		Session.set("error", undefined);
 	},
 	"click .edit": function() {
 		Session.set("active", this.index);
 	},
+	"click .del": function() {
+		questions.splice(this.index, 1);
+	},
+	"click .cancel": function() {
+		if(this.title === "") {
+			questions.pop();
+		}
+		Session.set("active", undefined);
+		Session.set("error", undefined);
+	},
+	"click .add-option-container": function(e) {
+		var c = {
+			type: Session.get("activeType")
+		}
+		if(Session.equals("activeType", "list")) {
+			c.type = "text";
+			c.list = true;
+		} else if(Session.equals("activeType", "checkboxes")) {
+			c.type = "text";
+			c.checkboxes = true;
+		}
+		Blaze.renderWithData(Template.option, c, e.target.parentNode.parentNode, e.target.parentNode); 
+	},
+	"change .type": function(e) {
+		Session.set("activeType", e.target.value);	
+		if(e.target.type === "text") {
+			Session.set("options", [""]);
+		} else if(e.target.type === "number") {
+			Session.set("options", [0]);
+		} else if(e.target.type === "list") {
+			Session.set("options", [{
+				value: "",
+				active: true	
+			}]);
+		} else if(e.target.type === "checkboxes") {
+			Session.set("options", [{
+				value: ""
+			}]);
+		}
+	},
+	"keyup .fill-in-the-blanks": function(e) {
+		var d = saveSelection(e.target);
+		$(e.target).html($(e.target).text().replace(/\[[a-zA-Z,\s\d]+\]/g, function(match) {
+			return "<span class=\"green\">" + match + "</span>";
+		}));
+		restoreSelection(e.target, d);
+	}
 }); 
+
+Template.option.events({
+	"click .remove": function(e) {
+		$(e.target).closest(".opt").remove();
+		Blaze.remove(Blaze.currentView);
+	}
+});
 
 Template.create_quiz.onRendered(function() {
 	$(".question-list").sortable({
@@ -155,7 +314,8 @@ Template.create_quiz.onRendered(function() {
 			$(this).sortable("cancel");
 			var p = questions.splice(i, 0, questions.splice(c, 1)[0]);
 			Deps.flush();
-		}
+		},
+		items: "> .question:not(.active)"
 	});
 });
 

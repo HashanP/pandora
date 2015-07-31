@@ -521,14 +521,27 @@ button {
 	cursor: move !important;
 }
 
-.question input.form-control[disabled] {
+.question:not(.active) input.form-control[disabled] {
 	background-color:white;
 }
 
-.question:not(:hover) .btn.edit {
+.question:not(:hover) .btn.edit, .question:not(:hover) .btn.del {
 	display:none;	
 }
 
-.question .btn.edit {
+.question .btn.edit, .question .btn.del {
 	background: #f5f5f5;
+}
+
+.question.active .add-option[disabled] {
+	cursor: pointer !important;
+}
+
+[contenteditable].form-control {
+	height:auto;
+}
+
+.green {
+	color: #119F11;
+	font-weight: bold;
 }
