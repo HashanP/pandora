@@ -572,8 +572,9 @@
 				<div class="panel-body questions">
 					<div class="question-list">
 					{{#each withIndex questions}}
+						<div class="questiono" data-index="{{index}}">
 						{{#if isActive index}}
-						<div class="question active" data-index="{{index}}">
+						<div class="question active">
 							<form class="form-horizontal">
 								<div class="form-group">
 									<label class="col-sm-2">Question Title</label>
@@ -596,7 +597,11 @@
 											{{else}}
 												<option value="text">Text</option>
 											{{/if}}
-											<option value="fill_in_the_blanks">Fill in the Blanks</option>
+											{{#if eq activeType "fill_in_the_blanks"}}
+												<option value="fill_in_the_blanks" selected>Fill in the Blanks</option>
+											{{else}}
+												<option value="fill_in_the_blanks">Fill in the Blanks</option>
+											{{/if}}
 											{{#if eq activeType "number"}}
 												<option value="number" selected>Number</option>
 											{{else}}
@@ -612,7 +617,6 @@
 											{{else}}
 												<option value="checkboxes">Checkboxes</option>
 											{{/if}}
-											<option value="date">Date</option>
 										</select>
 									</div>
 								</div> 
@@ -672,7 +676,7 @@
 								{{#if eq activeType "fill_in_the_blanks"}}
 									<div class="form-group">
 										<div class="col-md-12">
-											<div contenteditable="true" class="form-control fill-in-the-blanks"></div>
+											<div contenteditable="true" class="form-control fill-in-the-blanks">{{text}}</div>
 										</div>
 									</div>
 								{{/if}}
@@ -684,7 +688,7 @@
 							 </form>
 						</div>
 						{{else}}
-							<div class="question" data-index="{{index}}">
+							<div class="question">
 								<div class="row">
 									<div class="col-md-10">
 										<strong>{{title}}</strong>
@@ -722,11 +726,32 @@
 								</div>
 							</div>
 						{{/if}}	
+						</div>
 					{{/each}}
 					</div>
 					<div class="form-bottom">
 						<button class="btn btn-default add-question">Add Question</button>
+						<button class="btn btn-primary submit pull-right">Save</button>
 					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="quizFilename">
+	<div class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Enter quiz name</h4>
+				</div>
+				<div class="modal-body">
+					<input type="text" class="form-control">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary submit">Save</button>
 				</div>
 			</div>
 		</div>

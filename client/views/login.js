@@ -198,9 +198,9 @@ Template.create_quiz.helpers({
 		return Session.get("error");
 	},
 	fillInTheBlanks: function(y) {
-		return y.replace(/\[[a-zA-Z,\s\d]+\]/g, function(match) {
-			return "<input type=\"text\" class=\"form-control fill-me\" disabled>";
-		});
+		return "<span class=\"just-text\">" + y.replace(/\[[a-zA-Z,\s\."'\d]+\]/g, function(match) {
+			return "</span><input type=\"text\" class=\"form-control fill-me\" disabled><span class=\"just-text\">";
+		}) + "</span>";
 	}
 });
 
@@ -249,6 +249,11 @@ Template.create_quiz.events({
 	},
 	"click .edit": function() {
 		Session.set("active", this.index);
+		if(Session.equals("activeType", "fill_in_the_blanks")) {
+			window.setTimeout(function() {
+				$(".fill-in-the-blanks").trigger("keyup");
+			}, 0);
+		}
 	},
 	"click .del": function() {
 		questions.splice(this.index, 1);
@@ -291,13 +296,28 @@ Template.create_quiz.events({
 		}
 	},
 	"keyup .fill-in-the-blanks": function(e) {
-		var d = saveSelection(e.target);
-		$(e.target).html($(e.target).text().replace(/\[[a-zA-Z,\s\d]+\]/g, function(match) {
+		try {
+			var d = saveSelection(e.target);
+		} catch(e) {}
+		$(e.target).html($(e.target).text().replace(/\[[a-zA-Z,\s\.'"\d]+\]/g, function(match) {
 			return "<span class=\"green\">" + match + "</span>";
 		}));
-		restoreSelection(e.target, d);
+		try {
+			restoreSelection(e.target, d);
+		} catch(e) {}
+	},
+	"click .submit": function() {
+		Modal.show("quizFilename", {_id: Template.instance().data._id});
 	}
 }); 
+
+Template.quizFilename.events({
+	"click .submit": function() {
+		Meteor.call("createQuiz", Template.instance().data._id, Session.get("path"), $(".quiz-title").val(), questions.list());	
+		Modal.hide("quizFilename");
+		Router.go("/rooms/" + Template.instance().data._id + "/quizzes" + (Session.get("path") === "/" ? "/" : "/" + Session.get("path")));
+	}
+});
 
 Template.option.events({
 	"click .remove": function(e) {
@@ -315,8 +335,18 @@ Template.create_quiz.onRendered(function() {
 			var p = questions.splice(i, 0, questions.splice(c, 1)[0]);
 			Deps.flush();
 		},
-		items: "> .question:not(.active)"
+		start: function() {
+			Session.set("active", undefined);
+			if($(".question-title").length !== 0) {
+				if(Blaze.getData($(".question-title").get(0)).title === "") {
+					questions.pop();
+				}
+			}
+		}
 	});
+	if(questions.length === 0) {
+		$(".add-question").trigger("click");
+	}
 });
 
 Template.search.helpers({
