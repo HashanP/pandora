@@ -197,11 +197,19 @@ Template.create_quiz.helpers({
 	error: function() {
 		return Session.get("error");
 	},
-	fillInTheBlanks: function(y) {
-		return "<span class=\"just-text\">" + y.replace(/\[[a-zA-Z,\s\."'\d]+\]/g, function(match) {
-			return "</span><input type=\"text\" class=\"form-control fill-me\" disabled><span class=\"just-text\">";
-		}) + "</span>";
+	active: function() {
+		return Session.equals("active", this.index) ? "active": "";
 	}
+});
+
+UI.registerHelper("fillInTheBlanks", function(y, c) {
+	return "<span class=\"just-text\">" + y.replace(/\[[a-zA-Z,\s\."'\d]+\]/g, function(match) {
+		if(c) {
+			return "</span><input type=\"text\" class=\"form-control fill-me\"><span class=\"just-text\">";
+		} else {
+			return "</span><input type=\"text\" class=\"form-control fill-me\" disabled><span class=\"just-text\">";
+		}
+	}) + "</span>";
 });
 
 Template.create_quiz.events({
@@ -215,6 +223,7 @@ Template.create_quiz.events({
 		});
 		Session.set("activeType", "text");
 		Session.set("active", questions.length -1);
+		$(".question-list").addClass("in-progress");
 	},
 	"click .done": function() {
 		var p = {
@@ -242,6 +251,7 @@ Template.create_quiz.events({
 		} else if(p.options && p.options.length === 0) {
 			return Session.set("error", "There must be at least one correct answer.");
 		} 
+		$(".question-list").removeClass("in-progress");
 		console.log($(".question-title").val());
 		questions.splice(this.index, 1, p);
 		Session.set("active", undefined);
@@ -254,6 +264,7 @@ Template.create_quiz.events({
 				$(".fill-in-the-blanks").trigger("keyup");
 			}, 0);
 		}
+		$(".question-list").addClass(".in-progress");
 	},
 	"click .del": function() {
 		questions.splice(this.index, 1);
@@ -262,8 +273,10 @@ Template.create_quiz.events({
 		if(this.title === "") {
 			questions.pop();
 		}
+		$(".question-list").removeClass("in-progress");
 		Session.set("active", undefined);
 		Session.set("error", undefined);
+	
 	},
 	"click .add-option-container": function(e) {
 		var c = {
@@ -313,7 +326,7 @@ Template.create_quiz.events({
 
 Template.quizFilename.events({
 	"click .submit": function() {
-		Meteor.call("createQuiz", Template.instance().data._id, Session.get("path"), $(".quiz-title").val(), questions.list());	
+		Meteor.call("createQuiz", Template.instance().data._id, Session.get("path"), $(".quiz-title").val(), Array.prototype.slice.call(questions.list()));	
 		Modal.hide("quizFilename");
 		Router.go("/rooms/" + Template.instance().data._id + "/quizzes" + (Session.get("path") === "/" ? "/" : "/" + Session.get("path")));
 	}
@@ -326,6 +339,14 @@ Template.option.events({
 	}
 });
 
+var oldMouseStart = $.ui.sortable.prototype._mouseStart;
+$.ui.sortable.prototype._mouseStart = function(event, overrideHandle, noActivation) {
+   this._trigger("beforestart", event, this._uiHash());
+		if(!event.isDefaultPrevented()) {
+		 oldMouseStart.apply(this, [event, overrideHandle, noActivation]);
+		}
+};
+
 Template.create_quiz.onRendered(function() {
 	$(".question-list").sortable({
 		update: function(e, ui) {
@@ -335,14 +356,20 @@ Template.create_quiz.onRendered(function() {
 			var p = questions.splice(i, 0, questions.splice(c, 1)[0]);
 			Deps.flush();
 		},
-		start: function() {
-			Session.set("active", undefined);
+		beforestart: function(e, ui) {
+			if($(".question-list").is(".in-progress")) {
+				return e.preventDefault();
+			}
+			if(!$(ui.item).is(".active")) {
+				Session.set("active", undefined);
+			}
 			if($(".question-title").length !== 0) {
 				if(Blaze.getData($(".question-title").get(0)).title === "") {
 					questions.pop();
 				}
 			}
-		}
+		},
+		items: "> .questiono:not(.active)"
 	});
 	if(questions.length === 0) {
 		$(".add-question").trigger("click");

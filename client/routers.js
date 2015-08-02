@@ -75,18 +75,29 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 	Session.set("navActive", "quizzes");
 	Session.set("path", this.params.path ? this.params.path : "/");
 	var room = Rooms.findOne(this.params.room);
+	var x, c;
 	if(!this.params.path) {
 		var files = room.quizzes;
 	} else {
-		var files = room.quizzes;
 		var pathSplit = this.params.path.split("/");
-		pathSplit.forEach(function(p) {
-			files = _.findWhere(files, {name: p}).files;
+		x = _.findWhere(room.quizzes, {name:pathSplit[0]});
+		pathSplit.slice(1).forEach(function(p) {
+			if(x.type === "quiz" && p === "attempt") {
+				c = true;
+			} else {
+				files = _.findWhere(x.files, {name: p});
+			}
 		});
 	}
 	if(this.params.query.create === "quiz") {
 		window.questions = new ReactiveArray();
 		this.render("create_quiz", {data: {files: files, _id: room._id}});	
+	} else if(x && x.type === "quiz") {
+		if(c) {
+			this.render("quiz", {data: x});
+		} else {
+			this.render("quizIntro", {data: _.extend(x, {_id: room._id, path: pathSplit.join("/")})});
+		}
 	} else {
 		Session.set("search", this.params.query.search);
 		Session.set("newFolder", false);

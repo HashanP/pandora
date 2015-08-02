@@ -503,7 +503,7 @@
 						</tr>
 				{{else}}
 					<tr>
-							{{#if isActive _id}}
+							{{#if isActive name}}
 							<td class="bb">
 							{{> icon}}
 							<input type="text" class="form-control input-rename">
@@ -572,7 +572,7 @@
 				<div class="panel-body questions">
 					<div class="question-list">
 					{{#each withIndex questions}}
-						<div class="questiono" data-index="{{index}}">
+						<div class="questiono {{active}}" data-index="{{index}}">
 						{{#if isActive index}}
 						<div class="question active">
 							<form class="form-horizontal">
@@ -748,13 +748,73 @@
 					<h4 class="modal-title">Enter quiz name</h4>
 				</div>
 				<div class="modal-body">
-					<input type="text" class="form-control">
+					<input type="text" class="form-control quiz-title">
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-primary submit">Save</button>
 				</div>
 			</div>
 		</div>
+	</div>
+</template>
+
+<template name="quizIntro">
+	{{> navigation}}
+	<div class="container-small">
+		<div class="panel panel-default panel-super">
+			<div class="panel-body">
+				<div class="text-center">
+					<h2>
+						{{name}}
+					</h2>	
+					{{#if attempts}}
+					{{else}}
+						No previous attempts.<br><br>
+					{{/if}}
+					<a href="/rooms/{{_id}}/quizzes/{{path}}/attempt" class="btn btn-primary">Attempt Quiz</a>	
+				</div>
+			</div>	
+		</div>
+	</div>
+</template>
+
+<template name="quiz">
+	{{> navigation}}
+	<div class="container-small">
+		<div class="panel panel-default panel-super">
+			<div class="panel-body">
+			<h2 class="text-center">
+				{{name}}
+			</h2>
+			<form>
+				{{#each withIndex questions}}
+					<div class="form-group">
+						<label>{{title}}</label>	
+						{{#if eq type "text"}}
+							<input type="text" name="question{{index}}" class="form-control">
+						{{/if}}
+						{{#if eq type "number"}}
+							<input type="number" name="question{{index}}" class="form-control">
+						{{/if}}
+						{{#if eq type "list"}}
+							{{#each options}}
+								<input type="radio" name="question{{index}}">{{value}}<br>
+							{{/each}}	
+						{{/if}}
+						{{#if eq type "checkboxes"}} 
+							{{#each options}}
+								<input type="checkbox" name="question{{index}}">{{value}}<br>
+							{{/each}}
+						{{/if}}
+						{{#if eq type "fill_in_the_blanks"}}
+							<br>
+							{{{fillInTheBlanks text true}}}
+						{{/if}}		
+					</div>
+				{{/each}}
+			</form>
+		</div>
+	</div>
 	</div>
 </template>
 

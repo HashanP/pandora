@@ -502,7 +502,7 @@ button {
 	background:#f5f5f5;
 }
 
-.question:hover {
+.question-list:not(.in-progress) .question:hover {
 	background:#f5f5f5;
 }
 
@@ -513,11 +513,11 @@ button {
 	padding-top:15px;
 }
 
-.question:not(.active) {
+.question-list:not(.in-progress) .question:not(.active) {
 	cursor:move;
 }
 
-.question:not(.active) input[disabled] {
+.question-list:not(.in-progress) .question:not(.active) input[disabled] {
 	cursor: move !important;
 }
 
@@ -525,7 +525,8 @@ button {
 	background-color:white;
 }
 
-.question:not(:hover) .btn.edit, .question:not(:hover) .btn.del {
+.question:not(:hover) .btn.edit, .question:not(:hover) .btn.del,
+.question-list.in-progress .question .btn.edit, .question-list.in-progress .question .btn.del {
 	display:none;	
 }
 
