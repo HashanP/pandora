@@ -111,3 +111,8 @@ Meteor.methods({
 		}
 	}
 });
+
+Meteor.publish("vocabQuizzes", function(id) {
+	console.log(id);
+	return VocabQuizzes.find({_id: id});
+});

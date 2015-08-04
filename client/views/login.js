@@ -156,6 +156,12 @@ Template.notices.helpers({
 	}
 });
 
+Template.vocabQuiz.helpers({
+	questions: function() {
+		return VocabQuizzes.findOne(Template.instance().data.quizId).questions;
+	}
+});
+
 var search = function(folder, searc) {
 	var results = [];
 	folder.forEach(function(n) {
@@ -199,6 +205,51 @@ Template.create_quiz.helpers({
 	},
 	active: function() {
 		return Session.equals("active", this.index) ? "active": "";
+	},
+	inProgress: function() {
+		return Session.get("active") !== undefined ? "in-progress" : "";
+	}
+});
+
+Template.quiz.events({
+	"click .submit": function(e) {
+		var obj = {score:0, questions: []};
+		_.each($(".question"), function(el) {
+			var c = Blaze.getData(el);
+			if(c.type === "text" || c.type === "number") {
+				c.answer = $(el).find("input").val();
+				if(c.options.indexOf(c.answer) !== -1) {
+					c.correct = true;
+					obj.score++;
+				}
+			} else if(c.type === "list" || c.type ==="checkboxes") {
+				c.answer = _.map($(el).find("input[checked]"), function(i) {
+					return $(i).val();
+				});
+				if(_.difference(c.answer, _.pluck(_.where(c.options, {active: true}), "text"))) {
+					c.correct = true;
+					obj.score++;
+				}
+			} else {
+				c.marks = 0;
+				var t = _.map($(el).find("input"), function(d) {
+					return $(d).val();
+				});
+				_.each(c.text.match(/\[[a-zA-Z,\s\."'\d]+\]/g), function(a, i) {
+					var g = a.substring(1, a.length-1);
+					if(g === t[i]) {
+						c.marks++;
+						obj.score++;
+					}	
+				});	
+				if(c.marks === t.length) {
+					c.correct = true;
+				}
+			}	
+			obj.questions.push(c);
+		});
+		Meteor.call("attemptQuiz", Template.instance().data._id, Session.get("path"), obj);
+		console.log(obj);
 	}
 });
 
@@ -218,12 +269,11 @@ Template.create_quiz.events({
 			title: "",
 			help_text: "",
 			type: "text",
-			_id: Meteor.uuid(),
 			options: [""]
 		});
 		Session.set("activeType", "text");
 		Session.set("active", questions.length -1);
-		$(".question-list").addClass("in-progress");
+		$(".add-question").attr("disabled", true);
 	},
 	"click .done": function() {
 		var p = {
@@ -251,11 +301,11 @@ Template.create_quiz.events({
 		} else if(p.options && p.options.length === 0) {
 			return Session.set("error", "There must be at least one correct answer.");
 		} 
-		$(".question-list").removeClass("in-progress");
 		console.log($(".question-title").val());
 		questions.splice(this.index, 1, p);
 		Session.set("active", undefined);
 		Session.set("error", undefined);
+		$(".add-question").attr("disabled", false);
 	},
 	"click .edit": function() {
 		Session.set("active", this.index);
@@ -264,7 +314,6 @@ Template.create_quiz.events({
 				$(".fill-in-the-blanks").trigger("keyup");
 			}, 0);
 		}
-		$(".question-list").addClass(".in-progress");
 	},
 	"click .del": function() {
 		questions.splice(this.index, 1);
@@ -273,10 +322,9 @@ Template.create_quiz.events({
 		if(this.title === "") {
 			questions.pop();
 		}
-		$(".question-list").removeClass("in-progress");
 		Session.set("active", undefined);
 		Session.set("error", undefined);
-	
+		$(".add-question").attr("disabled", false);
 	},
 	"click .add-option-container": function(e) {
 		var c = {
@@ -324,12 +372,42 @@ Template.create_quiz.events({
 	}
 }); 
 
+Template.createVocabQuiz.events({
+	"click .add-question": function() {
+		Blaze.render(Template.vocabQuestion, $(".vocab-questions tbody").get(0));
+	},
+	"click .submit": function() {
+		_.each($(".vocab-questions tbody").children(), function(tr) {
+			questions.push({
+				question: $(tr).find(".vocab-question").val(),
+				answer: $(tr).find(".vocab-answer").val()
+			});
+		});
+		Modal.show("quizFilename", {_id: Template.instance().data._id});
+	}
+});
+
+Template.vocabQuestion.events({
+	"click .del": function(e) {
+		$(e.target).closest("tr").remove();	
+	}
+});
+
 Template.quizFilename.events({
 	"click .submit": function() {
-		Meteor.call("createQuiz", Template.instance().data._id, Session.get("path"), $(".quiz-title").val(), Array.prototype.slice.call(questions.list()));	
+		if(Router.current().params.query.create === "quiz") {
+			Meteor.call("createQuiz", Template.instance().data._id, Session.get("path"), $(".quiz-title").val(), Array.prototype.slice.call(questions.list()));	
+		} else {
+			Meteor.call("createVocabQuiz", Template.instance().data._id, Session.get("path"), $(".quiz-title").val(), Array.prototype.slice.call(questions.list()));		
+		}
 		Modal.hide("quizFilename");
 		Router.go("/rooms/" + Template.instance().data._id + "/quizzes" + (Session.get("path") === "/" ? "/" : "/" + Session.get("path")));
 	}
+});
+
+Template.vocabQuiz.onCreated(function()	{
+	console.log(this.data);
+	this.subscribe("vocabQuizzes", this.data.quizId);
 });
 
 Template.option.events({
@@ -342,9 +420,7 @@ Template.option.events({
 var oldMouseStart = $.ui.sortable.prototype._mouseStart;
 $.ui.sortable.prototype._mouseStart = function(event, overrideHandle, noActivation) {
    this._trigger("beforestart", event, this._uiHash());
-		if(!event.isDefaultPrevented()) {
-		 oldMouseStart.apply(this, [event, overrideHandle, noActivation]);
-		}
+	 oldMouseStart.apply(this, [event, overrideHandle, noActivation]);
 };
 
 Template.create_quiz.onRendered(function() {
@@ -358,18 +434,10 @@ Template.create_quiz.onRendered(function() {
 		},
 		beforestart: function(e, ui) {
 			if($(".question-list").is(".in-progress")) {
-				return e.preventDefault();
-			}
-			if(!$(ui.item).is(".active")) {
-				Session.set("active", undefined);
-			}
-			if($(".question-title").length !== 0) {
-				if(Blaze.getData($(".question-title").get(0)).title === "") {
-					questions.pop();
-				}
+				throw "Haha";
 			}
 		},
-		items: "> .questiono:not(.active)"
+		items: "> .question:not(.active)"
 	});
 	if(questions.length === 0) {
 		$(".add-question").trigger("click");
@@ -611,7 +679,8 @@ Template.item.onRendered(function() {
 			top: -23,
 			left: -23
 		},
-		containment: ".contents"
+		containment: ".contents",
+		distance: 10
 	});
 	Template.instance().$("tr.folder").droppable({
 		hoverClass:"ui-hover",
@@ -767,4 +836,42 @@ Template.imageList.events({
 		Session.set("imageTitle", this.title);
 		$("#show-image").modal("show");
 	}
+});
+
+Template.vocabQuiz.events({
+  "keyup input.answer": function(e) {
+    console.log("here");
+    if(e.target.dataset.answer.toLowerCase().split(",").map(function(str) {return str.trim()}).indexOf(e.target.value.toLowerCase().trim()) !== -1) {
+      if(!e.target.classList.contains("correct")) {
+        e.target.classList.add("correct");
+        e.target.classList.remove("incorrect");
+        if(e.target.nextElementSibling && e.target.nextElementSibling.nextElementSibling) {
+          e.target.nextElementSibling.nextElementSibling.focus();
+        } else {
+          e.target.blur();
+        }
+      }
+    } else if(e.target.value !== "") {
+      e.target.classList.add("incorrect");
+      e.target.classList.remove("correct");
+    }
+  },
+  "click .reveal-answers": function() {
+      Template.instance().findAll("input").forEach(function(el) {
+        if(!el.classList.contains("correct")) {
+          el.classList.add("incorrect");
+        }
+        el.value = el.dataset.answer;
+        el.readOnly = true;
+      });
+		},
+  "click .reset": function() {
+      Template.instance().findAll("input").forEach(function(el) {
+        el.value = "";
+        el.classList.remove("correct");
+        el.classList.remove("incorrect");
+        el.readOnly = false;
+      });
+    return false;
+  }
 });

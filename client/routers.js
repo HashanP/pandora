@@ -92,12 +92,18 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 	if(this.params.query.create === "quiz") {
 		window.questions = new ReactiveArray();
 		this.render("create_quiz", {data: {files: files, _id: room._id}});	
+	} else if(this.params.query.create === "vocab_quiz") {
+		window.questions = new ReactiveArray();
+		this.render("createVocabQuiz", {data: {files: files, _id: room._id}});
 	} else if(x && x.type === "quiz") {
 		if(c) {
-			this.render("quiz", {data: x});
+			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
+			this.render("quiz", {data: _.extend(x, {_id: room._id})});
 		} else {
 			this.render("quizIntro", {data: _.extend(x, {_id: room._id, path: pathSplit.join("/")})});
 		}
+	} else if(x && x.type === "vocabQuiz") {
+		this.render("vocabQuiz", {data: {_id: room._id, quizId: x.quizId, title: x.name}});
 	} else {
 		Session.set("search", this.params.query.search);
 		Session.set("newFolder", false);

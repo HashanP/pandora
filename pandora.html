@@ -287,11 +287,6 @@
 							{{else}}
 								<li><a href="/rooms/{{_id}}/quizzes">Quizzes</a></li>
 							{{/if}}
-							{{#if isNavActive "gradebook"}}
-								<li class="active"><a href="/rooms/{{_id}}/gradebook">Gradebook</a></li>
-							{{else}}
-								<li><a href="/rooms/{{_id}}/gradebook">Gradebook</a></li>
-							{{/if}}
 						</ul>
 					</nav>
 			</div>
@@ -564,17 +559,84 @@
 	</div>
 </template>
 
+<template name="vocabQuestion">
+	<tr class="vocab-unit">
+		<td>
+			<input type="text" class="vocab-question" placeholder="Write question here...">
+		</td>
+		<td>
+			<input type="text" class="vocab-answer" placeholder="Write answer here...">
+		</td>
+		<td>
+			<button class="btn btn-default btn-xs del"><i class="fa fa-times"></i></button>
+			<button class="btn btn-default btn-xs move"><i class="fa fa-navicon"></i></button>
+		</td>
+	</tr>
+</template>
+
+<template name="createVocabQuiz">
+	{{>navigation}}
+	<div class="container-small">
+		<div class="col-md-12">
+			<div class="panel panel-primary">
+				<div class="panel-body">
+					<table class="table table-bordered table-condensed vocab-questions">
+						<thead>
+							<tr>
+								<th>Question</th>
+								<th>Answer</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{{>vocabQuestion}}
+						</tbody>	
+					</table>
+					<button class="btn btn-default add-question">Add Question</button>
+					<div class="pull-right">
+						<button class="btn btn-primary submit">Submit</button>	
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+</template>
+
+<template name="vocabQuiz">
+	{{>navigation}}
+	<div class="container-small">
+		<div class="col-md-12">
+			<div class="panel panel-primary">
+				<div class="panel-body">
+					<div class="pull-right">
+						<button type="button" class="btn btn-sm btn-default reset">Reset</button>
+						<button type="button" class="btn btn-sm btn-warning reveal-answers">Reveal Answers</button>	
+					</div>
+					<br><br>
+					<div class="row vocab-quiz">
+						{{#each questions}}
+							<div class="col-xs-6 col-sm-6 col-md-3 col-lg-2">
+								{{question}}
+							</div>
+							<input type="text" class="answer col-xs-6 col-sm-6 col-md-3 col-lg-2" data-answer="{{answer}}">
+						{{/each}}
+					</div>
+				</div>	
+			</div>
+		</div>
+	</div>
+</template>
+
 <template name="create_quiz">
 	{{>navigation}}
 	<div class="container-small">
 		<div class="col-md-12">
 			<div class="panel panel-primary">
 				<div class="panel-body questions">
-					<div class="question-list">
+					<div class="question-list {{inProgress}}">
 					{{#each withIndex questions}}
-						<div class="questiono {{active}}" data-index="{{index}}">
+						<div class="question {{active}}" data-index="{{index}}">
 						{{#if isActive index}}
-						<div class="question active">
 							<form class="form-horizontal">
 								<div class="form-group">
 									<label class="col-sm-2">Question Title</label>
@@ -632,7 +694,8 @@
 											</div>
 										</div>
 									</div>
-									{{else}}{{#if eq activeType "number"}}
+								{{/if}}
+								{{#if eq activeType "number"}}
 									<div class="form-group">
 										<label class="col-sm-2">Correct Answer(s)</label>
 										<div class="col-sm-10">
@@ -644,8 +707,8 @@
 											</div>
 										</div>
 									</div>
-									{{else}}
-									{{#if eq activeType "list"}}
+								{{/if}}
+								{{#if eq activeType "list"}}
 									<div class="form-group">
 										<label class="col-sm-2">Options</label>
 										<div class="col-sm-10">
@@ -657,8 +720,6 @@
 											</div>
 										</div>
 									</div>
-									{{/if}}
-									{{/if}}
 								{{/if}}
 								{{#if eq activeType "checkboxes"}}
 									<div class="form-group">
@@ -686,9 +747,7 @@
 								<button class="btn btn-primary done" type="button">Done</button>
 								<button class="cancel btn btn-default" type="button">Cancel</button>
 							 </form>
-						</div>
 						{{else}}
-							<div class="question">
 								<div class="row">
 									<div class="col-md-10">
 										<strong>{{title}}</strong>
@@ -701,14 +760,14 @@
 										{{/if}}
 										{{#if eq type "list"}}
 											{{#each options}}
-												<input type="radio" name="inly{{index}}" disabled>
+												<input type="radio" disabled>
 												{{value}}
 												<br>
 											{{/each}}
 										{{/if}}	
 										{{#if eq type "checkboxes"}}
 											{{#each options}}
-												<input type="checkbox" name="inly{{index}}" disabled>
+												<input type="checkbox" disabled>
 												{{value}}
 												<br>
 											{{/each}}
@@ -724,7 +783,6 @@
 										</div>	
 									</div>
 								</div>
-							</div>
 						{{/if}}	
 						</div>
 					{{/each}}
@@ -763,6 +821,13 @@
 	<div class="container-small">
 		<div class="panel panel-default panel-super">
 			<div class="panel-body">
+				<div class="col-md-12">
+				<div class="pull-right">
+					<a class="btn btn-default">Edit</a>
+					<button class="btn btn-default">Results</button>
+				</div>
+			</div>
+
 				<div class="text-center">
 					<h2>
 						{{name}}
@@ -783,12 +848,13 @@
 	<div class="container-small">
 		<div class="panel panel-default panel-super">
 			<div class="panel-body">
+			<div class="col-md-12">
 			<h2 class="text-center">
 				{{name}}
 			</h2>
 			<form>
 				{{#each withIndex questions}}
-					<div class="form-group">
+					<div class="form-group question">
 						<label>{{title}}</label>	
 						{{#if eq type "text"}}
 							<input type="text" name="question{{index}}" class="form-control">
@@ -798,12 +864,12 @@
 						{{/if}}
 						{{#if eq type "list"}}
 							{{#each options}}
-								<input type="radio" name="question{{index}}">{{value}}<br>
+								<input type="radio" name="question{{index}}" value="{{value}}">{{value}}<br>
 							{{/each}}	
 						{{/if}}
 						{{#if eq type "checkboxes"}} 
 							{{#each options}}
-								<input type="checkbox" name="question{{index}}">{{value}}<br>
+								<input type="checkbox" name="question{{index}}" value="{{value}}">{{value}}<br>
 							{{/each}}
 						{{/if}}
 						{{#if eq type "fill_in_the_blanks"}}
@@ -812,7 +878,9 @@
 						{{/if}}		
 					</div>
 				{{/each}}
+				<button type="button" class="btn btn-primary submit">Submit</button>
 			</form>
+			</div>
 		</div>
 	</div>
 	</div>
@@ -900,38 +968,38 @@
 	<div class="circle"></div>
 	<div class="row">
 		<div class="col-md-12">
-	<div class="panel panel-super panel-default">
-		<div class="panel-heading">
-			<div class="col-lg-3 col-md-4">
-				{{> breadcrumb}}
-			</div>
-			<div class="col-lg-9 col-md-8">
-				<div class="pull-right">
-				{{> tools}}
-				<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
-				{{> search}}
+			<div class="panel panel-super panel-default">
+				<div class="panel-heading">
+					<div class="col-lg-3 col-md-4">
+						{{> breadcrumb}}
+					</div>
+					<div class="col-lg-9 col-md-8">
+						<div class="pull-right">
+							{{> tools}}
+							<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
+							{{> search}}
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	</div>
-	</div>
 	<div class="row">
-				<br><br><br>
+		<br><br><br>
 		{{#if filesBeingUploaded}}
-		<div class="col-md-12">
-			<div class="well file-uploads">
-				{{#each filesBeingUploaded}}
-					{{#with FS.GetFile "files" this}}
-						<h4>{{this.name}}</h4>
-						{{> FS.UploadProgressBar bootstrap=true class="progress-bar-success progress-bar-striped active" showPercent=true}}					
-					{{/with}}
-				{{/each}}
-				{{#if finished}}
-					<button class="btn btn-primary done">Done</button>
-				{{/if}}
+			<div class="col-md-12">
+				<div class="well file-uploads">
+					{{#each filesBeingUploaded}}
+						{{#with FS.GetFile "files" this}}
+							<h4>{{this.name}}</h4>
+							{{> FS.UploadProgressBar bootstrap=true class="progress-bar-success progress-bar-striped active" showPercent=true}}					
+						{{/with}}
+					{{/each}}
+					{{#if finished}}
+						<button class="btn btn-primary done">Done</button>
+					{{/if}}
+				</div>
 			</div>
-		</div>
 		{{/if}}
 		{{> explorer files=files _id=_id}}
 	</div>
