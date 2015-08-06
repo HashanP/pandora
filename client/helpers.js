@@ -18,6 +18,10 @@ UI.registerHelper("britishDate", function(date) {
   return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
 });
 
+UI.registerHelper("localDate", function(date) {
+	return date.toLocaleTimeString() + " " + date.toLocaleDateString();
+});
+
 UI.registerHelper("humanFileSize", function(bytes) {
     var thresh = 1024;
     if(Math.abs(bytes) < thresh) {

@@ -593,8 +593,12 @@ button {
   background-color:goldenrod;
 }
 
-.vocab-quiz div:nth-child(6n-5) {
+.vocab-quiz div:nth-child(3n-2) {
 	border-left: 1px solid black;	
+}
+
+.vocab-quiz input:nth-child(3n) {
+	border-right: 1px solid black;
 }
 
 .vocab-quiz input.correct {
@@ -633,3 +637,10 @@ button {
   }
 }
 
+.ui-sortable-helper {
+    display: table;
+}
+
+.vocab-questions tr {
+	background:white;
+}

@@ -113,6 +113,13 @@ Meteor.methods({
 });
 
 Meteor.publish("vocabQuizzes", function(id) {
-	console.log(id);
 	return VocabQuizzes.find({_id: id});
+});
+
+Meteor.publish("quizzes", function(id) {
+	return Quizzes.find({_id: id});
+});
+
+Meteor.publish("quizResults", function(id) {
+	return QuizResults.find({quizId: id, userId: this.userId});	
 });

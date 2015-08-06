@@ -75,7 +75,7 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 	Session.set("navActive", "quizzes");
 	Session.set("path", this.params.path ? this.params.path : "/");
 	var room = Rooms.findOne(this.params.room);
-	var x, c;
+	var x, c, attemptId;
 	if(!this.params.path) {
 		var files = room.quizzes;
 	} else {
@@ -83,7 +83,13 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 		x = _.findWhere(room.quizzes, {name:pathSplit[0]});
 		pathSplit.slice(1).forEach(function(p) {
 			if(x.type === "quiz" && p === "attempt") {
-				c = true;
+				c = 1;
+			} else if(c === 2) {
+				attemptId = p;
+			} else if(x.type === "quiz" && p ==="attempts") {
+				c = 2;
+			}  else if(x.type === "quiz" && p === "results") {
+				c = 3;
 			} else {
 				files = _.findWhere(x.files, {name: p});
 			}
@@ -96,11 +102,17 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 		window.questions = new ReactiveArray();
 		this.render("createVocabQuiz", {data: {files: files, _id: room._id}});
 	} else if(x && x.type === "quiz") {
-		if(c) {
+		if(c === 1) {
 			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
-			this.render("quiz", {data: _.extend(x, {_id: room._id})});
+			this.render("quiz", {data: {_id: room._id, name: x.name, quizId: x.quizId}});
+		} else if(c === 2) {
+			this.render("quizResult", {data: {_id: room._id, quizId: x.quizId, name: x.name, attemptId: attemptId}});
+		} else if(c ===3) {			
+			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
+			Session.set("criterion", "best");
+			this.render("quizBarGraph", {data: {_id: room._id, quizId: x.quizId, name: x.name}});	
 		} else {
-			this.render("quizIntro", {data: _.extend(x, {_id: room._id, path: pathSplit.join("/")})});
+			this.render("quizIntro", {data: {_id: room._id, name: x.name, path: pathSplit.join("/"), quizId: x.quizId}});
 		}
 	} else if(x && x.type === "vocabQuiz") {
 		this.render("vocabQuiz", {data: {_id: room._id, quizId: x.quizId, title: x.name}});

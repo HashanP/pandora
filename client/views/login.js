@@ -183,9 +183,9 @@ Template.explorer.helpers({
 	},
 	filesF: function() {
 		if(!Session.get("search")) {
-			return Template.instance().data.files;
+			return _.sortBy(Template.instance().data.files, "name");
 		} else {
-			return search(Template.instance().data.files, Session.get("search"));
+			return _.sortBy(search(Template.instance().data.files, Session.get("search")), "name");
 		}
 	}
 });
@@ -211,46 +211,190 @@ Template.create_quiz.helpers({
 	}
 });
 
+Template.quiz.onCreated(function() {
+	this.subscribe("quizzes", this.data.quizId);
+});
+
+Template.quiz.helpers({
+	questions: function() {
+		return Quizzes.findOne(Template.instance().data.quizId).questions;
+	}
+});
+
 Template.quiz.events({
 	"click .submit": function(e) {
-		var obj = {score:0, questions: []};
+		var obj = [];
 		_.each($(".question"), function(el) {
 			var c = Blaze.getData(el);
+			var y = {};
 			if(c.type === "text" || c.type === "number") {
-				c.answer = $(el).find("input").val();
-				if(c.options.indexOf(c.answer) !== -1) {
-					c.correct = true;
-					obj.score++;
-				}
-			} else if(c.type === "list" || c.type ==="checkboxes") {
-				c.answer = _.map($(el).find("input[checked]"), function(i) {
+				y.answer = $(el).find("input").val();
+			} else if(c.type === "list") {
+				y.answer = $(el).find("input[checked]").val();
+			} else if(c.type ==="checkboxes") {
+				y.answer = _.map($(el).find("input[checked]"), function(i) {
 					return $(i).val();
 				});
-				if(_.difference(c.answer, _.pluck(_.where(c.options, {active: true}), "text"))) {
-					c.correct = true;
-					obj.score++;
-				}
 			} else {
-				c.marks = 0;
-				var t = _.map($(el).find("input"), function(d) {
+				y.answer = _.map($(el).find("input"), function(d) {
 					return $(d).val();
 				});
-				_.each(c.text.match(/\[[a-zA-Z,\s\."'\d]+\]/g), function(a, i) {
-					var g = a.substring(1, a.length-1);
-					if(g === t[i]) {
-						c.marks++;
-						obj.score++;
-					}	
-				});	
-				if(c.marks === t.length) {
-					c.correct = true;
-				}
 			}	
-			obj.questions.push(c);
+			obj.push(y);
 		});
-		Meteor.call("attemptQuiz", Template.instance().data._id, Session.get("path"), obj);
-		console.log(obj);
+		var y = Template.instance().data;
+		Meteor.call("attemptQuiz", Template.instance().data.quizId, obj, function(err, id) {
+			Router.go("/rooms/" + y._id + "/quizzes" + (Session.get("path") === "/" ? Session.get("path") : "/" + Session.get("path")) + "/attempts/" + id);
+		});
 	}
+});
+
+Template.quizResult.onCreated(function() {
+	this.subscribe("quizResults", this.data.quizId);
+});
+
+Template.quizResult.helpers({
+	questions: function() {
+		return QuizResults.findOne(Template.instance().data.attemptId).questions;
+	},
+	correct: function() {
+		return this.correct ? "has-success" : "has-danger";
+	}
+});
+
+Template.quizIntro.onCreated(function() {
+	this.subscribe("quizResults", this.data.quizId);
+});
+
+Template.quizIntro.helpers({
+	previousAttempts: function() {
+		return _.sortBy(QuizResults.find({quizId: Template.instance().data.quizId, userId: Meteor.userId()}).fetch(), "date").reverse();	
+	},
+	path: function() {
+		return Session.get("path");
+	}
+});
+
+Template.quizBarGraph.onCreated(function() {
+	this.subscribe("quizResults", this.data.quizId);
+});
+
+Template.quizBarGraph.events({
+	"change .criterion": function(e) {
+		Session.set("criterion", e.target.value);
+	}
+});
+
+Template.quizBarGraph.onRendered(function() {
+	var c = Template.instance().data;
+	this.autorun(function() {
+		var attempts = QuizResults.find({quizId: c.quizId}).fetch();
+		var attemptsObj = {};
+		attempts.forEach(function(attempt) {
+			if(!(attempt.userId in attemptsObj)) {
+				attemptsObj[attempt.userId] = {
+					first: attempt,
+					best: attempt,
+					last: attempt,
+					average:[attempt]
+				};
+			} else {
+				if(attemptsObj[attempt.userId].first.date > attempt.date) {
+					attemptsObj[attempt.userId].first = attempt;
+				}
+				if(attemptsObj[attempt.userId].last.date < attempt.date) {
+					attemptsObj[attempt.userId].last = attempt;
+				}
+				if(attemptsObj[attempt.userId].best.score < attempt.score) {
+					attemptsObj[attempt.userId].best = attempt;
+				}
+				attemptsObj[attempt.userId].average.push(attempt);
+			}
+		});
+		console.log(attempts);
+		console.log(attemptsObj);
+		var attempts2 = [];
+		for(var key in attemptsObj) {
+			if(Session.equals("criterion", "first")) {
+				attempts2.push({user: Meteor.users.findOne(key).username, score: attemptsObj[key].first.score, max: attemptsObj[key].first.max, _id: attemptsObj[key].first._id});	
+			} else if(Session.equals("criterion", "average")) {
+				attempts2.push({user: Meteor.users.findOne(key).username, score: attemptsObj[key].average.reduce(function(a, b) {return a + b}) / attemptsObj[key].length});
+			} else if(Session.equals("criterion", "last")) {
+				attempts2.push({user: Meteor.users.findOne(key).username, score: attemptsObj[key].last.score, max: attemptsObj[key].last.max, _id: attemptsObj[key].last._id});
+			} else if(Session.equals("criterion", "best")) {
+				attempts2.push({user: Meteor.users.findOne(key).username, score: attemptsObj[key].best.score, max: attemptsObj[key].best.max, _id: attemptsObj[key].best._id});
+			}
+		}
+		console.log(attempts2);
+		 var HEIGHT = attempts2.length * 30;
+			
+		$(".svg svg").remove();
+ var canvas = d3.select($(".svg").get(0))
+      .append('svg')
+      .attr({viewBox:"0 0 907 " + (HEIGHT + 70)});
+
+      var color = d3.scale.quantize()
+      .domain([0, 1])
+      .range(colorbrewer.RdYlGn[9]);
+
+      var xscale = d3.scale.linear()
+      .domain([0, 1])
+      .range([0,722]);
+
+      var yscale = d3.scale.linear()
+      .domain([0, attempts2.length])
+      .range([0, HEIGHT + 6]);
+
+      var	yAxis = d3.svg.axis();
+      yAxis
+      .orient('left')
+      .scale(yscale)
+      .tickSize(4)
+      .tickFormat(function(d,i){ return attempts2[i].user; })
+      .tickValues(d3.range(attempts2.length));
+
+var formatPercent = d3.format(".0%");
+
+      var	xAxis = d3.svg.axis();
+      xAxis
+      .orient('bottom')
+      .scale(xscale)
+      .tickFormat(formatPercent);
+      //.tickValues([0].concat(quiz.questions.map(function(d,i){return i +1})));
+
+      var x_xis = canvas.append('g')
+      .attr("transform", "translate(149,"+ (HEIGHT + 16) +")")
+      .attr('id','xaxis')
+      .call(xAxis);
+
+      var y_xis = canvas.append('g')
+      .attr("transform", "translate(149,16)")
+      .attr('id','yaxis')
+      .call(yAxis);
+
+      y_xis.selectAll("text").attr("dy", "1.25em");
+
+      var chart = canvas.append('g')
+      .attr("transform", "translate(149.7,0)")
+      .attr('id','bars')
+      .selectAll('rect')
+      .data(attempts2)
+      .enter()
+      .append('rect')
+      .attr('height',19)
+      .on('mouseover', function(d){
+        d3.select(this).style({fill:d3.rgb(color(d.score/d.max)).darker(0.35)})
+      })
+      .on('mouseout', function(d){
+        d3.select(this).style({fill:color(d.score/d.max)})
+      })
+      .on('click', function(d) {
+        Router.go("/rooms/" + c._id + "/quizzes/" + Session.get("path") + "/attempts/" + d._id)
+      }.bind(this))
+      .attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
+      .style('fill',function(d,i){ return color(d.score/d.max); })
+      .attr('width',function(d){ return xscale(d.score/d.max); });
+	});
 });
 
 UI.registerHelper("fillInTheBlanks", function(y, c) {
@@ -269,7 +413,7 @@ Template.create_quiz.events({
 			title: "",
 			help_text: "",
 			type: "text",
-			options: [""]
+			possibleTextAnswers: [""]
 		});
 		Session.set("activeType", "text");
 		Session.set("active", questions.length -1);
@@ -283,22 +427,27 @@ Template.create_quiz.events({
 		};
 		if(Session.equals("activeType", "fill_in_the_blanks")) {
 			p.text = $(".fill-in-the-blanks").text();
+		} else if(Session.equals("activeType", "text")) {
+			p.possibleTextAnswers = _.map($(".opt"), function(el) {
+				return $(el).find(".option").val();
+			});
+		} else if(Session.equals("activeType", "number")) {
+			p.possibleNumberAnswers = _.map($(".opt"), function(el) {
+				return $(el).find(".option").val();
+			});
 		} else {
 			p.options = _.map($(".opt"), function(el) {
-				if(Session.equals("activeType", "list") || Session.equals("activeType", "checkboxes")) {
-					if($(el).find(".active").is(":checked")) {
-						return {value: $(el).find(".option").val(), active: true};
-					} else {
-						return {value: $(el).find(".option").val()};
-					}
+				if($(el).find(".active").is(":checked")) {
+					return {value: $(el).find(".option").val(), active: true};
 				} else {
-					return $(el).find(".option").val();
+					return {value: $(el).find(".option").val()};
 				}
 			});
 		}
 		if(p.title === "") {
 			return Session.set("error", "Question title cannot be blank.");
-		} else if(p.options && p.options.length === 0) {
+		} else if((p.options && p.options.length === 0) || (p.possibleTextAnswers && p.possibleTextAnswers.length === 0) || 
+			(p.possibleNumberAnswers && p.possibleNumberAnswers.length === 0)) {
 			return Session.set("error", "There must be at least one correct answer.");
 		} 
 		console.log($(".question-title").val());
@@ -836,6 +985,13 @@ Template.imageList.events({
 		Session.set("imageTitle", this.title);
 		$("#show-image").modal("show");
 	}
+});
+
+Template.createVocabQuiz.onRendered(function() {
+	$(".vocab-questions tbody").sortable({
+		handle:".move",
+		cancel:""
+	});
 });
 
 Template.vocabQuiz.events({
