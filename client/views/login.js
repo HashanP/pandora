@@ -100,7 +100,7 @@ Template["/subjects"].helpers({
 });
 
 Template.notices.onRendered(function() {
-	var n = function() {
+/*	var n = function() {
 		console.log("hi");
 		 $('.slimScrollBar, .slimScrollRail').remove();
 		$(".super").slimScroll({
@@ -115,7 +115,7 @@ Template.notices.onRendered(function() {
 	if(this.data.text) {
 		$(".create-text").modal("show")
 	}
-	$('[data-toggle="popover"]').popover();
+	$('[data-toggle="popover"]').popover();*/
 });
 
 Template.notices.events({
@@ -159,6 +159,21 @@ Template.notices.helpers({
 Template.vocabQuiz.helpers({
 	questions: function() {
 		return VocabQuizzes.findOne(Template.instance().data.quizId).questions;
+	},
+	path: function() {
+		return Session.get("path");
+	}
+});
+
+Template.createVocabQuiz.onCreated(function() {
+	if(this.data.quizId) {
+		this.subscribe("vocabQuizzes", this.data.quizId);
+	}
+});
+
+Template.createVocabQuiz.helpers({
+	questions: function() {
+		VocabQuizzes.findOne(Template.instance().data.quizId).questions;
 	}
 });
 
@@ -458,6 +473,7 @@ Template.create_quiz.events({
 	},
 	"click .edit": function() {
 		Session.set("active", this.index);
+		Session.set("activeType", window.questions.list()[this.index].type);
 		if(Session.equals("activeType", "fill_in_the_blanks")) {
 			window.setTimeout(function() {
 				$(".fill-in-the-blanks").trigger("keyup");
@@ -517,7 +533,12 @@ Template.create_quiz.events({
 		} catch(e) {}
 	},
 	"click .submit": function() {
-		Modal.show("quizFilename", {_id: Template.instance().data._id});
+		$(".question.active .done").trigger("click");
+		window.setTimeout(function() {
+			if($(".text-danger").length === 0) {
+				Modal.show("quizFilename", {_id: Template.instance().data._id});
+			}
+		});
 	}
 }); 
 
@@ -572,6 +593,17 @@ $.ui.sortable.prototype._mouseStart = function(event, overrideHandle, noActivati
 	 oldMouseStart.apply(this, [event, overrideHandle, noActivation]);
 };
 
+Template.create_quiz.onCreated(function() {
+	Session.set("error");
+	var quizId = this.data.quizId;
+	this.subscribe("quizzes", quizId, function() {
+		var t = Quizzes.findOne(quizId);
+		t.questions.forEach(function(x) {
+			window.questions.push(x);	
+		});
+	});
+});
+
 Template.create_quiz.onRendered(function() {
 	$(".question-list").sortable({
 		update: function(e, ui) {
@@ -588,7 +620,7 @@ Template.create_quiz.onRendered(function() {
 		},
 		items: "> .question:not(.active)"
 	});
-	if(questions.length === 0) {
+	if(!this.data.quizId) {
 		$(".add-question").trigger("click");
 	}
 });
@@ -658,7 +690,7 @@ Template.tools.events({
 });
 
 Template.explorer.events({
-	"click tr": function(e) {
+	"click tbody tr": function(e) {
 		if($(e.target).is("input")) {
 			return true;
 		}
@@ -703,6 +735,7 @@ Template.explorer.events({
 		Session.set("noOfActive", $("tr.active").length);
 	},
 	"drop tr.folder": function(e, ui) {
+if (!$(e.srcElement).hasClass("ui-draggable-dragging")) { return; }
 		e.preventDefault();
 		if(!$(e.target).is(".active")) {
 			Meteor.call("drop", Template.instance().data._id, Session.get("navActive"), Session.get("path"), $(e.target).find(".filename").text(), _.map($("tr.active"), function(el) {
@@ -710,7 +743,7 @@ Template.explorer.events({
 			}));
 		}
 	},
-	"dblclick tr": function(e) {
+	"dblclick tbody tr": function(e) {
 		if($(e.target).is("input")) {
 			return;
 		}

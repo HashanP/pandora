@@ -90,6 +90,10 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 				c = 2;
 			}  else if(x.type === "quiz" && p === "results") {
 				c = 3;
+			} else if(x.type === "quiz" && p ==="edit") {
+				c = 4;
+			} else if(x.type === "vocabQuiz" && p === "edit") {
+				c = 5;
 			} else {
 				files = _.findWhere(x.files, {name: p});
 			}
@@ -111,11 +115,18 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
 			Session.set("criterion", "best");
 			this.render("quizBarGraph", {data: {_id: room._id, quizId: x.quizId, name: x.name}});	
+		} else if(c === 4) {
+			window.questions = new ReactiveArray();
+			this.render("create_quiz", {data: {files: files, _id: room._id, quizId: x.quizId}});
 		} else {
 			this.render("quizIntro", {data: {_id: room._id, name: x.name, path: pathSplit.join("/"), quizId: x.quizId}});
 		}
 	} else if(x && x.type === "vocabQuiz") {
-		this.render("vocabQuiz", {data: {_id: room._id, quizId: x.quizId, title: x.name}});
+		if(c === 5) {
+			this.render("createVocabQuiz", {data: {files: files, _id: room._id, quizId: x.quizId}});	
+		} else {
+			this.render("vocabQuiz", {data: {_id: room._id, quizId: x.quizId, title: x.name}});
+		}
 	} else {
 		Session.set("search", this.params.query.search);
 		Session.set("newFolder", false);

@@ -267,6 +267,17 @@
 </template>
 
 <template name="navigation">
+	<div class="cover-image">
+		<div class="cover-image-container">
+			<div class="open-drawer">
+			<i class="fa fa-navicon"></i>
+			<div class="cover-info">
+				<div class="cover-title">10a/Fl1</div>
+				<div class="cover-subtitle">Mrs Flower</div>
+			</div>
+			</div>
+		</div>
+	</div>
 	<div class="topbar">
 		<div class="row">
 			<div class="col-md-12">
@@ -306,13 +317,31 @@
 
 <template name="notices">
 	{{> navigation}}
-	<div class="container-small">
+	<div class="container">
+		<div class="col-md-3">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					Upcoming deadlines
+				</div>	
+				<div class="panel-body">
+					There are no upcoming events.
+				</div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					RSS feed <i class="fa fa-rss"></i>
+				</div>
+				<div class="panel-body">
+					<input type="text" class="form-control" readonly value="pandora.com/rss/h4jfk7">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-9">
 		<div class="super">
 		<div class="col-md-12">
-			<div class="panel panel-default panel-super">
-				<div class="panel-body">
+				<div class="topbit">
 					<a href="/rooms/{{_id}}/notices/announcement" class="btn btn-primary">Announcement</a>
-			</div>
+				</div>
 				{{#if isNotEmpty}}
 				<div class="panel-footer">
 					<button class="btn btn-link">Add Image</button>
@@ -326,20 +355,34 @@
 				</div>
 		{{#each notices}}
 			<div class="col-md-12">
-				<div class="panel panel-default panel-super">
+				<div class="panel panel-default">
 					<div class="panel-body">
 						{{#if eq type "post"}}
-							<div class="row">
-							<div class="col-md-1 first">
-								<img class="icon" src='{{GeoPattern "Mr Davey"}}'>
+							<div class="first">
+							<img class="icon" src='{{GeoPattern "Mr Davey"}}'>
 							</div>
-							<div class="col-md-11">
+							<div class="after">
 								<b>Mr Davey</b>
 								<br>
 								{{content}}
-								{{> imageList images=images}}
-								{{> youtubeList youtubes=youtubes}}
-							</div>
+								<br>
+								<div class="images">
+								{{#each images}}
+									<div class="notice-image">
+									<div class="notice-link">{{title}} &#9662;</div>
+									<img src="{{data}}" class="notice-image" width="200px">	
+									<div class="info">4KB, JPEG, 2000x3000</div>
+									</div>
+								{{/each}}
+								</div>
+								<br>
+								{{#each youtubes}}
+								<div class="notice-embed">
+									<div class="info">YouTube</div>
+									<div class="notice-link"><a href="youtube.com/watch?v={{id}}">{{title}}</a></div>
+									<img src="https://img.youtube.com/vi/{{id}}/0.jpg" width="300px">
+								</div>
+								{{/each}}
 							</div>
 						{{/if}}
 					</div>
@@ -364,7 +407,7 @@
       </div>
       <div class="modal-body">
         <p>One fine body&hellip;</p>
-      </div>
+     </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary">Save changes</button>
@@ -468,12 +511,12 @@
 
 <template name="icon">
 	{{#if isImage}}
-		<i class="fa fa-2x fa-file-image-o"></i>
+		<i class="fa fa-file-image-o"></i>
 	{{else}}
 		{{#if isAudio}}
-			<i class="fa fa-2x fa-file-sound-o"></i>
+			<i class="fa fa-file-sound-o"></i>
 		{{else}}
-			<i class="fa fa-2x fa-file-o"></i>
+			<i class="fa fa-file-o"></i>
 		{{/if}}
 	{{/if}}	
 </template>
@@ -482,13 +525,15 @@
 	{{#if isFolder}}
 		<tr class="folder">
 			{{#if isActive name}}
+				<td>
+					<i class="fa fa-folder-o"></i>
+				</td>
 				<td class="bb">
-					<i class="fa fa-2x fa-folder-o"></i>
-					<input type="text"  class="form-control input-rename">
+					<input type="text"  class="form-control input-rename input-sm">
 				</td>
 			{{else}}
 						<td>
-							<i class="fa fa-2x fa-folder-o"></i>
+							<i class="fa fa-folder-o"></i></td><td>
 							<span class="filename">{{name}}</span>
 						</td>
 						{{/if}}
@@ -499,13 +544,17 @@
 				{{else}}
 					<tr>
 							{{#if isActive name}}
-							<td class="bb">
+							<td>
 							{{> icon}}
-							<input type="text" class="form-control input-rename">
+							</td>
+							<td class="bb">
+							<input type="text" class="form-control input-sm input-rename">
 							</td>
 							{{else}}			
 								<td>
 								{{> icon}}										
+								</td>
+								<td>
 							<span class="filename">
 									{{name}}
 								</span>
@@ -589,7 +638,13 @@
 							</tr>
 						</thead>
 						<tbody>
-							{{>vocabQuestion}}
+							{{#if quizId}}
+								{{#each questions}}
+									{{>vocabQuestion}}	
+								{{/each}}
+							{{else}}
+								{{>vocabQuestion}}
+							{{/if}}
 						</tbody>	
 					</table>
 					<button class="btn btn-default add-question">Add Question</button>
@@ -610,6 +665,7 @@
 				<div class="panel-body">
 					<div class="pull-right">
 						<button type="button" class="btn btn-sm btn-default reset">Reset</button>
+						<a href="/rooms/{{_id}}/quizzes/{{path}}/edit" type="button" class="btn btn-sm btn-default edit">Edit</a>
 						<button type="button" class="btn btn-sm btn-primary reveal-answers">Reveal Answers</button>	
 					</div>
 					<br><br>
@@ -845,7 +901,7 @@
 			<div class="panel-body">
 				<div class="col-md-12">
 				<div class="pull-right">
-					<a class="btn btn-default">Edit</a>
+					<a href="/rooms/{{_id}}/quizzes/{{path}}/edit" class="btn btn-default">Edit</a>
 					<a href="/rooms/{{_id}}/quizzes/{{path}}/results" class="btn btn-default">Results</a>
 				</div>
 			</div>
@@ -949,10 +1005,12 @@
 <template name="quizzes">
 	{{> navigation}}
 	<div class="circle"></div>
-	<div class="col-md-12">
-		<div class="panel panel-super panel-primary files">
-			<div class="panel-heading">
-				{{> breadcrumb}}		
+	<div class="container">
+		<div class="row">
+				<div class="col-md-4">
+					{{> breadcrumb}}		
+				</div>
+				<div class="col-md-8">
 				<div class="pull-right">
 				{{> tools}}
 				<div class="btn-group">
@@ -967,15 +1025,16 @@
 					</ul>
 				</div>
 				{{> search}}
-			 </div>
+				</div>
 			</div>
 		</div>
+		<br>
+		{{> explorer files=files _id=_id}}
 	</div>
-	{{> explorer files=files _id=_id}}
 </template>
 
 <template name="breadcrumb">
-	<ol class="breadcrumb">
+<!--	<ol class="breadcrumb">
 		{{#each pathSplit}}
 			{{#if active}}
 				<li class="active">{{name}}</li>
@@ -983,7 +1042,16 @@
 				<li><a href="/rooms/{{../_id}}/{{navActive}}{{p}}">{{name}}</a></li>
 			{{/if}}
 		{{/each}}
-	</ol>
+	</ol>-->
+	<div class="path">
+	{{#each pathSplit}}
+		{{#if active}}
+			{{name}}
+		{{else}}
+			<a href="/rooms/{{../_id}}/{{navActive}}{{p}}">{{name}}</a>	>
+		{{/if}}
+	{{/each}}	
+	</div>
 </template>
 
 <template name="explorer">
@@ -992,6 +1060,7 @@
 			<table class="table files">
 				<thead>
 					<tr>
+						<th></th>
 						<th>Name</th>
 						{{#if isNavActive "files"}}
 							<th>Size</th>
@@ -1024,42 +1093,38 @@
 <template name="files">
 	{{> navigation}}
 	<div class="circle"></div>
-	<div class="row">
-		<div class="col-md-12">
-			<div class="panel panel-super panel-default">
-				<div class="panel-heading">
-					<div class="col-lg-3 col-md-4">
-						{{> breadcrumb}}
-					</div>
-					<div class="col-lg-9 col-md-8">
-						<div class="pull-right">
-							{{> tools}}
-							<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
-							{{> search}}
+	<div class="container">
+			<div class="row">
+						<div class="col-md-4">
+							{{> breadcrumb}}
 						</div>
+						<div class="col-md-8">
+							<div class="pull-right">
+								{{> tools}}
+								<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
+								{{> search}}
+							</div>
+						</div>
+			</div>
+		<div class="row">
+			<br>
+			{{#if filesBeingUploaded}}
+				<div class="col-md-12">
+					<div class="well file-uploads">
+						{{#each filesBeingUploaded}}
+							{{#with FS.GetFile "files" this}}
+								<h4>{{this.name}}</h4>
+								{{> FS.UploadProgressBar bootstrap=true class="progress-bar-success progress-bar-striped active" showPercent=true}}					
+							{{/with}}
+						{{/each}}
+						{{#if finished}}
+							<button class="btn btn-primary done">Done</button>
+						{{/if}}
 					</div>
 				</div>
-			</div>
+			{{/if}}
+			{{> explorer files=files _id=_id}}
 		</div>
-	</div>
-	<div class="row">
-		<br><br><br>
-		{{#if filesBeingUploaded}}
-			<div class="col-md-12">
-				<div class="well file-uploads">
-					{{#each filesBeingUploaded}}
-						{{#with FS.GetFile "files" this}}
-							<h4>{{this.name}}</h4>
-							{{> FS.UploadProgressBar bootstrap=true class="progress-bar-success progress-bar-striped active" showPercent=true}}					
-						{{/with}}
-					{{/each}}
-					{{#if finished}}
-						<button class="btn btn-primary done">Done</button>
-					{{/if}}
-				</div>
-			</div>
-		{{/if}}
-		{{> explorer files=files _id=_id}}
 	</div>
 </template>	
 
