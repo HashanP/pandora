@@ -122,6 +122,10 @@ Meteor.publish("files", function(room) {
 Meteor.users.before.remove(function(userId, doc) {
 	Rooms.update({}, {$pull: {students: doc._id, teachers: doc._id}}, {multi:true});
 });
+
+Quizzes.after.remove(function(userId, doc) {
+	QuizResults.remove({quizId: doc._id});
+});
 					
 Accounts.onCreateUser(function(options, user) { 
 	user.schoolId = options.profile.schoolId; 
