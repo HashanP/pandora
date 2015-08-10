@@ -533,10 +533,16 @@ Template.create_quiz.events({
 		} catch(e) {}
 	},
 	"click .submit": function() {
+		var data = Template.instance().data;
 		$(".question.active .done").trigger("click");
 		window.setTimeout(function() {
 			if($(".text-danger").length === 0) {
-				Modal.show("quizFilename", {_id: Template.instance().data._id});
+				if(data.quizId) {
+					Quizzes.update(data.quizId, {$set: {questions: Array.prototype.slice.call(questions.list())}});		
+					Router.go("/rooms/" + data._id + "/quizzes" + (Session.get("path") === "/" ? "/" : "/" + Session.get("path")));
+				} else {
+					Modal.show("quizFilename", data);
+				}
 			}
 		});
 	}
@@ -553,7 +559,12 @@ Template.createVocabQuiz.events({
 				answer: $(tr).find(".vocab-answer").val()
 			});
 		});
-		Modal.show("quizFilename", {_id: Template.instance().data._id});
+		if(Template.instance().data.quizId) {
+			VocabQuizzes.update(Template.instance().data.quizId, {$set: {questions: Array.prototype.slice.call(questions.list())}});		
+			Router.go("/rooms/" + Template.instance().data._id + "/quizzes" + (Session.get("path") === "/" ? "/" : "/" + Session.get("path")));
+		} else {
+			Modal.show("quizFilename", Template.instance().data);
+		}
 	}
 });
 

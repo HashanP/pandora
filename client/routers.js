@@ -115,14 +115,16 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
 			Session.set("criterion", "best");
 			this.render("quizBarGraph", {data: {_id: room._id, quizId: x.quizId, name: x.name}});	
-		} else if(c === 4) {
+		} else if(c === 4) {	
+			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
 			window.questions = new ReactiveArray();
 			this.render("create_quiz", {data: {files: files, _id: room._id, quizId: x.quizId}});
-		} else {
+		} else { 
 			this.render("quizIntro", {data: {_id: room._id, name: x.name, path: pathSplit.join("/"), quizId: x.quizId}});
 		}
 	} else if(x && x.type === "vocabQuiz") {
 		if(c === 5) {
+			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
 			this.render("createVocabQuiz", {data: {files: files, _id: room._id, quizId: x.quizId}});	
 		} else {
 			this.render("vocabQuiz", {data: {_id: room._id, quizId: x.quizId, title: x.name}});

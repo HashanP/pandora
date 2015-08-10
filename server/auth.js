@@ -22,6 +22,18 @@ Rooms.allow({
 	}
 }); 
 
+Quizzes.allow({
+	update: function(userId, doc) {
+		if(!userId) {
+			return false;
+		} else {
+			var user = Meteor.users.findOne(userId);
+			var room = Rooms.findOne(doc.roomId);
+			return ((user.roles && user.roles.indexOf("admin") !== -1) || (room.teachers.indexOf(userId) !== -1)) && user.schoolId === room.schoolId;
+		}
+	}
+});
+
 Files.on("stored", Meteor.bindEnvironment(function(doc) {
   if(doc.category === "resource") {
 		var room = Rooms.findOne(doc.owner);
