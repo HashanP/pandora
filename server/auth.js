@@ -65,6 +65,11 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 		console.log(path);
 		console.log(doc.path);
 		if(path === doc.path) {
+			var c = _.findWhere(b, {name: doc.name()});
+			if(c) {
+				Files.remove(b[b.indexOf(c)]._id);		
+				b.splice(b.indexOf(c), 1);	
+			}
 			b.push({type: "file", _id: doc._id, name: doc.name()});
 			Rooms.update(doc.owner, {$set: {files: room.files}});
 		} else {
