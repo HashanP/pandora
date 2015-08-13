@@ -23,12 +23,18 @@ Router.onAfterAction(function() {
 });
 
 Router.route("/", function() {
-	this.render("room");
+	Session.set("navbarActive", "home");
+	this.render("home", {data: {subjects:Rooms.find().fetch(), active2: "0"}});
 });
 
-Router.route("/subjects", function() {
-	console.log("here");
-	this.render("/subjects");
+Router.route("/subjects", function() {	
+	Session.set("navbarActive", "home");
+	this.render("home", {data: {subjects: Rooms.find({type: "subject"}).fetch(), active2: "1"}});
+}); 
+
+Router.route("/clubs", function() {	
+	Session.set("navbarActive", "home");
+	this.render("home", {data: {subjects: Rooms.find({type: "club"}).fetch(), active2:"2"}});
 });
 
 Router.route("/rooms/:room", function() {
@@ -137,7 +143,9 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 	}
 });
 
-Router.route("/admin/users", function() {
+Router.route("/admin/users", function() {	
+	Session.set("navbarActive", "admin");
+	Session.set("adminActive", "users");
 	var offset = (this.params.query.page ? parseInt(this.params.query.page, 10)  - 1 : 0) * 10;
 	Session.set("limit", 10);
 	Session.set("offset", offset);
@@ -161,6 +169,7 @@ Router.route("/admin/users/:user/edit", function() {
 });
 
 Router.route("/admin/rooms", function() {
+	Session.set("adminActive", "rooms");
 	Session.set("limit", 10);
 	Session.set("count", Counts.get("rooms"));
 	Session.set("offset", (this.params.query.page ? parseInt(this.params.query.page, 10)  - 1 : 0) * 10);

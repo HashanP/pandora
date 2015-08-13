@@ -1,5 +1,12 @@
 $table-bg-active: #E3F2FF;
 $panel-footer-padding: 6px 10px;
+$navbar-default-bg: #1DA078;
+$navbar-default-link-color: #fff;
+$navbar-default-link-active-bg:rgba(255,255,255,0.33);
+$navbar-default-brand-color: #fff;
+$navbar-default-border: white;
+$navbar-default-link-active-color:$navbar-default-link-color;
+$navbar-default-link-hover-color:#fff; 
 @import ".meteor/local/build/programs/server/assets/packages/reywood_bootstrap3-sass/bootstrap";
 @import "http://fonts.googleapis.com/css?family=Lobster|Titillium+Web";
 @import url(http://fonts.googleapis.com/css?family=Raleway:400,300);
@@ -771,4 +778,27 @@ thead tr th {
   display: inline-block;
   text-align: left;
   vertical-align: middle;
+}
+
+.icon2 {
+	display:block;
+	width: 100%;
+	padding-bottom: 100%;
+	height: 0;
+	position: relative;	
+	text-align:center;
+	text-decoration:none !important;
+}
+
+.icon2 .title {
+	top:85px;
+	position:relative;
+	text-decoration:none !important;
+	color:white;
+	font-size:25px;
+}
+
+.bit-g .active {
+	background-color:#F5AB44 !important;
+	border-color:#F5AB44 !important;
 }

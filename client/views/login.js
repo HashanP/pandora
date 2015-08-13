@@ -93,9 +93,18 @@ Template.base.helpers({
 	}
 });
 
-Template["/subjects"].helpers({
-	subjects: function() {
-		return Rooms.find({type: "subject"}).fetch();
+Template.navbar.helpers({
+	username: function() {
+		return Meteor.user().username;
+	},
+	navbarActive: function() {
+		return Session.get("navbarActive");
+	}
+});
+
+Template.adminNav.helpers({
+	adminActive: function() {
+		return Session.get("adminActive");
 	}
 });
 

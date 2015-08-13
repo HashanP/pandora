@@ -31,8 +31,105 @@
 	</div>
 </template>
 
+<template name="navbar">
+	<nav class="navbar navbar-default navbar-static-top">
+		<div class="container">
+			<div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Pandora</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+				{{#if eq navbarActive "home"}}
+        <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
+				{{else}}
+				<li><a href="/">Home</a></li>
+				{{/if}}
+        <li><a href="#">Planner</a></li>
+				{{#if eq navbarActive "admin"}}
+				<li class="active"><a href="/admin/users">Admin</a></li>
+				{{else}}
+				<li><a href="/admin/users">Admin</a></li>
+				{{/if}}
+			</ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{username}} <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Settings</a></li>
+            <li><a href="#">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div>
+	</nav>
+</template>
+
+<template name="home">
+	{{>navbar}}
+	<div class="container">
+		<div class="col-md-2">
+			<div class="list-group bit-g">
+				{{#if eq active2 "0"}}
+					<a class="list-group-item active" href="/">My Courses</a>
+				{{else}}
+					<a class="list-group-item" href="/">My Courses</a>
+				{{/if}}
+				{{#if eq active2 "1"}}
+					<a class="list-group-item active" href="/subjects">Subjects</a>
+				{{else}}
+					<a class="list-group-item" href="/subjects">Subjects</a>
+				{{/if}}
+				{{#if eq active2 "2"}}
+					<a class="list-group-item active" href="/clubs">Clubs</a>
+				{{else}}
+					<a class="list-group-item" href="/clubs">Clubs</a>
+				{{/if}}
+			</div>	
+		</div>
+		<div class="col-md-10">
+			{{#each subjects}}
+				<div class="col-md-3">
+					<a href="/rooms/{{_id}}/" style="background-image: url({{GeoPattern title}});" class="icon2">
+						<span class="title">{{title}}</span>	
+					</a>	
+				</div>
+			{{/each}}
+		</div>
+	</div>
+</template>
+
+<template name="adminNav">
+	<div class="bit-g list-group">
+		{{#if eq adminActive "users"}}
+			<a class="list-group-item active" href="/admin/users">Users</a>
+		{{else}}
+			<a class="list-group-item" href="/admin/users">Users</a>
+		{{/if}}
+		{{#if eq adminActive "rooms"}}
+			<a class="list-group-item active" href="/admin/rooms">Rooms</a>
+		{{else}}
+			<a class="list-group-item" href="/admin/rooms">Rooms</a>
+		{{/if}}
+	</div>
+</template>
+
 <template name="/admin/users">
-	<div class="row">
+	{{>navbar}}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-2">
+				{{>adminNav}}
+			</div>
+	<div class="col-md-10">
 		<div class="col-md-4 col-lg-3">
 			<input type="text" class="form-control search" placeholder="Search...">
 		</div>
@@ -42,9 +139,7 @@
 				<a href="/admin/users/massUserCreation" class="btn btn-success"><i class="fa fa-users"></i> Mass User Creation</a>	
 			</div>
 		</div>
-	</div>
-	<br>
-	<div class="row">
+		<br><br><br>
 		<div class="col-md-12">	
 			<div class="panel panel-default users">
 				<div class="panel-heading">
@@ -74,6 +169,8 @@
 			</div>
 			{{> pagination route="users"}}
 		</div>
+	</div>
+	</div>
 	</div>
 </template>
 
@@ -112,9 +209,15 @@
 		</ul>
 	</nav>
 </template>
-	
+
 <template name="/admin/rooms">
-	<div class="row">
+	{{>navbar}}
+	<div class="container">
+<div class="row">
+	<div class="col-md-2">
+		{{>adminNav}}
+	</div>
+	<div class="col-md-10">
 		<div class="col-md-4 col-lg-3">
 			<input type="text" class="form-control search" placeholder="Search...">
 		</div>
@@ -123,9 +226,8 @@
 				<a class="btn btn-success" href="/admin/rooms/create"><i class="fa fa-plus"></i> Add</a>
 			</div>	
 		</div>
-	</div>	
 	<br>
-	<div class="row">
+	<br><br>
 		<div class="col-md-12">
 			<div class="panel panel-default users">
 				<div class="panel-heading">
@@ -153,11 +255,19 @@
 			{{> pagination route="rooms"}}
 		</div>
 	</div>
+	</div>
+</div>
 </template>
 
 <template name="/admin/users/create">
+	{{>navbar}}
+	<div class="container">
 	<div class="row">
-		<div class="col-md-12">
+		<div class="col-md-2">
+			{{>adminNav}}
+		</div>
+		<div class="col-md-10">
+			<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
@@ -222,11 +332,19 @@
 			</div>
 		</div>
 	</div>
+	</div>
+	</div>
 </template>
 
 <template name="/admin/rooms/create">
+	{{>navbar}}
+	<div class="container">
 	<div class="row">
-		<div class="col-md-12">
+		<div class="col-md-2">
+			{{>adminNav}}
+		</div>
+		<div class="col-md-10">
+			<div class="col-md-12">
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
@@ -264,17 +382,35 @@
 			</div>
 		</div>
 	</div>
+	</div>
+	</div>
 </template>
 
 <template name="navigation">
 	<div class="cover-image">
 		<div class="cover-image-container">
 			<div class="open-drawer">
-			<i class="fa fa-navicon"></i>
+			<div class="bit-f">
+				<i class="fa fa-navicon"></i>
+			</div>
+			 <ul class="dropdown-menu bit-e" aria-labelledby="dropdownMenu1">
+    <li><a href="/">Home</a></li>
+    <li><a href="#">Settings</a></li>
+    <li><a href="#">Logout</a></li>
+		<li role="separator" class="divider"></li>
+    <li class="dropdown-header">Subjects</li>
+			{{#each subjects}}
+				<li><a href="/rooms/{{_id}}">{{title}}</a></li>	
+			{{/each}}
+		<li role="separator" class="divider"></li>
+		<li class="dropdown-header">Admin</li>
+		<li><a href="/admin/users">Users</a></li>
+		<li><a href="/admin/rooms">Rooms</a></li>
+  </ul>	
+			</div>
 			<div class="cover-info">
 				<div class="cover-title">10a/Fl1</div>
 				<div class="cover-subtitle">Mrs Flower</div>
-			</div>
 			</div>
 		</div>
 	</div>
@@ -305,26 +441,16 @@
 	</div>
 </template>	
 
-<template name="/subjects">
-	<div class="row">
-		{{#each subjects}}
-			<div class="col-md-3 col-lg-2">
-				<img class="icon" src='{{GeoPattern title}}'/>
-			</div>
-		{{/each}}
-	</div>
-</template>
-
 <template name="notices">
 	{{> navigation}}
 	<div class="container">
 		<div class="col-md-3">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					Upcoming deadlines
+					Upcoming
 				</div>	
 				<div class="panel-body">
-					There are no upcoming events.
+					There are nothing upcoming.
 				</div>
 			</div>
 			<div class="panel panel-default">
@@ -340,7 +466,10 @@
 		<div class="super">
 		<div class="col-md-12">
 				<div class="topbit">
-					<a href="/rooms/{{_id}}/notices/announcement" class="btn btn-primary">Announcement</a>
+					<a href="/rooms/{{_id}}/notices/announcement" class="btn btn-default">Announcement</a>
+					<a href="/rooms/{{_id}}/notices/poll" class="btn btn-default">Poll</a>
+					<a href="/rooms/{{_id}}/notices/reminder" class="btn btn-default">Reminder</a>
+					<a href="/rooms/{{_id}}/notices/assignment" class="btn btn-default">Assignment</a>
 				</div>
 				{{#if isNotEmpty}}
 				<div class="panel-footer">
@@ -357,40 +486,107 @@
 			<div class="col-md-12">
 				<div class="panel panel-default">
 					<div class="panel-body">
-						{{#if eq type "post"}}
+						{{#if eq type "notice"}}
 							<div class="first">
 							<img class="icon" src='{{GeoPattern "Mr Davey"}}'>
 							</div>
 							<div class="after">
 								<b>Mr Davey</b>
 								<br>
-								{{content}}
-								<br>
-								<div class="images">
-								{{#each images}}
-									<div class="notice-image">
-									<div class="notice-link">{{title}} &#9662;</div>
-									<img src="{{data}}" class="notice-image" width="200px">	
-									<div class="info">4KB, JPEG, 2000x3000</div>
+								{{text}}
+								{{#if images}}
+									<br>
+									<div class="images">
+									{{#each images}}
+										<div class="notice-image">
+										<div class="notice-link">{{title}} &#9662;</div>
+										<img src="{{data}}" class="notice-image" width="200px">	
+										<div class="info">4KB, JPEG, 2000x3000</div>
+										</div>
+									{{/each}}
 									</div>
-								{{/each}}
-								</div>
-								<br>
-								{{#each youtubes}}
-								<div class="notice-embed">
-									<div class="info">YouTube</div>
-									<div class="notice-link"><a href="youtube.com/watch?v={{id}}">{{title}}</a></div>
-									<img src="https://img.youtube.com/vi/{{id}}/0.jpg" width="300px">
-								</div>
-								{{/each}}
+								{{/if}}
+								{{#if youtubes}}
+									<br>
+									{{#each youtubes}}
+									<div class="notice-embed">
+										<div class="info">YouTube</div>
+										<div class="notice-link"><a href="youtube.com/watch?v={{id}}">{{title}}</a></div>
+										<img src="https://img.youtube.com/vi/{{id}}/0.jpg" width="300px">
+									</div>
+									{{/each}}
+								{{/if}}
 							</div>
 						{{/if}}
+						{{#if eq type "poll"}}
+							<b>Poll</b>
+							<br>
+							{{text}}
+							<br>
+							{{#each pollOptions}}
+								<input type="radio" name="{{../_id}}" value="{{.}}">
+								{{.}}
+								<br>
+							{{/each}}
+							<button class="btn btn-default btn-sm poll-submit">Submit</button>
+						{{/if}}
+						{{#if eq type "reminder"}}
+							<b>Reminder</b>
+							<br>
+							{{text}}
+							<br>
+							<span class="info">{{fullDate eventDate}}</span>
+						{{/if}}
+						{{#if eq type "assignment"}}
+							<b>Assignment</b>
+							<br>
+							{{text}}
+							<br>
+							<span class="info">Due on {{fullDate deadline}}</span>	
+						{{/if}}
 					</div>
+					{{#if tooManyComments}}
+						<div class="panel-body panel-reply-plus-plus panel-reply-plus panel-reply">
+							<button class="btn btn-link show-all">
+							{{#if showAll}}	
+								Hide Comments
+							{{else}}
+								Show More Comments
+							{{/if}}
+							</button>
+						</div>
+					{{/if}}
+					{{#each commentsF}}
+						<div class="panel-body panel-reply-plus panel-reply">
+							<div class="first">
+								<img class="icon" src='{{GeoPattern "HeyHeyYouYou"}}'>
+							</div>
+							<div class="after">
+								<b>{{username userId}}</b> <span class="info">said {{fullDate date}}</span>
+								<div class="pull-right">
+									<div class="bit-d">Edit</div>
+									<div class="bit-d del-reply" data-id="{{../_id}}" data-type="{{../type}}">Delete</div>
+								</div>
+								<br>
+								{{text}}
+							</div>	
+						</div>
+					{{/each}}
+					{{#if eq activeNotice _id}}
+						<div class="panel-body panel-reply">
+							<div class="input-group">
+								<textarea class="form-control reply-text" rows="1"></textarea>
+								<span class="input-group-addon btn btn-primary submit-reply">Submit</span>
+								<span class="input-group-addon btn btn-default cancel-reply"><i class="fa fa-times"></i></span>
+							</div>
+						</div>
+					{{/if}}
 					<div class="panel-footer">
-						<button class="btn btn-link">Reply</button>
+						<button class="btn btn-link reply">Reply</button>
+						<a href="/rooms/{{../_id}}/notices/{{noticeId}}/edit" class="btn btn-link">Edit</a>
 						<button class="btn btn-link del">Delete</button>
 						<div class="pull-right">
-							{{fullDate dateCreated}}
+							{{fullDate date}}
 						</div>
 					</div>
 				</div>
@@ -398,56 +594,7 @@
 		{{/each}}
 		</div>
 	</div>
-<div class="modal fade" id="youtube">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Modal title</h4>
-      </div>
-      <div class="modal-body">
-        <p>One fine body&hellip;</p>
-     </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<div class="modal create-text fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Create Post</h4>
-      </div>
-      <div class="modal-body">
-				<div class="text-center">
-					<div class="btn-group">
-						<button class="btn btn-default">Text</button>
-						<button class="btn btn-default">Image</button>
-						<button class="btn btn-default">Poll</button>
-						<button class="btn btn-default">Video</button>
-					</div>
-				</div>
-				<br>
-				<form>
-					<div class="form-group">
-						<input type="text" placeholder="Title" class="form-control">
-					</div>
-					<div class="form-group">
-						<textarea class="form-control" rows="5"></textarea>
-					</div>
-				</form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Publish</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-	<!--<div class="row">
+<!--<div class="row">
 		<div class="col-md-12">
 			<div class="dropdown pull-right">
 				<button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus"></i> Add <span class="caret"></span></button>
@@ -611,10 +758,10 @@
 <template name="vocabQuestion">
 	<tr class="vocab-unit">
 		<td>
-			<input type="text" class="vocab-question" placeholder="Write question here...">
+			<input type="text" value="{{question}}" class="vocab-question" placeholder="Write question here...">
 		</td>
 		<td>
-			<input type="text" class="vocab-answer" placeholder="Write answer here...">
+			<input type="text" value="{{answer}}" class="vocab-answer" placeholder="Write answer here...">
 		</td>
 		<td>
 			<button class="btn btn-default btn-xs del"><i class="fa fa-times"></i></button>
@@ -1145,16 +1292,11 @@
 
 <template name="youtubeList">
 	{{#each withIndex youtubes}}
-		<div class="media">
-			<div class="media-left">
-				<img class="media-object show-youtube" src="https://img.youtube.com/vi/{{id}}/1.jpg">
-			</div>
-			<div class="media-body">
-				<h4 class="media-heading show-youtube"><i class="fa fa-youtube-play"></i> {{title}}</h4>
-				{{#if ../can}}
-				<button class="btn btn-xs btn-warning remove-youtube">Remove</button>
-				{{/if}}
-			</div>
+		<div class="notice-embed notice-embed-plus">
+			<div class="remove-icon"><i class="fa fa-times remove-youtube"></i></div>
+			<div class="info">YouTube</div>
+			<div class="notice-link"><a href="https://youtube.com/watch?v={{id}}" target="_blank">{{title}}</a></div>
+			<img width="200px" src="https://img.youtube.com/vi/{{id}}/1.jpg">	
 		</div>
 	{{/each}}
 	<div class="modal" id="show-youtube">
@@ -1176,16 +1318,10 @@
 
 <template name="imageList">
 	{{#each withIndex images}}
-		<div class="media">
-			<div class="media-left">
-				<img class="media-object show-image" src="{{data}}">
-			</div>
-			<div class="media-body">
-				<h4 class="media-heading show-image">{{title}}</h4>
-				{{#if ../can}}
-					<button class="btn btn-xs btn-warning remove-image">Remove</button>
-				{{/if}}
-			</div>
+		<div class="notice-embed notice-embed-plus">
+			<div class="remove-icon"><i class="fa fa-times remove-image"></i></div>
+			<div class="notice-link"><a href="" target="_blank">{{title}}</a></div>
+			<img width="200px" src="{{data}}">
 		</div>
 	{{/each}}
 	<div class="modal" id="show-image">
@@ -1219,13 +1355,13 @@
 				<textarea class="form-control text" rows="3" placeholder="Type post here..."></textarea>
 				{{> imageList images=images can=true}}
 				{{> youtubeList youtubes=youtubes can=true}}
-				<br>
-				Add:&nbsp;  
-				<button class="btn btn-default add-image">Image <i class="fa fa-image"></i></button>
-				<button class="btn btn-default" data-toggle="modal" data-target="#youtube">YouTube <i class="fa fa-youtube"></i></button>
-		 </div>
+			 </div>
 			<div class="panel-footer">
-				<button class="btn btn-link submit">Submit</button>
+				<button class="btn btn-link add-image">Add Image <i class="fa fa-image"></i></button>
+				<button class="btn btn-link" data-toggle="modal" data-target="#youtube">Add Video <i class="fa fa-youtube"></i></button>
+				<div class="pull-right">
+					<button class="btn btn-link submit">Submit</button>
+				</div>
 			</div>
 		</div>
 	</div>	
@@ -1250,45 +1386,97 @@
 	</div>
 </template>
 
-<template name="/notices/create/poll">
-	<div class="row">
-		<div class="col-md-12">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">
-						Create Poll
-						<div class="pull-right">
-							<a href="/rooms/{{_id}}/notices"><i class="fa fa-times"></i></a>
-						</div>
-					</h3>
+<template name="createReminder">
+	{{>navigation}}
+	<div class="container-small">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<div class="form-group">
+					<label>Date</label>
+					<input type="date" class="form-control eventDate">	
 				</div>
-				<div class="panel-body">
-					<form>
-						<div class="form-group">
-							<label>Title</label>
-							<input type="text" class="form-control">
-						</div>
-						<div class="form-group">
-							<label>Options</label>
-							<br>
-							<button class="btn btn-default btn-xs">Add Option</button>
-							<br><br>
-							<div class="input-group">
-								<span class="input-group-addon">1. </span>
-								<input type="text" class="form-control">
-								<span class="input-group-btn">
-									<button class="btn btn-default"><i class="fa fa-times"></i></button>
-								</span>
+				<div class="form-group">
+					<label>Event</label>
+					<input type="text" class="form-control text">
+				</div>	
+				<button class="btn btn-primary submit">Submit</button>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="createAssignment">
+	{{>navigation}}
+	<div class="container-small">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<div class="form-group">
+					<label>Details</label>
+					<textarea class="form-control text"></textarea>
+				</div>
+				<div class="form-group">
+					<label>Due Date</label>
+					<input type="date" class="dueDate form-control">
+				</div>
+				<div class="form-group">
+					<label>Hand-in via Pandora</label> 
+					<input type="checkbox" class="uploadViaPandora">
+				</div>
+				<button class="btn btn-primary submit">Submit</button>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="pollOption">
+	<div class="option">
+		<div class="input-group">
+			<input type="text" class="form-control">
+			<span class="input-group-btn">
+				<button class="btn btn-default remove-option"><i class="fa fa-times"></i></button>
+			</span>
+		</div>
+		<br>
+	</div>
+</template>
+
+<template name="createPoll">
+	{{>navigation}}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							Create Poll
+							<div class="pull-right">
+								<a href="/rooms/{{_id}}"><i class="fa fa-times"></i></a>
 							</div>
-						</div>
-						<button type="submit" class="btn btn-primary">Submit</button>
-					</form>
+						</h3>
+					</div>
+					<div class="panel-body">
+						<form>
+							<div class="form-group">
+								<label>Title</label>
+								<input type="text" class="form-control text">
+							</div>
+							<div class="form-group">
+								<label>Options</label>
+								<br>
+								{{>pollOption}}
+								<div class="add-option">
+									<input type="text" class="form-control" placeholder="Add option" disabled>
+								</div>
+							</div>
+							<button type="button" class="btn btn-primary submit">Submit</button>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
-			
+	
 <template name="login">
 	<nav class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
