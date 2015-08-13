@@ -12,7 +12,7 @@ Template["/admin/users"].helpers({
 
 Template.base.helpers({
 	"yp": function() {
-		return wnd.get().pathname.indexOf("/admin") === 0 ? "admin" : "other";
+		return wnd.get().pathname.indexOf("/rooms") === 0 ? "room" : "other";
 	}
 });
 

@@ -76,7 +76,12 @@ Meteor.publish("rooms", function() {
 	if(!this.userId) {
 		return [];
 	}
-	return Rooms.find({$or: [{students: {$in: [this.userId]}}, {teachers: {$in: [this.userId]}}]});
+	var user = Meteor.users.findOne(this.userId);
+	if(user.roles && user.roles.indexOf("admin") !== -1) {
+		return Rooms.find({schoolId: user.schoolId});
+	} else {
+		return Rooms.find({$or: [{students: {$in: [this.userId]}}, {teachers: {$in: [this.userId]}}]});
+	}
 });
 
 Meteor.methods({
@@ -122,4 +127,12 @@ Meteor.publish("quizzes", function(id) {
 
 Meteor.publish("quizResults", function(id) {
 	return QuizResults.find({quizId: id, userId: this.userId});	
+});
+
+Meteor.publish("notices", function(id) {
+	return [Notices.find({roomId: id}), 
+		Polls.find({roomId: id}),
+		Reminders.find({roomId: id}),
+		Assignments.find({roomId: id})
+	];
 });

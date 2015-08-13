@@ -4,7 +4,7 @@ $navbar-default-bg: #1DA078;
 $navbar-default-link-color: #fff;
 $navbar-default-link-active-bg:rgba(255,255,255,0.33);
 $navbar-default-brand-color: #fff;
-$navbar-default-border: white;
+$navbar-default-border: $navbar-default-bg;
 $navbar-default-link-active-color:$navbar-default-link-color;
 $navbar-default-link-hover-color:#fff; 
 @import ".meteor/local/build/programs/server/assets/packages/reywood_bootstrap3-sass/bootstrap";
@@ -26,6 +26,10 @@ $navbar-default-link-hover-color:#fff;
 	border:1px solid #b3b3b3;
 	background-color:white;
 	margin-top:70px;
+}
+
+.page-wrapper {
+	padding-top:51px;
 }
 
 .topbar {
@@ -435,47 +439,9 @@ textarea {
 	opacity:1;
 }
 
-.panel-super {
-	background:none;
-}
-
-.panel-super .panel-body, .panel-super table {
-	background-color:white;
-}
-
-.panel-super div:first-child {
-	border-top-left-radius:4px;
-	border-top-right-radius:4px;
-}
-
-.panel-super .panel-heading {
-	background:rgba(215,215,215,0.81);
-	border-color:black;
-}
-
-.contents.contents-other input:focus {
-	background-color:white;
-}
-
-.panel-super .breadcrumb {
-	background:none;
-}
-
-.panel-super .panel-footer {
-	background-color:rgba(215,215,215,0.81);
-	border-color:#0D2D4F;
-	padding-top:7px;
-	padding-bottom:6px;
-}
-
 .panel .panel-footer .btn.btn-link {
 	padding-top:0;
 	padding-bottom:0;
-}
-
-.panel-super div:last-child {
-	border-bottom-left-radius:4px;
-	border-bottom-right-radius:4px;
 }
 
 .media-object {
@@ -788,6 +754,7 @@ thead tr th {
 	position: relative;	
 	text-align:center;
 	text-decoration:none !important;
+	margin-bottom:30px;
 }
 
 .icon2 .title {
@@ -801,4 +768,79 @@ thead tr th {
 .bit-g .active {
 	background-color:#F5AB44 !important;
 	border-color:#F5AB44 !important;
+}
+
+.error-msg {
+	margin-bottom:5px;
+}
+
+.contents-other .navbar ~ .container {
+	margin-top:24px;
+}
+
+.contents-room .navbar {
+	box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.50);
+}
+
+.panel-body-none {
+	background-color:#eeeeee;
+}
+
+.panel-body-none p {
+	margin-bottom: 15px;
+	font-size: 21px;
+	font-weight: 200;
+}	
+
+.poll-submit {
+	margin-top:5px;
+}
+
+.panel-reply textarea {
+	margin-bottom:5px;
+}
+
+.panel-reply {
+	background:#f5f5f5;
+	border-top: 1px solid #ddd;
+}
+
+.panel-reply-plus {
+	padding-top:10px;
+	padding-bottom:10px;
+}
+
+.panel-reply-plus .icon {
+	width:30px;
+	margin-left:5px;
+}
+
+.panel-reply-plus.panel-reply-plus-plus {
+	padding-top:0px !important;
+	padding-bottom:0px !important;
+}
+
+.notice-embed-plus {
+	margin-left:15px;
+	position:relative;
+	margin-top:20px;
+	margin-bottom:20px;
+}
+
+.notice-embed-plus .remove-icon {
+	left:-20px;
+	position:absolute;
+	color:#9E9EA6;
+}
+
+.notice-embed-plus .remove-icon:hover {
+	color:darken(#9E9EA6, 10);
+	cursor:pointer;
+}
+
+.bit-d {
+	@extend a;
+	display:inline;
+	cursor:pointer;	
+	margin-left:5px;
 }

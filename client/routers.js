@@ -11,6 +11,7 @@ Router.onBeforeAction(function() {
 		} else {
 			this.layout("base");
 			this.next();
+			Session.set("navbarActive", "");
 		}
 	}
 });
@@ -37,10 +38,15 @@ Router.route("/clubs", function() {
 	this.render("home", {data: {subjects: Rooms.find({type: "club"}).fetch(), active2:"2"}});
 });
 
+Router.route("/settings", function() {
+	Session.set("error", "");
+	Session.set("success", "");
+	this.render("settings");
+});
+
 Router.route("/rooms/:room", function() {
 	Session.set("navActive", "notices");
 	var room = Rooms.findOne(this.params.room);
-	room.notices = _.sortBy(room.notices, function(notice) {return notice.dateCreated;}).reverse();
 	Session.set("isNotEmpty", false);
 	Session.set("post", "");
 	this.render("notices", {data: room});
@@ -51,6 +57,19 @@ Router.route("/rooms/:room/notices/announcement", function() {
 	window.youtubes = new ReactiveArray();
 	var room = Rooms.findOne(this.params.room);
 	this.render("/announcement", {data: room});
+});
+
+Router.route("/rooms/:room/notices/reminder", function() {
+	var room = Rooms.findOne(this.params.room);
+	this.render("createReminder", {data: room});
+});
+
+Router.route("/rooms/:room/notices/poll", function() {
+	this.render("createPoll", {data: Rooms.findOne(this.params.room)});
+});
+
+Router.route("/rooms/:room/notices/assignment", function() {
+	this.render("createAssignment", {data: Rooms.findOne(this.params.room)});
 });
 
 Router.route("/rooms/:room/notices/create/poll", function() {

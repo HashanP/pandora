@@ -6,25 +6,6 @@
 
 <template name="base">
 	<div class="page-wrapper">
-		<nav class="sidebar">
-			<ul class="sidebar-nav">
-				<li class="header">General</li>
-				<li><a><i class="fa fa-home"></i> Home</a></li>
-				<li class="header">Subjects</li>
-				{{#each subjects}}
-					<li>
-						<a href="/rooms/{{_id}}"><i class="fa fa-graduation-cap"></i> {{title}}</a>
-					</li>
-				{{/each}}
-				<li><a href="/subjects"><i class="fa fa-plus"></i> All Subjects</a></li>
-				{{#if admin}}
-					<li class="header">Admin</li>
-					<li><a href="/admin/users"><i class="fa fa-users"></i> Users</a></li>
-					<li><a href="/admin/rooms"><i class="fa fa-server"></i> Rooms</a></li>
-					<li><a href="/admin/billing"><i class="fa fa-credit-card"></i> Billing</a></li>
-				{{/if}}
-			</ul>
-		</nav>
 		<div class="contents contents-{{yp}}">
 			{{> yield}}
 		</div>
@@ -32,7 +13,7 @@
 </template>
 
 <template name="navbar">
-	<nav class="navbar navbar-default navbar-static-top">
+	<nav class="navbar navbar-default navbar-fixed-top">
 		<div class="container">
 			<div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -53,18 +34,20 @@
 				<li><a href="/">Home</a></li>
 				{{/if}}
         <li><a href="#">Planner</a></li>
-				{{#if eq navbarActive "admin"}}
-				<li class="active"><a href="/admin/users">Admin</a></li>
-				{{else}}
-				<li><a href="/admin/users">Admin</a></li>
+				{{#if admin}}
+					{{#if eq navbarActive "admin"}}
+						<li class="active"><a href="/admin/users">Admin</a></li>
+					{{else}}
+						<li><a href="/admin/users">Admin</a></li>
+					{{/if}}
 				{{/if}}
 			</ul>
       <ul class="nav navbar-nav navbar-right">
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{username}} <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#">Settings</a></li>
-            <li><a href="#">Logout</a></li>
+            <li><a href="/settings">Settings</a></li>
+            <li><a href="#" class="logout">Logout</a></li>
           </ul>
         </li>
       </ul>
@@ -73,15 +56,59 @@
 	</nav>
 </template>
 
-<template name="home">
+<template name="settings">
 	{{>navbar}}
 	<div class="container">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Change Password</h3>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label>Current Password</label>
+					<input type="password" class="form-control current-password">
+				</div>
+				<div class="form-group">
+					<label>New Password</label>
+					<input type="password" class="form-control new-password">
+				</div>
+				<div class="form-group">
+					<label>Confirm New Password</label>
+					<input type="password" class="form-control confirm-password">
+				</div>
+				{{#if error}}
+					<div class="error-msg">
+						<strong class="text-danger">{{error}}</strong>
+					</div>
+				{{/if}}
+				{{#if success}}
+					<div class="error-msg">
+						<strong class="text-success">{{success}}</strong>
+					</div>	
+				{{/if}}
+				<button class="btn btn-primary change-password">Update Password</button>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="home">
+	{{>navbar}}
+	<div class="container container-f">
 		<div class="col-md-2">
 			<div class="list-group bit-g">
-				{{#if eq active2 "0"}}
-					<a class="list-group-item active" href="/">My Courses</a>
-				{{else}}
-					<a class="list-group-item" href="/">My Courses</a>
+				{{#if admin}}
+					{{#if eq active2 "0"}}
+						<a class="list-group-item active" href="/">All Courses</a>
+					{{else}}
+						<a class="list-group-item" href="/">All Courses</a>	
+					{{/if}}
+					{{else}}
+					{{#if eq active2 "0"}}
+						<a class="list-group-item active" href="/">My Courses</a>
+					{{else}}
+						<a class="list-group-item" href="/">My Courses</a>
+					{{/if}}
 				{{/if}}
 				{{#if eq active2 "1"}}
 					<a class="list-group-item active" href="/subjects">Subjects</a>
@@ -161,7 +188,9 @@
 							{{/if}}
 							<div class="pull-right">
 								<a href="/admin/users/{{_id}}/edit" class="btn btn-edit btn-xs"><i class="fa fa-pencil"></i> Edit</a>
-								<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+								{{#if ne currentUser.username username}}
+									<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+								{{/if}}
 							</div>
 						</li>
 					{{/each}}	
@@ -387,27 +416,9 @@
 </template>
 
 <template name="navigation">
+	{{>navbar}}
 	<div class="cover-image">
 		<div class="cover-image-container">
-			<div class="open-drawer">
-			<div class="bit-f">
-				<i class="fa fa-navicon"></i>
-			</div>
-			 <ul class="dropdown-menu bit-e" aria-labelledby="dropdownMenu1">
-    <li><a href="/">Home</a></li>
-    <li><a href="#">Settings</a></li>
-    <li><a href="#">Logout</a></li>
-		<li role="separator" class="divider"></li>
-    <li class="dropdown-header">Subjects</li>
-			{{#each subjects}}
-				<li><a href="/rooms/{{_id}}">{{title}}</a></li>	
-			{{/each}}
-		<li role="separator" class="divider"></li>
-		<li class="dropdown-header">Admin</li>
-		<li><a href="/admin/users">Users</a></li>
-		<li><a href="/admin/rooms">Rooms</a></li>
-  </ul>	
-			</div>
 			<div class="cover-info">
 				<div class="cover-title">10a/Fl1</div>
 				<div class="cover-subtitle">Mrs Flower</div>
@@ -450,7 +461,7 @@
 					Upcoming
 				</div>	
 				<div class="panel-body">
-					There are nothing upcoming.
+					There is nothing upcoming.
 				</div>
 			</div>
 			<div class="panel panel-default">
@@ -465,12 +476,14 @@
 		<div class="col-md-9">
 		<div class="super">
 		<div class="col-md-12">
+				{{#if teacher}}
 				<div class="topbit">
 					<a href="/rooms/{{_id}}/notices/announcement" class="btn btn-default">Announcement</a>
 					<a href="/rooms/{{_id}}/notices/poll" class="btn btn-default">Poll</a>
 					<a href="/rooms/{{_id}}/notices/reminder" class="btn btn-default">Reminder</a>
 					<a href="/rooms/{{_id}}/notices/assignment" class="btn btn-default">Assignment</a>
 				</div>
+				{{/if}}
 				{{#if isNotEmpty}}
 				<div class="panel-footer">
 					<button class="btn btn-link">Add Image</button>
@@ -482,6 +495,24 @@
 				{{/if}}
       </div>
 				</div>
+		{{#if eq notices.length 0}}
+			<div class="col-md-12">
+			<div class="jumbotron">
+				<h2 class="text-center"><i class="fa fa-exclamation-circle fa-2x"></i></h2>
+				<p class="text-center">Nothing here</p>
+				<ul>
+					<li>Announcements let you post information</li>
+					<li>Polls let you gather class feedback</li>
+					<li>Reminders let you put up important dates which is put in the students' online calendars</li>
+					<li>Assignments let you set homework which is put in students' online planners</li>
+					<li>Assignments can also be used to let students upload work onto Pandora for marking and grading</li>
+					<li>Files let you upload resources for pupils to download</li>
+					<li>Quizzes let you test students on single answer, multiple choice, checkbox and fill-in-the-gap questions</li>
+					<li>Vocabulary Quizzes let students practice vocabulary</li>
+				</ul>
+			</div>
+			</div>
+		{{/if}}
 		{{#each notices}}
 			<div class="col-md-12">
 				<div class="panel panel-default">
@@ -614,7 +645,6 @@
 
 			<div class="fixed">
 				<div class="jumbotron">
-					<h2 class="text-center"><i class="fa fa-exclamation-circle fa-2x"></i></h2>
 					<p class="text-center"><strong>There isn't anything here yet.</strong></p>
 					<p>
 						<ul>
@@ -834,7 +864,7 @@
 	{{>navigation}}
 	<div class="container-small">
 		<div class="col-md-12">
-			<div class="panel panel-primary">
+			<div class="panel panel-default">
 				<div class="panel-body questions">
 					<div class="question-list {{inProgress}}">
 					{{#each withIndex questions}}
@@ -1159,6 +1189,7 @@
 				</div>
 				<div class="col-md-8">
 				<div class="pull-right">
+				{{#if teacher}}
 				{{> tools}}
 				<div class="btn-group">
 					<button type="button" class="btn btn-default btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -1171,6 +1202,7 @@
 						<li><a href="?create=wordsearch">Wordsearch</a></li>
 					</ul>
 				</div>
+				{{/if}}
 				{{> search}}
 				</div>
 			</div>
@@ -1229,6 +1261,12 @@
 					{{/if}}
 				</tbody>
 			</table>
+			{{#if eq filesF.length 0}}
+				<div class="panel-body panel-body-none">
+					<h2 class="text-center"><i class="fa fa-2x fa-exclamation-circle"></i></h2>
+					<p class="text-center">Nothing here</p>
+				</div>
+			{{/if}}	
 		</div>
 	</div>
 </template>
@@ -1247,8 +1285,10 @@
 						</div>
 						<div class="col-md-8">
 							<div class="pull-right">
-								{{> tools}}
-								<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
+								{{#if teacher}}
+									{{> tools}}
+									<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
+								{{/if}}
 								{{> search}}
 							</div>
 						</div>
@@ -1511,7 +1551,7 @@
 					<div class="form-group">
 						<input type="password" placeholder="Password" class="password form-control input-lg">
 					</div>
-					<button type="submit" class="btn btn-success btn-block btn-lg login-button">
+					<button type="button" class="btn btn-success btn-block btn-lg login-button">
             <i class="fa fa-lock"></i>
             Login
           </button>

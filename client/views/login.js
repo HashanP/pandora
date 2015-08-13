@@ -69,9 +69,10 @@ if (window.getSelection && document.createRange) {
 }
 
 Template.login.events({
-	"form submit": function(e) {
-		e.preventDefault();
-		Meteor.loginWithPassword(Template.instance().find(".username").value, Template.instance().find(".password").value);
+	"click .login-button": function(e) {
+		Meteor.loginWithPassword(Template.instance().find(".username").value, Template.instance().find(".password").value, function(err) {
+			console.log(err);
+		});
 	 } 
 }); 
 
@@ -102,10 +103,50 @@ Template.navbar.helpers({
 	}
 });
 
+Template.navbar.events({
+	"click .logout": function() {
+		Meteor.logout();
+	}
+});
+
 Template.adminNav.helpers({
 	adminActive: function() {
 		return Session.get("adminActive");
 	}
+});
+
+Template.settings.events({
+	"click .change-password": function() {
+		if($(".new-password").val() === "") {
+			Session.set("error", "New password cannot be blank.");
+		} else if($(".new-password").val() !== $(".confirm-password").val()) {
+			Session.set("error", "New password and confirm new password are not the same.");	
+		} else {
+			Accounts.changePassword($(".current-password").val(), $(".confirm-password").val(), function(err) {
+				if(err) {
+					Session.set("error", err.reason + ".");
+				} else {
+					$(".new-password").val("");
+					$(".confirm-password").val("");
+					$(".current-password").val("");
+					Session.set("success", "Your password has been changed.");
+				}
+			});
+		}
+	}
+});
+
+Template.settings.helpers({
+	error: function() {
+		return Session.get("error");
+	},
+	success: function() {
+		return Session.get("success");
+	}
+});
+
+Template.notices.onCreated(function() {
+	this.subscribe("notices", this.data._id);
 });
 
 Template.notices.onRendered(function() {
@@ -128,40 +169,60 @@ Template.notices.onRendered(function() {
 });
 
 Template.notices.events({
-	"input .create-post": function(e) {
-		Session.set("post", e.target.value);
-	},
-	"focus .create-post": function(e) {
-		if(Session.get("post") === "") {
-			e.target.rows = 3;
-			$(e.target).autosize();
-			Session.set("isNotEmpty", true);
-		}
-	},
-	"blur .create-post": function(e) {
-		console.log($(":focus"));
-		if(Session.get("post") === "" && Session.get("modal") !== true) {
-			$(e.target).off();
-			e.target.style.height = "";
-			e.target.rows = 1;
-			Session.set("isNotEmpty", false);
-		}
-	},
-	"click .youtube": function(e) {
-		Session.set("modal", "true");
-	},
-	"click .submit": function() {
-		Meteor.call("insertPost", this._id, $(".create-post").val());
-		$(".create-post").val("").css("height", "").attr("rows", 1);
-	},
 	"click .del": function() {
-		Meteor.call("removePost", Template.instance().data._id, this.noticeId);
-	}	
+		if(this.type === "notice") {
+			Notices.remove(this._id);
+		} else if(this.type === "poll") {
+			Polls.remove(this._id);
+		} else if(this.type === "reminder") {
+			Reminders.remove(this._id);
+		} else {
+			Assignments.remove(this._id);
+		}
+	},
+	"click .reply": function() {
+		Session.set("activeNotice", this._id);
+		window.setTimeout(function() {
+			$("textarea").autosize();
+		}, 0);
+	},
+	"click .submit-reply": function() {
+		Meteor.call("reply", Template.instance().data._id, this._id, this.type, $(".reply-text").val());
+		Session.set("activeNotice", undefined);
+	},
+	"click .show-all": function() {
+		Session.set("showAll", !Session.get("showAll"));
+	},
+	"click .cancel-reply": function() {
+		Session.set("activeNotice", undefined);
+	},
+	"click .del-reply": function(e) {
+		console.log(e.target.dataset);
+		Meteor.call("delComment", e.target.dataset.id, e.target.dataset.type, this.commentId);
+	}
 });
 
 Template.notices.helpers({
 	"isNotEmpty": function() {
 		return Session.get("isNotEmpty");
+	},
+	activeNotice: function() {
+		return Session.get("activeNotice");
+	},
+	"username": function(userId) {
+		return Meteor.users.findOne(userId).username;
+	},
+	tooManyComments: function() {
+		return this.comments.length > 3;
+	},
+	showAll: function() {
+		return Session.get("showAll");
+	},
+	commentsF: function() {
+		return Session.get("showAll") || this.comments.length < 3 ? this.comments : this.comments.slice(this.comments.length-3);
+	},
+	notices: function() {
+		return _.sortBy(Notices.find().fetch().concat(Polls.find().fetch()).concat(Assignments.find().fetch()).concat(Reminders.find().fetch()), "date").reverse();
 	}
 });
 
@@ -171,6 +232,62 @@ Template.vocabQuiz.helpers({
 	},
 	path: function() {
 		return Session.get("path");
+	}
+});
+
+Template.createPoll.events({
+	"click .add-option": function(e) {
+		Blaze.render(Template.pollOption, e.target.parentNode.parentNode, e.target.parentNode, Template.instance()); 
+	},
+	"click .remove-option": function(e) {
+		$(e.target).closest(".option").remove();
+	},
+	"click .submit": function() {
+		var p = _.map($(".option input"), function(el) {
+			return $(el).val();
+		});
+		Polls.insert({
+			text: $(".text").val(),
+			date: new Date(Date.now()),
+			comments: [],
+			allowComments: true,
+			pollOptions: p,
+			roomId: Template.instance().data._id,
+			userId: Meteor.userId()
+		});		
+		Router.go("/rooms/" + Template.instance().data._id);
+	}
+});
+
+Template.createReminder.events({
+	"click .submit": function() {
+		Reminders.insert({
+			date: new Date(Date.now()),
+			eventDate: new Date($(".eventDate").val()),
+			text: $(".text").val(),
+			comments: [],
+			allowComments: true,
+			roomId: Template.instance().data._id,
+			userId: Meteor.userId()	
+		});
+		Router.go("/rooms/" + Template.instance().data._id);
+	}
+});
+
+Template.createAssignment.events({
+	"click .submit": function() {
+		Assignments.insert({
+			text: $(".text").val(),
+			comments: [],
+			allowComments: true,
+			roomId: Template.instance().data._id,
+			userId: Meteor.userId(),
+			deadline: new Date($(".dueDate").val()),
+			date: new Date(Date.now()),
+			uploads: [],
+			uploadViaPandora: $(".uploadViaPandora").val() === "on"
+		});		
+		Router.go("/rooms/" + Template.instance().data._id);
 	}
 });
 
@@ -986,7 +1103,16 @@ Template["/announcement"].events({
 		youtubes.splice(this.index, 1);
 	},
 	"click .submit": function() {
-		Meteor.call("insertPost", Template.instance().data._id, $(".text").val(), Array.prototype.slice.call(youtubes.list()), Array.prototype.slice.call(images.list()));
+		Notices.insert({
+			text: $(".text").val(),
+			date: new Date(Date.now()),
+			roomId: Template.instance().data._id,
+			allowComments: true,
+			comments: [],
+			youtubes: Array.prototype.slice.call(youtubes.list()),
+			images: Array.prototype.slice.call(images.list()),
+			userId: Meteor.userId()
+		});
 		Router.go("/rooms/" + Template.instance().data._id);
 	}
 });

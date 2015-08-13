@@ -10,6 +10,14 @@ Handlebars.registerHelper("not", function(a) {
 	return !a;
 });
 
+Handlebars.registerHelper("ne", function(a, b) {
+	return a !== b;
+});
+
+UI.registerHelper("teacher", function() {
+	return Rooms.findOne(Template.instance().data._id).teachers.indexOf(Meteor.userId()) !== -1 || (Meteor.user().roles && Meteor.user().roles.indexOf("admin") !== -1);
+});
+
 Handlebars.registerHelper("formatArray", function(a) {
 	return JSON.stringify(a);
 });

@@ -22,16 +22,42 @@ Rooms.allow({
 	}
 }); 
 
-Quizzes.allow({
-	update: function(userId, doc) {
-		if(!userId) {
-			return false;
-		} else {
-			var user = Meteor.users.findOne(userId);
-			var room = Rooms.findOne(doc.roomId);
-			return ((user.roles && user.roles.indexOf("admin") !== -1) || (room.teachers.indexOf(userId) !== -1)) && user.schoolId === room.schoolId;
-		}
+var updateQuiz = function(userId, doc) {
+	if(!userId) {
+		return false;
+	} else {
+		var user = Meteor.users.findOne(userId);
+		var room = Rooms.findOne(doc.roomId);
+		return ((user.roles && user.roles.indexOf("admin") !== -1) || (room.teachers.indexOf(userId) !== -1)) && user.schoolId === room.schoolId;
 	}
+}
+
+Notices.allow({
+	insert: updateQuiz,
+	remove: updateQuiz
+});
+
+Polls.allow({
+	insert: updateQuiz,
+	remove: updateQuiz
+});
+
+Reminders.allow({
+	insert: updateQuiz,
+	remove: updateQuiz
+});
+
+Assignments.allow({
+	insert: updateQuiz,
+	remove: updateQuiz
+});
+
+Quizzes.allow({
+	update: updateQuiz
+});
+
+VocabQuizzes.allow({
+	update: updateQuiz
 });
 
 Files.on("stored", Meteor.bindEnvironment(function(doc) {
