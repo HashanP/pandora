@@ -14,6 +14,10 @@ Handlebars.registerHelper("ne", function(a, b) {
 	return a !== b;
 });
 
+Handlebars.registerHelper("contain", function(a, b) {
+	return a.indexOf(b) !== -1;
+});
+
 UI.registerHelper("teacher", function() {
 	return Rooms.findOne(Template.instance().data._id).teachers.indexOf(Meteor.userId()) !== -1 || (Meteor.user().roles && Meteor.user().roles.indexOf("admin") !== -1);
 });

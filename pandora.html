@@ -452,26 +452,46 @@
 	</div>
 </template>	
 
+<template name="noticeNav">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			Upcoming
+		</div>	
+		{{#if eq events.length 0}}
+			<div class="panel-body">
+				There is nothing upcoming.
+			</div>
+		{{/if}}
+		<ul class="list-group">
+			{{#each events}}
+				<li class="list-group-item">	
+					{{text}}<br>	
+					<span class="info">
+						{{#if eq type "reminder"}}
+							{{fullDate eventDate}}
+						{{else}}
+							Due on {{fullDate deadline}}
+						{{/if}}
+					</span>
+				</li>
+			{{/each}}
+		</ul>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			RSS feed <i class="fa fa-rss"></i>
+		</div>
+		<div class="panel-body">
+			<input type="text" class="form-control" readonly value="pandora.com/rss/h4jfk7">
+		</div>
+	</div>
+</template>
+
 <template name="notices">
 	{{> navigation}}
 	<div class="container">
 		<div class="col-md-3">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					Upcoming
-				</div>	
-				<div class="panel-body">
-					There is nothing upcoming.
-				</div>
-			</div>
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					RSS feed <i class="fa fa-rss"></i>
-				</div>
-				<div class="panel-body">
-					<input type="text" class="form-control" readonly value="pandora.com/rss/h4jfk7">
-				</div>
-			</div>
+			{{>noticeNav}}
 		</div>
 		<div class="col-md-9">
 		<div class="super">
@@ -484,16 +504,7 @@
 					<a href="/rooms/{{_id}}/notices/assignment" class="btn btn-default">Assignment</a>
 				</div>
 				{{/if}}
-				{{#if isNotEmpty}}
-				<div class="panel-footer">
-					<button class="btn btn-link">Add Image</button>
-					<button class="btn btn-link youtube" data-toggle="modal" data-target="#youtube">Add YouTube Video</button>
-					<div class="pull-right">
-							<button class="btn btn-link submit">Submit</button>
-					</div>
 				</div>
-				{{/if}}
-      </div>
 				</div>
 		{{#if eq notices.length 0}}
 			<div class="col-md-12">
@@ -574,6 +585,52 @@
 							{{text}}
 							<br>
 							<span class="info">Due on {{fullDate deadline}}</span>	
+							<br>
+							{{#if uploadViaPandora}}
+								{{#if teacher}}
+									<div class="stat">
+										<div class="stat-number">
+											{{uploads.length}}
+										</div>
+										<div class="stat-title">
+											Submitted
+										</div>
+									</div>	
+									<div class="stat">
+										<div class="stat-number">
+											{{notDone}}
+										</div>
+										<div class="stat-title">
+											Not Submitted
+										</div>
+									</div>
+									<br>
+									<a href="/rooms/{{../_id}}/notices/assignments/{{_id}}">See All</a>
+								{{else}}
+									{{#if eq fff.length 0}}
+										<button class="btn btn-sm btn-default hand-in">Hand in</button>
+									{{else}}
+										<table class="table table-bordered">
+											<thead>
+												<tr>
+													<th>Filename</th>
+													<th></th>
+												</tr>
+											</thead>
+											<tbody>
+												{{#each fff}}
+													{{#with FS.GetFile "files" .}}
+														<tr>
+															<td>{{this.name}}</td>
+															<td></td>
+														</tr>
+													{{/with}}
+												{{/each}}
+											</tbody>	
+										</table>	
+									{{/if}}
+								{{/if}}
+							{{/if}}
 						{{/if}}
 					</div>
 					{{#if tooManyComments}}
@@ -614,8 +671,12 @@
 					{{/if}}
 					<div class="panel-footer">
 						<button class="btn btn-link reply">Reply</button>
-						<a href="/rooms/{{../_id}}/notices/{{noticeId}}/edit" class="btn btn-link">Edit</a>
-						<button class="btn btn-link del">Delete</button>
+						{{#if teacher}}
+							{{#if ne type "poll"}}
+								<a href="/rooms/{{../_id}}/notices/{{noticeId}}/edit" class="btn btn-link">Edit</a>
+							{{/if}}
+							<button class="btn btn-link del">Delete</button>
+						{{/if}}
 						<div class="pull-right">
 							{{fullDate date}}
 						</div>
@@ -663,27 +724,6 @@
 				{{/if}}
 		</div>	
 	</div>-->
-</template>
-
-<template name="post">
-	<div class="row">
-		<div class="col-md-12">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">
-						Notices
-						<div class="pull-right">
-							<a href="/rooms/{{room._id}}/notices"><i class="fa fa-times"></i></a>
-						</div>
-					</h3>
-				</div>
-				<div class="panel-body">
-					<h2>{{post.title}}</h2>
-					<p>{{{post.content}}}</p>
-				</div>
-			</div>
-		</div>
-	</div>
 </template>
 
 <template name="icon">
@@ -824,7 +864,8 @@
 							{{/if}}
 						</tbody>	
 					</table>
-					<button class="btn btn-default add-question">Add Question</button>
+					<button class="btn btn-default add-question">Add Row</button>
+					<button class="btn btn-default add-rows-10">Add 10 Rows</button>
 					<div class="pull-right">
 						<button class="btn btn-primary submit">Submit</button>	
 					</div>
@@ -893,9 +934,9 @@
 												<option value="text">Text</option>
 											{{/if}}
 											{{#if eq activeType "fill_in_the_blanks"}}
-												<option value="fill_in_the_blanks" selected>Fill in the Blanks</option>
+												<option value="fill_in_the_blanks" selected>Fill in the Gaps</option>
 											{{else}}
-												<option value="fill_in_the_blanks">Fill in the Blanks</option>
+												<option value="fill_in_the_blanks">Fill in the Gaps</option>
 											{{/if}}
 											{{#if eq activeType "number"}}
 												<option value="number" selected>Number</option>
@@ -970,6 +1011,7 @@
 								{{#if eq activeType "fill_in_the_blanks"}}
 									<div class="form-group">
 										<div class="col-md-12">
+											<div class="text-info error-msg">To make a word have to be filled in, put the word in square brackets e.g. to make students have to fill in Roman, write [Roman].</div>
 											<div contenteditable="true" class="form-control fill-in-the-blanks">{{text}}</div>
 										</div>
 									</div>
@@ -1253,10 +1295,14 @@
 					{{#if newFolder}}
 					<tr class="create-new-folder">
 						<td>
-							<i class="fa fa-2x fa-folder-o"></i> 
-							<input type="text" placeholder="Enter folder name" class="pull-right input-create-folder form-control">
+							<i class="fa fa-folder-o"></i>
 						</td>
-						<td></td>
+						<td>
+							<input type="text" placeholder="Enter folder name" class="pull-right input-create-folder input-sm form-control">
+						</td>
+						{{#if isNavActive "files"}}
+							<td></td>
+						{{/if}}
 					</tr>
 					{{/if}}
 				</tbody>
@@ -1273,6 +1319,24 @@
 
 <template name="search">
 	<input type="text" placeholder="Search..." value="{{search}}" class="form-control search zeplin">
+</template>
+
+<template name="uploadStatus">
+	{{#if filesBeingUploaded}}
+		<div class="col-md-12">
+			<div class="well file-uploads">
+				{{#each filesBeingUploaded}}
+					{{#with FS.GetFile "files" this}}
+						<h4>{{this.name}}</h4>
+						{{> FS.UploadProgressBar bootstrap=true class="progress-bar-success progress-bar-striped active" showPercent=true}}					
+					{{/with}}
+				{{/each}}
+				{{#if finished}}
+					<button class="btn btn-primary done">Done</button>
+				{{/if}}
+			</div>
+		</div>
+	{{/if}}
 </template>
 
 <template name="files">
@@ -1294,22 +1358,8 @@
 						</div>
 			</div>
 		<div class="row">
+			{{>uploadStatus}}
 			<br>
-			{{#if filesBeingUploaded}}
-				<div class="col-md-12">
-					<div class="well file-uploads">
-						{{#each filesBeingUploaded}}
-							{{#with FS.GetFile "files" this}}
-								<h4>{{this.name}}</h4>
-								{{> FS.UploadProgressBar bootstrap=true class="progress-bar-success progress-bar-striped active" showPercent=true}}					
-							{{/with}}
-						{{/each}}
-						{{#if finished}}
-							<button class="btn btn-primary done">Done</button>
-						{{/if}}
-					</div>
-				</div>
-			{{/if}}
 			{{> explorer files=files _id=_id}}
 		</div>
 	</div>
@@ -1381,15 +1431,20 @@
 
 <template name="/announcement">
 	{{> navigation}}
-	<div class="container-small">
+	<div class="container">
+		<div class="col-md-3">
+			{{>noticeNav}}	
+		</div>
+		<div class="col-md-9">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				Create Post
-				<div class="pull-right">
-					<a href="/rooms/{{_id}}">
-						<i class="fa fa-times"></i>
-					</a>
-				</div>
+				<h3 class="panel-title">Create Post
+					<div class="pull-right">
+						<a href="/rooms/{{_id}}">
+							<i class="fa fa-times"></i>
+						</a>
+					</div>
+				</h3>
 			</div>
 			<div class="panel-body">
 				<textarea class="form-control text" rows="3" placeholder="Type post here..."></textarea>
@@ -1424,31 +1479,60 @@
 		</div>
 		</div>	
 	</div>
+	</div>
 </template>
 
 <template name="createReminder">
 	{{>navigation}}
-	<div class="container-small">
+	<div class="container">
+		<div class="col-md-3">
+			{{>noticeNav}}
+		</div>
+		<div class="col-md-9">
 		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Create Reminder
+					<div class="pull-right">
+						<a href="/rooms/{{_id}}"><i class="fa fa-times"></i></a>	
+					</div>
+				</h3>
+			</div>
 			<div class="panel-body">
 				<div class="form-group">
-					<label>Date</label>
+					<label>Event Date</label>
 					<input type="date" class="form-control eventDate">	
 				</div>
 				<div class="form-group">
-					<label>Event</label>
+					<label>Event Name</label>
 					<input type="text" class="form-control text">
 				</div>	
+				{{#if error}}
+					<div class="error-msg">
+						<strong class="text-danger">{{error}}</strong>
+					</div>
+				{{/if}}
 				<button class="btn btn-primary submit">Submit</button>
 			</div>
+		</div>
 		</div>
 	</div>
 </template>
 
 <template name="createAssignment">
 	{{>navigation}}
-	<div class="container-small">
+	<div class="container">
+		<div class="col-md-3">
+			{{>noticeNav}}
+		</div>
+		<div class="col-md-9">
 		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Create Assignment
+					<div class="pull-right">
+						<a href="/rooms/{{_id}}"><i class="fa fa-times"></i></a>
+					</div>
+				</h3>
+			</div>	
 			<div class="panel-body">
 				<div class="form-group">
 					<label>Details</label>
@@ -1462,8 +1546,14 @@
 					<label>Hand-in via Pandora</label> 
 					<input type="checkbox" class="uploadViaPandora">
 				</div>
+				{{#if error}}
+					<div class="error-msg">
+						<strong class="text-danger">{{error}}</strong>
+					</div>
+				{{/if}}
 				<button class="btn btn-primary submit">Submit</button>
 			</div>
+		</div>
 		</div>
 	</div>
 </template>
@@ -1484,7 +1574,10 @@
 	{{>navigation}}
 	<div class="container">
 		<div class="row">
-			<div class="col-md-12">
+			<div class="col-md-3">
+				{{>noticeNav}}
+			</div>
+			<div class="col-md-9">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -1504,6 +1597,7 @@
 								<label>Options</label>
 								<br>
 								{{>pollOption}}
+								{{>pollOption}}
 								<div class="add-option">
 									<input type="text" class="form-control" placeholder="Add option" disabled>
 								</div>
@@ -1516,7 +1610,7 @@
 		</div>
 	</div>
 </template>
-	
+
 <template name="login">
 	<nav class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">

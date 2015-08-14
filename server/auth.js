@@ -102,7 +102,17 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 			console.log("hell");
 			Files.remove(doc._id);
 		}
-  } 
+  } else if(doc.category === "upload") {
+		var assignment = Assignments.findOne(doc.assignmentId);
+		var room = Rooms.findOne(doc.owner);
+		if(assignment.roomId !== doc.owner) {
+			Files.remove(doc._id);
+		} else if(room.students.indexOf(doc.userId) === -1) {
+			Files.remove(doc._id);
+		}
+		Assignments.update({_id: assignment._id, "uploads.userId": doc.userId}, {$push: {"uploads.$.files": doc._id}});
+		Assignments.update({_id: assignment._id, "uplaods.userId": {$ne: doc.userId}}, {$push: {uploads: {userId: doc.userId, files: [doc._id]}}});
+	} 
 }));
 
 Files.on("removed", function(doc) {
@@ -148,6 +158,10 @@ Files.allow({
 
 Meteor.publish("files", function(room) {
 	return Files.find({category: "resource", owner: room});
+});
+
+Meteor.publish("noticeFiles", function(room) {
+	return Files.find({category:"upload", owner: room, userId: this.userId});
 });
 
 Meteor.users.before.remove(function(userId, doc) {

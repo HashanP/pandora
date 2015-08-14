@@ -25,17 +25,17 @@ Router.onAfterAction(function() {
 
 Router.route("/", function() {
 	Session.set("navbarActive", "home");
-	this.render("home", {data: {subjects:Rooms.find().fetch(), active2: "0"}});
+	this.render("home", {data: {subjects:Rooms.find({}, {sort: ["title"]}).fetch(), active2: "0"}});
 });
 
 Router.route("/subjects", function() {	
 	Session.set("navbarActive", "home");
-	this.render("home", {data: {subjects: Rooms.find({type: "subject"}).fetch(), active2: "1"}});
+	this.render("home", {data: {subjects: Rooms.find({type: "subject"}, {sort: ["title"]}).fetch(), active2: "1"}});
 }); 
 
 Router.route("/clubs", function() {	
 	Session.set("navbarActive", "home");
-	this.render("home", {data: {subjects: Rooms.find({type: "club"}).fetch(), active2:"2"}});
+	this.render("home", {data: {subjects: Rooms.find({type: "club"}, {sort: ["title"]}).fetch(), active2:"2"}});
 });
 
 Router.route("/settings", function() {
@@ -60,6 +60,7 @@ Router.route("/rooms/:room/notices/announcement", function() {
 });
 
 Router.route("/rooms/:room/notices/reminder", function() {
+	Session.set("error", "");
 	var room = Rooms.findOne(this.params.room);
 	this.render("createReminder", {data: room});
 });
@@ -69,6 +70,7 @@ Router.route("/rooms/:room/notices/poll", function() {
 });
 
 Router.route("/rooms/:room/notices/assignment", function() {
+	Session.set("error", "");
 	this.render("createAssignment", {data: Rooms.findOne(this.params.room)});
 });
 

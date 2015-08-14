@@ -145,7 +145,7 @@ Template.settings.helpers({
 	}
 });
 
-Template.notices.onCreated(function() {
+Template.navigation.onCreated(function() {
 	this.subscribe("notices", this.data._id);
 });
 
@@ -199,6 +199,30 @@ Template.notices.events({
 	"click .del-reply": function(e) {
 		console.log(e.target.dataset);
 		Meteor.call("delComment", e.target.dataset.id, e.target.dataset.type, this.commentId);
+	},
+	"click .hand-in": function(e) {
+		var y = Template.instance();
+		var c = this;
+		var fileEl = document.createElement("input");
+		$("body").append(fileEl);
+		fileEl.type = "file";
+		fileEl.addEventListener("change", function(e) { 
+		FS.Utility.eachFile(e, function(file) {
+			file = new FS.File(file);
+			file.owner = y.data._id;
+			file.schoolId = y.data.schoolId;
+			file.category = "upload";
+			file.userId = Meteor.userId();
+			file.assignmentId = c._id;
+			Files.insert(file, function(err, fileObj) {
+				var files = Session.get("filesBeingUploaded");
+				files.push(fileObj._id);
+					Session.set("filesBeingUploaded", files);
+				});
+			});
+			$(fileEl).remove();
+		});	
+		fileEl.click();
 	}
 });
 
@@ -223,6 +247,18 @@ Template.notices.helpers({
 	},
 	notices: function() {
 		return _.sortBy(Notices.find().fetch().concat(Polls.find().fetch()).concat(Assignments.find().fetch()).concat(Reminders.find().fetch()), "date").reverse();
+	},
+	notDone: function() {
+		return Rooms.findOne(Template.instance().data._id).students.length - this.uploads.length;
+	},
+	fff: function() {
+		var t = _.findWhere(this.uploads, {userId: Meteor.userId()});
+		console.log(t);
+		if(t === undefined) {
+			return [];
+		} else {
+			return t.files;
+		}
 	}
 });
 
@@ -261,6 +297,11 @@ Template.createPoll.events({
 
 Template.createReminder.events({
 	"click .submit": function() {
+		if($(".text").val() === "") {
+			return Session.set("error", "Event name cannot be empty.");
+		} else if($(".eventDate").val() === "") {
+			return Session.set("error", "Event date cannot be empty.");
+		}
 		Reminders.insert({
 			date: new Date(Date.now()),
 			eventDate: new Date($(".eventDate").val()),
@@ -274,8 +315,25 @@ Template.createReminder.events({
 	}
 });
 
+Template.createAssignment.helpers({
+	error: function() {
+		return Session.get("error");
+	}
+});
+
+Template.createReminder.helpers({
+	error: function() {
+		return Session.get("error");
+	}
+});
+
 Template.createAssignment.events({
 	"click .submit": function() {
+		if($(".text").val() === "") {
+			return Session.set("error", "Details cannot be empty.");
+		} else if($(".dueDate").val() === "") {
+			return Session.set("error", "Due date cannot be empty.");
+		}
 		Assignments.insert({
 			text: $(".text").val(),
 			comments: [],
@@ -285,7 +343,7 @@ Template.createAssignment.events({
 			deadline: new Date($(".dueDate").val()),
 			date: new Date(Date.now()),
 			uploads: [],
-			uploadViaPandora: $(".uploadViaPandora").val() === "on"
+			uploadViaPandora: $(".uploadViaPandora").is(":checked")
 		});		
 		Router.go("/rooms/" + Template.instance().data._id);
 	}
@@ -548,6 +606,14 @@ UI.registerHelper("fillInTheBlanks", function(y, c) {
 	}) + "</span>";
 });
 
+Template.noticeNav.helpers({
+	events: function() {
+		return _.sortBy(Reminders.find({roomId: Template.currentData()._id}).fetch().concat(Assignments.find({roomId: Template.currentData()._id}).fetch()), function(x) {
+			return x.type === "reminder" ? x.eventDate : x.deadline;
+		});
+	}
+});
+
 Template.create_quiz.events({
 	"click .add-question": function() {
 		questions.push({
@@ -558,6 +624,7 @@ Template.create_quiz.events({
 		});
 		Session.set("activeType", "text");
 		Session.set("active", questions.length -1);
+		Session.set("activeAnswer", questions.list()[Session.get("active")]);
 		$(".add-question").attr("disabled", true);
 	},
 	"click .done": function() {
@@ -632,7 +699,7 @@ Template.create_quiz.events({
 	},
 	"change .type": function(e) {
 		Session.set("activeType", e.target.value);	
-		if(e.target.type === "text") {
+		/*if(e.target.type === "text") {
 			Session.set("options", [""]);
 		} else if(e.target.type === "number") {
 			Session.set("options", [0]);
@@ -645,7 +712,10 @@ Template.create_quiz.events({
 			Session.set("options", [{
 				value: ""
 			}]);
-		}
+		}*/
+/*		window.setTimeout(function() {
+			$(".add-option").trigger("click");
+		}, 0);*/
 	},
 	"keyup .fill-in-the-blanks": function(e) {
 		try {
@@ -677,6 +747,11 @@ Template.create_quiz.events({
 Template.createVocabQuiz.events({
 	"click .add-question": function() {
 		Blaze.render(Template.vocabQuestion, $(".vocab-questions tbody").get(0));
+	},
+	"click .add-rows-10": function() {
+		for(var i = 0; i < 10; i++) {
+			Blaze.render(Template.vocabQuestion, $(".vocab-questions tbody").get(0));
+		}
 	},
 	"click .submit": function() {
 		_.each($(".vocab-questions tbody").children(), function(tr) {
@@ -919,7 +994,7 @@ if (!$(e.srcElement).hasClass("ui-draggable-dragging")) { return; }
 	}
 });
 
-Template.files.helpers({
+Template.uploadStatus.helpers({
 	filesBeingUploaded: function() {
 		return Session.get("filesBeingUploaded");
 	},
@@ -932,7 +1007,10 @@ Template.files.helpers({
 			}
 		}
 		return true;
-	},
+	}
+});
+
+Template.files.helpers({
 	path: function() {
 		var x = Session.get("path");
 		if(x !== "/") {
@@ -1052,6 +1130,10 @@ Template.files.events({
 
 Template.files.onCreated(function() {
 	this.subscribe("files", this.data._id);
+});
+
+Template.notices.onCreated(function() {
+	this.subscribe("noticeFiles", this.data._id);
 });
 
 UI.registerHelper("isNavActive", function(a) {
