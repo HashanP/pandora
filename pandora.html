@@ -670,12 +670,18 @@
 							</div>
 							<div class="after">
 								<b>{{username userId}}</b> <span class="info">said {{fullDate date}}</span>
-								<div class="pull-right">
-									<div class="bit-d">Edit</div>
-									<div class="bit-d del-reply" data-id="{{../_id}}" data-type="{{../type}}">Delete</div>
-								</div>
-								<br>
-								{{text}}
+								{{#if activeComment ../type ../_id commentId}}
+									<textarea class="form-control edit-reply-field">{{text}}</textarea>	
+								{{else}}
+									{{#if eq currentUser._id userId}}
+										<div class="pull-right">
+											<div class="bit-d edit-reply" data-id="{{../_id}}" data-type="{{../type}}">Edit</div>
+											<div class="bit-d del-reply" data-id="{{../_id}}" data-type="{{../type}}">Delete</div>
+										</div>
+									{{/if}}
+									<br>
+									{{text}}
+								{{/if}}
 							</div>	
 						</div>
 					{{/each}}

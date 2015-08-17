@@ -200,6 +200,16 @@ Template.notices.events({
 		console.log(e.target.dataset);
 		Meteor.call("delComment", e.target.dataset.id, e.target.dataset.type, this.commentId);
 	},
+	"click .edit-reply": function(e) {
+		Session.set("activeComment", {
+			type: e.target.dataset.type,
+			_id: e.target.dataset.id,
+			id: this.commentId
+		});
+		window.setTimeout(function() {
+			$(".edit-reply-field").focus();
+		}, 0);
+	},
 	"click .hand-in": function(e) {
 		var y = Template.instance();
 		var c = this;
@@ -223,6 +233,11 @@ Template.notices.events({
 			$(fileEl).remove();
 		});	
 		fileEl.click();
+	},
+	"blur .edit-reply-field": function() {
+		var c = Session.get("activeComment");
+		Meteor.call("editReply", c.type, c._id, c.id, $(".edit-reply-field").val());
+		Session.set("activeComment", "");
 	}
 });
 
@@ -259,6 +274,10 @@ Template.notices.helpers({
 		} else {
 			return t.files;
 		}
+	},
+	activeComment: function(x, z, y) {
+		var pp = Session.get("activeComment");
+		return pp.type === x && pp._id === z && pp.id === y;
 	}
 });
 

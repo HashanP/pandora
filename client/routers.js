@@ -46,6 +46,7 @@ Router.route("/settings", function() {
 
 Router.route("/rooms/:room", function() {
 	Session.set("navActive", "notices");
+	Session.set("activeComment", undefined);
 	var room = Rooms.findOne(this.params.room);
 	Session.set("isNotEmpty", false);
 	Session.set("post", "");
