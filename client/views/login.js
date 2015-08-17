@@ -279,11 +279,23 @@ Template.createPoll.events({
 		$(e.target).closest(".option").remove();
 	},
 	"click .submit": function() {
+		var title = $(".text").val();
 		var p = _.map($(".option input"), function(el) {
 			return $(el).val();
 		});
+		if(title === "") {
+			return Session.set("error", "Title cannot be empty.");
+		}
+		if(p.length < 2) {
+			return Session.set("error", "A poll must have at least 2 options.");
+		}
+		for(var i = 0; i < p.length; i++) {
+			if(p[i].trim() === "") {
+				return Session.set("error", "Options cannot be empty.");
+			}
+		}
 		Polls.insert({
-			text: $(".text").val(),
+			text: title,
 			date: new Date(Date.now()),
 			comments: [],
 			allowComments: true,
@@ -292,6 +304,12 @@ Template.createPoll.events({
 			userId: Meteor.userId()
 		});		
 		Router.go("/rooms/" + Template.instance().data._id);
+	}
+});
+
+Template.createPoll.helpers({
+	error: function() {
+		return Session.get("error");
 	}
 });
 
@@ -407,6 +425,9 @@ Template.create_quiz.helpers({
 	},
 	inProgress: function() {
 		return Session.get("active") !== undefined ? "in-progress" : "";
+	},
+	bigError: function() {
+		return Session.get("bigError");
 	}
 });
 
@@ -616,6 +637,7 @@ Template.noticeNav.helpers({
 
 Template.create_quiz.events({
 	"click .add-question": function() {
+		Session.set("bigError", "");
 		questions.push({
 			title: "",
 			help_text: "",
@@ -652,12 +674,34 @@ Template.create_quiz.events({
 				}
 			});
 		}
+		console.log(p);
 		if(p.title === "") {
 			return Session.set("error", "Question title cannot be blank.");
 		} else if((p.options && p.options.length === 0) || (p.possibleTextAnswers && p.possibleTextAnswers.length === 0) || 
 			(p.possibleNumberAnswers && p.possibleNumberAnswers.length === 0)) {
 			return Session.set("error", "There must be at least one correct answer.");
-		} 
+		}
+		if(p.type === "text") {
+			for(var i = 0; i < p.possibleTextAnswers.length; i++) {
+				if(p.possibleTextAnswers[i].trim() === "") {
+					return Session.set("error", "Answer(s) cannot be empty.");
+				}
+			}	
+		} else if(p.type === "number") {
+			for(var i = 0; i < p.possibleNumberAnswers.length; i++) {
+				if(p.possibleNumberAnswers[i] === "") {
+					return Session.set("error", "Answer(s) cannot be empty.");
+				}
+			}	
+		}  else if(p.type === "list" || p.type === "checkboxes") {
+			for(var i = 0; i < p.options.length; i++) {
+				if(p.options[i].value.trim() === "") {
+					return Session.set("error", "Options cannot be empty.");
+				}
+			}
+		} else if(p.type === "fill_in_the_blanks" && p.text.trim() === "") {
+			return Session.set("error", "Fill in the gaps text cannot be empty.");
+		}
 		console.log($(".question-title").val());
 		questions.splice(this.index, 1, p);
 		Session.set("active", undefined);
@@ -729,6 +773,9 @@ Template.create_quiz.events({
 		} catch(e) {}
 	},
 	"click .submit": function() {
+		if(questions.list().length === 0) {
+			return Session.set("bigError", "There must be at least 1 question.");
+		}
 		var data = Template.instance().data;
 		$(".question.active .done").trigger("click");
 		window.setTimeout(function() {
@@ -1185,8 +1232,12 @@ Template["/announcement"].events({
 		youtubes.splice(this.index, 1);
 	},
 	"click .submit": function() {
+		var text = $(".text").val();
+		if(text === "" && youtubes.length === 0 && images.length === 0) {
+			return Session.set("error", "Announcement cannot contain nothing.");
+		}
 		Notices.insert({
-			text: $(".text").val(),
+			text: text,
 			date: new Date(Date.now()),
 			roomId: Template.instance().data._id,
 			allowComments: true,
@@ -1206,6 +1257,9 @@ Template["/announcement"].helpers({
 	youtubes: function() {
 		return youtubes.list();
 	},
+	error: function() {
+		return Session.get("error");
+	}
 });
 
 Template.youtubeList.helpers({

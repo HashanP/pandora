@@ -546,14 +546,16 @@
 							</div>
 							<div class="after">
 								<b>{{username userId}}</b>
-								<br>
-								{{text}}
+								{{#if text}}
+									<br>
+									{{text}}
+								{{/if}}
 								{{#if images}}
 									<br>
 									<div class="images">
 									{{#each images}}
 										<div class="notice-image">
-										<div class="notice-link">{{title}} &#9662;</div>
+										<div class="notice-link">{{title}}<!--&#9662;--></div>
 										<img src="{{data}}" class="notice-image" width="200px">	
 										<div class="info">4KB, JPEG, 2000x3000</div>
 										</div>
@@ -1079,6 +1081,13 @@
 						</div>
 					{{/each}}
 					</div>
+					{{#if bigError}}
+						<div class="col-md-12">
+							<div class="text-danger error-msg">
+								<strong>{{bigError}}</strong>
+							</div>
+						</div>
+					{{/if}}
 					<div class="form-bottom">
 						<button class="btn btn-default add-question">Add Question</button>
 						<button class="btn btn-primary submit pull-right">Save</button>
@@ -1467,6 +1476,11 @@
 				<textarea class="form-control text" rows="3" placeholder="Type post here..."></textarea>
 				{{> imageList images=images can=true}}
 				{{> youtubeList youtubes=youtubes can=true}}
+				{{#if error}}
+					<div class="error-msg-2 text-danger">
+						<strong>{{error}}</strong>	
+					</div>
+				{{/if}}
 			 </div>
 			<div class="panel-footer">
 				<button class="btn btn-link add-image">Add Image <i class="fa fa-image"></i></button>
@@ -1619,6 +1633,11 @@
 									<input type="text" class="form-control" placeholder="Add option" disabled>
 								</div>
 							</div>
+							{{#if error}}
+								<div class="error-msg text-danger">
+									<strong>{{error}}</strong>
+								</div>	
+							{{/if}}
 							<button type="button" class="btn btn-primary submit">Submit</button>
 						</form>
 					</div>

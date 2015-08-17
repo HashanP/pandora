@@ -56,6 +56,7 @@ Router.route("/rooms/:room/notices/announcement", function() {
 	window.images = new ReactiveArray();	
 	window.youtubes = new ReactiveArray();
 	var room = Rooms.findOne(this.params.room);
+	Session.set("error", "");
 	this.render("/announcement", {data: room});
 });
 
@@ -99,6 +100,7 @@ Router.route("/rooms/:room/files/:path*", function() {
 });
 
 Router.route("/rooms/:room/quizzes/:path*", function() {
+	Session.set("bigError", "");
 	Session.set("navActive", "quizzes");
 	Session.set("path", this.params.path ? this.params.path : "/");
 	var room = Rooms.findOne(this.params.room);
