@@ -72,16 +72,25 @@ Meteor.publish("/admin/rooms", function(offset, limit, search) {
 	}
 });
 
-Meteor.publish("rooms", function() {
-	if(!this.userId) {
-		return [];
-	}
-	var user = Meteor.users.findOne(this.userId);
-	if(user.roles && user.roles.indexOf("admin") !== -1) {
-		return Rooms.find({schoolId: user.schoolId});
-	} else {
-		return Rooms.find({$or: [{students: {$in: [this.userId]}}, {teachers: {$in: [this.userId]}}]});
-	}
+Meteor.publishComposite("rooms", {
+	find: function() {
+		if(!this.userId) {
+			return [];
+		}
+		var user = Meteor.users.findOne(this.userId);
+		if(user.roles && user.roles.indexOf("admin") !== -1) {
+			return Rooms.find({schoolId: user.schoolId});
+		} else {
+			return Rooms.find({$or: [{students: {$in: [this.userId]}}, {teachers: {$in: [this.userId]}}]});
+		}
+	},
+	children: [
+		{
+			find: function(doc) {
+				return Meteor.users.find({$or: [{_id: {$in: doc.students}}, {roles: {$in: ["admin"]}}], schoolId: doc.schoolId}, {fields: {username: 1}});	
+			}
+		}
+	]
 });
 
 Meteor.methods({

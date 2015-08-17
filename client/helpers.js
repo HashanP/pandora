@@ -1,5 +1,5 @@
 Handlebars.registerHelper("admin", function() {
-	return Meteor.user().roles.indexOf("admin") !== -1;
+	return Meteor.user().roles && Meteor.user().roles.indexOf("admin") !== -1;
 });
 
 Handlebars.registerHelper("eq", function(a, b) { 

@@ -176,8 +176,10 @@ Router.route("/admin/users", function() {
 	this.render("/admin/users");
 });
 
-Router.route("/admin/users/create", function() {
+Router.route("/admin/users/create", function() {	
+	Session.set("adminActive", "users");
 	Session.set("howToChoosePassword", "username");
+	Session.set("error", "");
 	this.render("/admin/users/create");
 });
 
@@ -200,6 +202,8 @@ Router.route("/admin/rooms", function() {
 });
 
 Router.route("/admin/rooms/create", function() {
+	Session.set("error", "");	
+	Session.set("adminActive", "rooms");
 	this.render("/admin/rooms/create");
 });
 

@@ -111,22 +111,27 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 			Files.remove(doc._id);
 		}
 		Assignments.update({_id: assignment._id, "uploads.userId": doc.userId}, {$push: {"uploads.$.files": doc._id}});
-		Assignments.update({_id: assignment._id, "uplaods.userId": {$ne: doc.userId}}, {$push: {uploads: {userId: doc.userId, files: [doc._id]}}});
+		Assignments.update({_id: assignment._id, "uploads": {$not: {$elemMatch: {userId: doc.userId}}}}, {$push: {uploads: {userId: doc.userId, files: [doc._id]}}});
 	} 
 }));
 
 Files.on("removed", function(doc) {
-	var room = Rooms.findOne(doc.owner);
-	var b = room;
-	if(doc.path === "/") {
-		b.files = _.without(b.files, _.findWhere(b.files, {_id: doc._id}));
-	} else {
-		doc.path.split("/").forEach(function(name) {
-			b = _.findWhere(b.files, {name: name});
-		});
-		b.files = _.without(b.files, _.findWhere(b.files, {_id: doc._id}));
+	if(doc.category === "resource") {
+		var room = Rooms.findOne(doc.owner);
+		var b = room;
+		if(doc.path === "/") {
+			b.files = _.without(b.files, _.findWhere(b.files, {_id: doc._id}));
+		} else {
+			doc.path.split("/").forEach(function(name) {
+				b = _.findWhere(b.files, {name: name});
+			});
+			b.files = _.without(b.files, _.findWhere(b.files, {_id: doc._id}));
+		}
+		Rooms.update(doc.owner, {$set: {files: room.files}});
+	} else if(doc.category === "upload") {
+		Assignments.update({_id: doc.assignmentId, "uploads.userId": doc.userId}, {$pull: {"uploads.$.files": doc._id}});
+		Assignments.update({_id: doc.assignmentId}, {$pull: {uploads: {userId: doc.userId, files: []}}});
 	}
-	Rooms.update(doc.owner, {$set: {files: room.files}});
 });
 
 var isAdmin = function(userId) {
@@ -149,7 +154,11 @@ Files.allow({
 		return true;
 	},
 	remove: function(userId, doc) {
-		return isTeacher(userId, doc.owner);
+		if(doc.category === "resource") {
+			return isTeacher(userId, doc.owner);
+		} else if(doc.category === "upload") {
+			return isStudent(userId, doc.owner);
+		}
 	},
 	download: function(userId, doc) {
 		return isStudent(userId, doc.owner);

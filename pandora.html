@@ -355,6 +355,13 @@
 							<label>Rooms with write access</label>
 							<input type="hidden" class="subjects-write form-control">
 						</div>
+						{{#if error}}
+							<div class="text-danger error-msg">
+								<strong>
+									{{error}}
+								</strong>	
+							</div>	
+						{{/if}}
 						<button type="button" class="btn btn-success create">Submit</button>
 					</form>
 				</div>
@@ -405,6 +412,11 @@
 							<label>Teachers</label>
 							<input type="hidden" class="teachers form-control">
 						</div>
+						{{#if error}}
+							<div class="text-danger error-msg">
+								<strong>{{error}}</strong>
+							</div>
+						{{/if}}
 						<button type="submit" class="btn btn-primary">Submit</button>
 					</form>
 				</div>
@@ -533,7 +545,7 @@
 							<img class="icon" src='{{GeoPattern "Mr Davey"}}'>
 							</div>
 							<div class="after">
-								<b>Mr Davey</b>
+								<b>{{username userId}}</b>
 								<br>
 								{{text}}
 								{{#if images}}
@@ -610,24 +622,29 @@
 									{{#if eq fff.length 0}}
 										<button class="btn btn-sm btn-default hand-in">Hand in</button>
 									{{else}}
+										<br>
 										<table class="table table-bordered">
 											<thead>
 												<tr>
 													<th>Filename</th>
-													<th></th>
 												</tr>
 											</thead>
 											<tbody>
 												{{#each fff}}
 													{{#with FS.GetFile "files" .}}
 														<tr>
-															<td>{{this.name}}</td>
-															<td></td>
+															<td>
+																{{this.name}}
+																{{> FS.DeleteButton class="btn btn-danger btn-xs"}}
+															</td>
 														</tr>
 													{{/with}}
 												{{/each}}
 											</tbody>	
 										</table>	
+										{{#if ne fff.length 4}}
+											<button class="btn btn-sm btn-default hand-in">Upload More Files</button>
+										{{/if}}
 									{{/if}}
 								{{/if}}
 							{{/if}}
