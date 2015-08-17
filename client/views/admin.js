@@ -102,6 +102,8 @@ Template["/admin/rooms/create"].events({
 		var title = Template.instance().$(".title").val();
 		if(title === "") {
 			return Session.set("error", "Title cannot be empty.");
+		} else if(title.length > 20) {
+			return Session.set("error", "Title cannot exceed 20 characters.");		
 		}
 		var obj = {
 			title: title,
@@ -109,17 +111,18 @@ Template["/admin/rooms/create"].events({
 			students: $(".students").select2("val"),
 			teachers: $(".teachers").select2("val")
 		};
+		var sep = function(err) {
+			if(err) {
+				Session.set("error", "Another room has the same title; you must choose a different one.");
+			} else {
+				Router.go("/admin/rooms");
+			}
+		}
 		if(this._id) {
-			Rooms.update({_id: this._id}, {$set: obj});
+			Rooms.update({_id: this._id}, {$set: obj}, sep);
 		} else {
 			obj.schoolId = Meteor.user().schoolId;
-			Rooms.insert(obj, function(err) {
-				if(err) {
-					Session.set("error", "Another room has the same title; you must choose a different one.");
-				} else {
-					Router.go("/admin/rooms");
-				}
-			});
+			Rooms.insert(obj, sep);
 		}	
 	}
 });
@@ -244,6 +247,8 @@ Template["/admin/users/create"].events({
 		var username = Template.instance().$(".username").val();
 		if(username === "") {
 			return Session.set("error", "Username cannot be empty.");
+		} else if(username.length > 20) {
+			return Session.set("error", "Username cannot exceed 20 characters.");
 		}
 		if(Session.equals("howToChoosePassword", "username")) {
 			var password = username;
@@ -256,7 +261,7 @@ Template["/admin/users/create"].events({
 		var writeSubjects = $(".subjects-write").select2("val");
 		Meteor.call("createUser2", username, password, readSubjects, writeSubjects, Template.instance().data ? Template.instance().data._id : undefined, function(y, b) {
 			if(y) {
-				Session.set("error", y.reason);
+				Session.set("error", "Username already exists.");
 			} else {
 				Router.go("/admin/users");
 			}

@@ -994,7 +994,7 @@ Template.explorer.events({
 		Session.set("noOfActive", $("tr.active").length);
 	},
 	"drop tr.folder": function(e, ui) {
-if (!$(e.srcElement).hasClass("ui-draggable-dragging")) { return; }
+/*if (!$(e.srcElement).hasClass("ui-draggable-dragging")) { return; }*/
 		e.preventDefault();
 		if(!$(e.target).is(".active")) {
 			Meteor.call("drop", Template.instance().data._id, Session.get("navActive"), Session.get("path"), $(e.target).find(".filename").text(), _.map($("tr.active"), function(el) {

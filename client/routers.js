@@ -186,6 +186,7 @@ Router.route("/admin/users/create", function() {
 });
 
 Router.route("/admin/users/:user/edit", function() {
+	Session.set("error", "");
 	Meteor.call("findUser", this.params.user, function(err, user) {
 		Meteor.call("findRoomsByUser", this.params.user, function(err, data) {
 			this.render("/admin/users/create", {data: _.extend(user, {students: data[0], teachers: data[1]})});
@@ -210,6 +211,7 @@ Router.route("/admin/rooms/create", function() {
 });
 
 Router.route("/admin/rooms/:room/edit", function() {
+	Session.set("error", "");
 	Meteor.call("findRoom", this.params.room, function(err, data) {
 		this.render("/admin/rooms/create", {data: data});
 	}.bind(this));
