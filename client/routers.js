@@ -53,6 +53,11 @@ Router.route("/rooms/:room", function() {
 	this.render("notices", {data: room});
 });
 
+Router.route("/rooms/:room/notices/assignments/:assignment", function() {	
+	var room = Rooms.findOne(this.params.room);
+	this.render("assignment", {data: {_id: room._id, assignmentId: this.params.assignment}});
+});
+
 Router.route("/rooms/:room/notices/announcement", function() {
 	window.images = new ReactiveArray();	
 	window.youtubes = new ReactiveArray();

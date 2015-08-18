@@ -621,7 +621,7 @@
 									<br>
 									<a href="/rooms/{{../_id}}/notices/assignments/{{_id}}">See All</a>
 								{{else}}
-									{{#if eq fff.length 0}}
+									{{#if eq fff.files.length 0}}
 										<button class="btn btn-sm btn-default hand-in">Hand in</button>
 									{{else}}
 										<br>
@@ -632,7 +632,7 @@
 												</tr>
 											</thead>
 											<tbody>
-												{{#each fff}}
+												{{#each fff.files}}
 													{{#with FS.GetFile "files" .}}
 														<tr>
 															<td>
@@ -644,8 +644,29 @@
 												{{/each}}
 											</tbody>	
 										</table>	
-										{{#if ne fff.length 4}}
+										{{#if ne fff.files.length 4}}
 											<button class="btn btn-sm btn-default hand-in">Upload More Files</button>
+										{{/if}}
+										{{#if fff.grade}}
+											<br>
+										{{else}}
+											{{#if fff.comment}}
+											<br>
+											{{/if}}
+										{{/if}}
+										{{#if fff.grade}}
+											<br>
+											<div>
+												<strong>Grade</strong><br>
+												{{fff.grade}}
+											</div>
+										{{/if}}
+										{{#if fff.comment}}
+											<br>
+											<div>
+												<strong>Comment</strong><br>
+												{{fff.comment}}	
+											</div>	
 										{{/if}}
 									{{/if}}
 								{{/if}}
@@ -711,44 +732,89 @@
 		{{/each}}
 		</div>
 	</div>
-<!--<div class="row">
-		<div class="col-md-12">
-			<div class="dropdown pull-right">
-				<button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus"></i> Add <span class="caret"></span></button>
-				<ul class="dropdown-menu">
-					<li><a href="/rooms/{{_id}}/notices/create/post">Post</a></li>
-					<li><a href="/rooms/{{_id}}/notices/create/poll">Poll</a></li>
-					<li><a href="#">Survey</a></li>
-				</ul>
-			</div>
-				<br><br><br>
-				{{#if notices}}
-					<div class="list-group">
-					{{#each notices}}
-							<a href="/rooms/{{../_id}}/notices/{{_id}}" class="list-group-item">
-								<h4 class="list-group-item-heading">{{title}}</h4> <p class="list-group-item-text">{{britishDate dateCreated}}</p> </a>
-					{{/each}} </div> {{else}}
+</template>
 
-			<div class="fixed">
-				<div class="jumbotron">
-					<p class="text-center"><strong>There isn't anything here yet.</strong></p>
-					<p>
-						<ul>
-							<li>To add a notice, click on the add button. You can also add a class poll or a survey.</li>
-							<li>To upload a file for your students to access go to resources and click <i>Add</i></li>
-							<li>To create a quiz, vocabulary quiz or crossword go to resources and click <i>Add</i> from there.</li>
-							<li>To add students' grades to a database go to <i>Gradebook</i></li>
-							<li><i>Gradebook</i> also displays students' grades collated from quizzes you have set them.</li>
-							<li>To get a list of all the students in your class, go to <i>Students</i></li>
-							<li>From here, you can print out a class register.</li>
-							<li>There is also a random name generator that lets you randomly select a student.</li>
-						</ul>
-					</p>
+<template name="assignment">
+	{{>navigation}}
+	<div class="container">
+		<div class="col-md-3">
+			{{>noticeNav}}
+		</div>
+		<div class="col-md-9">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						Upload
+						<div class="pull-right">
+							<a href="/rooms/{{_id}}"><i class="fa fa-times"></i></a>
+						</div>
+					</h3>	
+				</div>
+				<div class="panel-body">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>User</th>
+								<th>Files</th>
+								<th>Feedback</th>
+							</tr>
+						</thead>
+						<tbody>
+						{{#if uploads}}
+							{{#each uploads}}
+								<tr>
+									<td>{{username2 userId}}</td>
+									<td>
+										{{#each files}}
+											{{#with FS.GetFile "files" .}}
+												<a href="{{this.url}}">{{this.name}}</a><br>	
+											{{/with}}
+										{{/each}}
+									</td>
+									<td>
+										{{#if feedback}}
+											<button class="btn btn-default btn-sm open-feedback">Change</button>	
+										{{else}}
+											<button class="btn btn-default btn-sm open-feedback">Give</button>
+										{{/if}}
+									</td>
+								</tr>
+							{{/each}}
+						{{else}}
+							Nobody has uploaded anything yet.
+						{{/if}}
+						</tbody>
+					</table>
 				</div>
 			</div>
-				{{/if}}
-		</div>	
-	</div>-->
+		</div>
+	</div>
+</template>
+
+<template name="feedback">
+	<div class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Feedback</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label>Grade</label>
+						<input type="text" value="{{grade}}" class="form-control grade">
+					</div>
+					<div class="form-group">
+						<label>Comment</label>
+						<textarea class="form-control comment">{{comment}}</textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary save">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <template name="icon">

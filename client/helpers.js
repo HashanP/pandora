@@ -58,6 +58,10 @@ UI.registerHelper("fullDate", function(date) {
 	return date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear();
 });
 
+UI.registerHelper("username2", function(userId) {
+	return Meteor.users.findOne(userId).username;
+});
+
 UI.registerHelper('withIndex', function(x) {
 	console.log(x);
 	return x.map(function(y, i) {

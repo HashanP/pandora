@@ -138,6 +138,10 @@ Meteor.publish("quizResults", function(id) {
 	return QuizResults.find({quizId: id, userId: this.userId});	
 });
 
+Meteor.publish("fa", function(id) {
+	return Files.find({assignmentId: id});
+});
+
 Meteor.publish("notices", function(id) {
 	return [Notices.find({roomId: id}), 
 		Polls.find({roomId: id}),

@@ -241,6 +241,32 @@ Template.notices.events({
 	}
 });
 
+Template.assignment.onCreated(function() {
+	this.subscribe("fa", this.data.assignmentId);
+});
+
+Template.assignment.helpers({
+	uploads: function() {
+		return Assignments.findOne(Template.instance().data.assignmentId).uploads;
+	},
+	feedback: function() {
+		return this.grade !== undefined || this.comment !== undefined;
+	}
+});
+
+Template.assignment.events({
+	"click .open-feedback": function() {
+		Modal.show("feedback", {grade: this.grade, comment: this.comment, userId: this.userId, assignmentId: Template.instance().data.assignmentId});
+	}
+});
+
+Template.feedback.events({
+	"click .save": function() {
+		Meteor.call("feedback", Template.instance().data.assignmentId, Template.instance().data.userId, $(".grade").val(), $(".comment").val());
+		Modal.hide("feedback");
+	}
+});
+
 Template.notices.helpers({
 	"isNotEmpty": function() {
 		return Session.get("isNotEmpty");
@@ -270,9 +296,9 @@ Template.notices.helpers({
 		var t = _.findWhere(this.uploads, {userId: Meteor.userId()});
 		console.log(t);
 		if(t === undefined) {
-			return [];
+			return {files: []};
 		} else {
-			return t.files;
+			return t;
 		}
 	},
 	activeComment: function(x, z, y) {
