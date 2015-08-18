@@ -68,3 +68,11 @@ UI.registerHelper('withIndex', function(x) {
 		return _.extend(y, {index: i});
 	}); 
 });
+
+UI.registerHelper("percent", function(x, y) {
+	return x/y * 100;
+});
+
+UI.registerHelper("toDate", function(x) {
+	return x.toISOString().substring(0, 10); 
+});

@@ -575,16 +575,42 @@
 							</div>
 						{{/if}}
 						{{#if eq type "poll"}}
+							<div class="poll">
 							<b>Poll</b>
 							<br>
 							{{text}}
 							<br>
-							{{#each pollOptions}}
-								<input type="radio" name="{{../_id}}" value="{{.}}">
-								{{.}}
-								<br>
-							{{/each}}
-							<button class="btn btn-default btn-sm poll-submit">Submit</button>
+							{{#if admin}}
+								{{#if eq voted.length 0}}
+									<div class="info">Nobody has submitted this poll.</div>
+								{{else}}
+									<br>	
+									{{#each pollOptions}}
+										{{title}}
+										<div class="progress progress-info active">
+											<div class="progress-bar" style="width: {{percent votes ../voted.length}}%;"></div>
+										</div>		
+									{{/each}}
+								{{/if}}
+							{{else}}
+							{{#if contain voted currentUser._id}}
+								{{#each pollOptions}}
+									<input type="radio" name="{{../_id}}" disabled value="{{title}}">
+									{{title}}
+									<br>
+								{{/each}}
+								<button class="btn btn-default btn-sm poll-submit" disabled>Submit</button>
+								<div class="info">Poll already submitted.</div>
+							{{else}}
+								{{#each pollOptions}}
+									<input type="radio" name="{{../_id}}" value="{{title}}">
+									{{title}}
+									<br>
+								{{/each}}
+								<button class="btn btn-default btn-sm poll-submit">Submit</button>
+							{{/if}}
+							{{/if}}
+							</div>
 						{{/if}}
 						{{#if eq type "reminder"}}
 							<b>Reminder</b>
@@ -637,7 +663,7 @@
 														<tr>
 															<td>
 																{{this.name}}
-																{{> FS.DeleteButton class="btn btn-danger btn-xs"}}
+																{{> FS.DeleteButton class="btn btn-danger btn-xs pull-right"}}
 															</td>
 														</tr>
 													{{/with}}
@@ -719,7 +745,15 @@
 						<button class="btn btn-link reply">Reply</button>
 						{{#if teacher}}
 							{{#if ne type "poll"}}
-								<a href="/rooms/{{../_id}}/notices/{{noticeId}}/edit" class="btn btn-link">Edit</a>
+								{{#if eq type "notice"}}
+									<a href="/rooms/{{../_id}}/notices/announcements/{{_id}}/edit" class="btn btn-link">Edit</a>
+								{{/if}}
+								{{#if eq type "reminder"}}									
+									<a href="/rooms/{{../_id}}/notices/reminders/{{_id}}/edit" class="btn btn-link">Edit</a>
+								{{/if}}
+								{{#if eq type "assignment"}}
+									<a href="/rooms/{{../_id}}/notices/assignments/{{_id}}/edit" class="btn btn-link">Edit</a>
+								{{/if}}
 							{{/if}}
 							<button class="btn btn-link del">Delete</button>
 						{{/if}}
@@ -1545,7 +1579,11 @@
 				</h3>
 			</div>
 			<div class="panel-body">
-				<textarea class="form-control text" rows="3" placeholder="Type post here..."></textarea>
+				{{#if value}}
+					<textarea class="form-control text">{{value}}</textarea>	
+				{{else}}
+					<textarea class="form-control text" rows="3" placeholder="Type post here..."></textarea>
+				{{/if}}	
 				{{> imageList images=images can=true}}
 				{{> youtubeList youtubes=youtubes can=true}}
 				{{#if error}}
@@ -1603,11 +1641,11 @@
 			<div class="panel-body">
 				<div class="form-group">
 					<label>Event Date</label>
-					<input type="date" class="form-control eventDate">	
+					<input type="date" class="form-control eventDate" value="{{toDate obj.eventDate}}">	
 				</div>
 				<div class="form-group">
 					<label>Event Name</label>
-					<input type="text" class="form-control text">
+					<input type="text" class="form-control text" value="{{obj.text}}">
 				</div>	
 				{{#if error}}
 					<div class="error-msg">
@@ -1639,15 +1677,19 @@
 			<div class="panel-body">
 				<div class="form-group">
 					<label>Details</label>
-					<textarea class="form-control text"></textarea>
+					<textarea class="form-control text">{{obj.text}}</textarea>
 				</div>
 				<div class="form-group">
 					<label>Due Date</label>
-					<input type="date" class="dueDate form-control">
+					<input type="date" class="dueDate form-control" value="{{toDate obj.deadline}}">
 				</div>
 				<div class="form-group">
 					<label>Hand-in via Pandora</label> 
-					<input type="checkbox" class="uploadViaPandora">
+					{{#if obj.uploadViaPandora}}
+						<input type="checkbox" class="uploadViaPandora" checked>	
+					{{else}}
+						<input type="checkbox" class="uploadViaPandora">
+					{{/if}}
 				</div>
 				{{#if error}}
 					<div class="error-msg">

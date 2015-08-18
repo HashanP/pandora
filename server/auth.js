@@ -34,6 +34,7 @@ var updateQuiz = function(userId, doc) {
 
 Notices.allow({
 	insert: updateQuiz,
+	update: updateQuiz,
 	remove: updateQuiz
 });
 
@@ -44,11 +45,13 @@ Polls.allow({
 
 Reminders.allow({
 	insert: updateQuiz,
+	update: updateQuiz,
 	remove: updateQuiz
 });
 
 Assignments.allow({
 	insert: updateQuiz,
+	update: updateQuiz,
 	remove: updateQuiz
 });
 

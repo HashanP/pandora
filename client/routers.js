@@ -59,11 +59,24 @@ Router.route("/rooms/:room/notices/assignments/:assignment", function() {
 });
 
 Router.route("/rooms/:room/notices/announcement", function() {
-	window.images = new ReactiveArray();	
-	window.youtubes = new ReactiveArray();
 	var room = Rooms.findOne(this.params.room);
 	Session.set("error", "");
 	this.render("/announcement", {data: room});
+});
+
+Router.route("/rooms/:room/notices/announcements/:announcement/edit", function() {	
+	var room = Rooms.findOne(this.params.room)
+	this.render("/announcement", {data: {_id: room._id, announcementId: this.params.announcement}});
+});
+
+Router.route("/rooms/:room/notices/reminders/:reminder/edit", function() {	
+	var room = Rooms.findOne(this.params.room)
+	this.render("createReminder", {data: {_id: room._id, reminderId: this.params.reminder}});
+});
+
+Router.route("/rooms/:room/notices/assignments/:assignment/edit", function() {
+	var room = Rooms.findOne(this.params.room);
+	this.render("createAssignment", {data: {_id: room._id, assignmentId: this.params.assignment}});
 });
 
 Router.route("/rooms/:room/notices/reminder", function() {

@@ -238,6 +238,15 @@ Template.notices.events({
 		var c = Session.get("activeComment");
 		Meteor.call("editReply", c.type, c._id, c.id, $(".edit-reply-field").val());
 		Session.set("activeComment", "");
+	},
+	"click .poll-submit": function(e) {
+		console.log(this);
+		var x = $(e.target).closest(".poll").find("input:checked");
+		if(x.length === 0) {
+			swal("You must select an option.");
+		} else {
+			Meteor.call("vote", this._id, $(e.target).closest(".poll").find("input:checked").val());
+		}
 	}
 });
 
@@ -339,14 +348,18 @@ Template.createPoll.events({
 				return Session.set("error", "Options cannot be empty.");
 			}
 		}
+		var t = p.map(function(x) {
+			return {title: x, votes:0};
+		});
 		Polls.insert({
 			text: title,
 			date: new Date(Date.now()),
 			comments: [],
 			allowComments: true,
-			pollOptions: p,
+			pollOptions: t,
 			roomId: Template.instance().data._id,
-			userId: Meteor.userId()
+			userId: Meteor.userId(),
+			voted: []
 		});		
 		Router.go("/rooms/" + Template.instance().data._id);
 	}
@@ -365,15 +378,24 @@ Template.createReminder.events({
 		} else if($(".eventDate").val() === "") {
 			return Session.set("error", "Event date cannot be empty.");
 		}
-		Reminders.insert({
-			date: new Date(Date.now()),
-			eventDate: new Date($(".eventDate").val()),
-			text: $(".text").val(),
-			comments: [],
-			allowComments: true,
-			roomId: Template.instance().data._id,
-			userId: Meteor.userId()	
-		});
+		if(!Template.instance().data.reminderId) {
+			Reminders.insert({
+				date: new Date(Date.now()),
+				eventDate: new Date($(".eventDate").val()),
+				text: $(".text").val(),
+				comments: [],
+				allowComments: true,
+				roomId: Template.instance().data._id,
+				userId: Meteor.userId()	
+			});
+		} else {
+			Reminders.update(Template.instance().data.reminderId, {
+				$set: {
+					eventDate: new Date($(".eventDate").val()),
+					text: $(".text").val()
+				}
+			});
+		}
 		Router.go("/rooms/" + Template.instance().data._id);
 	}
 });
@@ -381,12 +403,20 @@ Template.createReminder.events({
 Template.createAssignment.helpers({
 	error: function() {
 		return Session.get("error");
+	},
+	obj: function() {
+		return Assignments.findOne(Template.instance().data.assignmentId);
 	}
 });
 
 Template.createReminder.helpers({
 	error: function() {
 		return Session.get("error");
+	},
+	obj: function() {
+		if(Template.instance().data.reminderId) {
+			return Reminders.findOne(Template.instance().data.reminderId);
+		}
 	}
 });
 
@@ -397,17 +427,28 @@ Template.createAssignment.events({
 		} else if($(".dueDate").val() === "") {
 			return Session.set("error", "Due date cannot be empty.");
 		}
-		Assignments.insert({
-			text: $(".text").val(),
-			comments: [],
-			allowComments: true,
-			roomId: Template.instance().data._id,
-			userId: Meteor.userId(),
-			deadline: new Date($(".dueDate").val()),
-			date: new Date(Date.now()),
-			uploads: [],
-			uploadViaPandora: $(".uploadViaPandora").is(":checked")
-		});		
+		if(!Template.instance().data.assignmentId) {
+			Assignments.insert({
+				text: $(".text").val(),
+				comments: [],
+				allowComments: true,
+				roomId: Template.instance().data._id,
+				userId: Meteor.userId(),
+				deadline: new Date($(".dueDate").val()),
+				date: new Date(Date.now()),
+				uploads: [],
+				uploadViaPandora: $(".uploadViaPandora").is(":checked")
+			});		
+		} else {
+			var obj = {
+				text: $(".text").val(),
+				deadline: new Date($(".dueDate").val()),
+				uploadViaPandora: $(".uploadViaPandora").is(":checked")
+			};
+			Assignments.update(Template.instance().data.assignmentId, {
+				$set: obj
+			});
+		}
 		Router.go("/rooms/" + Template.instance().data._id);
 	}
 });
@@ -1232,6 +1273,25 @@ UI.registerHelper("isNavActive", function(a) {
 	return Session.equals("navActive", a);
 });
 
+Template["/announcement"].onCreated(function() {
+	window.images = new ReactiveArray();	
+	window.youtubes = new ReactiveArray();
+	var data = this.data;
+	if(data.announcementId) {
+		this.autorun(function() {
+			var announcement = Notices.findOne(data.announcementId)
+			if(announcement) {
+				announcement.images.forEach(function(x) {
+					images.push(x);
+				});
+				announcement.youtubes.forEach(function(x) {
+					youtubes.push(x);
+				});
+			}
+		});
+	}
+});
+
 Template["/announcement"].onRendered(function() {
 	Template.instance().$(".text").autosize();
 });
@@ -1281,16 +1341,24 @@ Template["/announcement"].events({
 		if(text === "" && youtubes.length === 0 && images.length === 0) {
 			return Session.set("error", "Announcement cannot contain nothing.");
 		}
-		Notices.insert({
-			text: text,
-			date: new Date(Date.now()),
-			roomId: Template.instance().data._id,
-			allowComments: true,
-			comments: [],
-			youtubes: Array.prototype.slice.call(youtubes.list()),
-			images: Array.prototype.slice.call(images.list()),
-			userId: Meteor.userId()
-		});
+		if(!Template.instance().data.announcementId) {
+			Notices.insert({
+				text: text,
+				date: new Date(Date.now()),
+				roomId: Template.instance().data._id,
+				allowComments: true,
+				comments: [],
+				youtubes: Array.prototype.slice.call(youtubes.list()),
+				images: Array.prototype.slice.call(images.list()),
+				userId: Meteor.userId()
+			});
+		} else {
+			Notices.update(Template.instance().data.announcementId, {$set: {
+				text: text,
+				youtubes: Array.prototype.slice.call(youtubes.list()),
+				images: Array.prototype.slice.call(images.list())
+			}});
+		}
 		Router.go("/rooms/" + Template.instance().data._id);
 	}
 });
@@ -1304,6 +1372,12 @@ Template["/announcement"].helpers({
 	},
 	error: function() {
 		return Session.get("error");
+	},
+	value: function() {
+		console.log(Notices.findOne(Template.instance().data.announcementId));
+		if(Template.instance().data.announcementId) {
+			return Notices.findOne(Template.instance().data.announcementId).text;
+		}	
 	}
 });
 
