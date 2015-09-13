@@ -22,6 +22,11 @@ UI.registerHelper("teacher", function() {
 	return Rooms.findOne(Template.instance().data._id).teachers.indexOf(Meteor.userId()) !== -1 || (Meteor.user().roles && Meteor.user().roles.indexOf("admin") !== -1);
 });
 
+UI.registerHelper("today", function() {
+	var x = new Date(Date.now());
+	return x.getFullYear() + "-" + (x.getMonth()+1) + "-" + x.getDate();
+});
+
 Handlebars.registerHelper("formatArray", function(a) {
 	return JSON.stringify(a);
 });
@@ -74,5 +79,8 @@ UI.registerHelper("percent", function(x, y) {
 });
 
 UI.registerHelper("toDate", function(x) {
+	if(!x) {
+		x = new Date(Date.now());
+	}
 	return x.toISOString().substring(0, 10); 
 });

@@ -149,25 +149,6 @@ Template.navigation.onCreated(function() {
 	this.subscribe("notices", this.data._id);
 });
 
-Template.notices.onRendered(function() {
-/*	var n = function() {
-		console.log("hi");
-		 $('.slimScrollBar, .slimScrollRail').remove();
-		$(".super").slimScroll({
-			height:($(window).height() - 76) + "px" 
-		});
-	};
-	n();
-	$(window).resize(function() {
-		$(".super").unwrap();
-		n();
-	});
-	if(this.data.text) {
-		$(".create-text").modal("show")
-	}
-	$('[data-toggle="popover"]').popover();*/
-});
-
 Template.notices.events({
 	"click .del": function() {
 		if(this.type === "notice") {
@@ -339,13 +320,19 @@ Template.createPoll.events({
 		});
 		if(title === "") {
 			return Session.set("error", "Title cannot be empty.");
+		} else if(title.length > 400) {
+			return Session.set("error", "Title cannot be longer than 400 characters.");
 		}
 		if(p.length < 2) {
-			return Session.set("error", "A poll must have at least 2 options.");
+			return Session.set("error", "There must be at least 2 options.");
+		} else if(p.length > 10) {
+			return Session.set("error", "There cannot be more than 10 options.");
 		}
 		for(var i = 0; i < p.length; i++) {
 			if(p[i].trim() === "") {
 				return Session.set("error", "Options cannot be empty.");
+			} else if(p[i].length > 100) {
+				return Session.set("error", "Options cannot be longer than 100 characters.");
 			}
 		}
 		var t = p.map(function(x) {
@@ -375,6 +362,8 @@ Template.createReminder.events({
 	"click .submit": function() {
 		if($(".text").val() === "") {
 			return Session.set("error", "Event name cannot be empty.");
+		} else if($(".text").val().length > 200) {
+			return Session.set("error", "Event name cannot be longer than 200 characters.");
 		} else if($(".eventDate").val() === "") {
 			return Session.set("error", "Event date cannot be empty.");
 		}
@@ -424,6 +413,8 @@ Template.createAssignment.events({
 	"click .submit": function() {
 		if($(".text").val() === "") {
 			return Session.set("error", "Details cannot be empty.");
+		} else if($(".text").val().length > 4000) {
+			return Session.set("error", "Details cannot be longer than 4000 characters.");		
 		} else if($(".dueDate").val() === "") {
 			return Session.set("error", "Due date cannot be empty.");
 		}
@@ -768,17 +759,23 @@ Template.create_quiz.events({
 				}
 			});
 		}
-		console.log(p);
 		if(p.title === "") {
 			return Session.set("error", "Question title cannot be blank.");
 		} else if((p.options && p.options.length === 0) || (p.possibleTextAnswers && p.possibleTextAnswers.length === 0) || 
 			(p.possibleNumberAnswers && p.possibleNumberAnswers.length === 0)) {
 			return Session.set("error", "There must be at least one correct answer.");
+		} else if((p.options && p.options.length > 20) || (p.possibleTextAnswers && p.possibleTextAnswers.length > 20) || 
+			(p.possibleNumberAnswers && p.possibleNumberAnswers.length > 20)) {
+			return Session.set("error", "There cannot be more than 20 correct answers.");	
+		} else if(p.title.length > 200) {
+			return Session.set("error", "Title cannot be longer than 200 characters.");
 		}
 		if(p.type === "text") {
 			for(var i = 0; i < p.possibleTextAnswers.length; i++) {
 				if(p.possibleTextAnswers[i].trim() === "") {
 					return Session.set("error", "Answer(s) cannot be empty.");
+				} else if(p.possibleTextAnswers[i].length > 100) {
+					return Session.set("error", "Answer(s) can not be longer than 100 characters.");
 				}
 			}	
 		} else if(p.type === "number") {
@@ -795,6 +792,8 @@ Template.create_quiz.events({
 			}
 		} else if(p.type === "fill_in_the_blanks" && p.text.trim() === "") {
 			return Session.set("error", "Fill in the gaps text cannot be empty.");
+		} else if(p.type === "fill_in_the_blanks" && p.text.length > 1000) {
+			return Session.set("error", "Fill in the gaps text cannot be longer than 1000 characters.");
 		}
 		console.log($(".question-title").val());
 		questions.splice(this.index, 1, p);
@@ -869,6 +868,8 @@ Template.create_quiz.events({
 	"click .submit": function() {
 		if(questions.list().length === 0) {
 			return Session.set("bigError", "There must be at least 1 question.");
+		} else if(questions.list().length > 100) {
+			return Session.set("bigError", "There can at most be 100 questions.");
 		}
 		var data = Template.instance().data;
 		$(".question.active .done").trigger("click");
@@ -1370,7 +1371,9 @@ Template["/announcement"].events({
 	"click .submit": function() {
 		var text = $(".text").val();
 		if(text === "" && youtubes.length === 0 && images.length === 0) {
-			return Session.set("error", "Announcement cannot contain nothing.");
+			return Session.set("error", "Post cannot contain nothing.");
+		} else if(text.length > 4000) {
+			return Session.set("error", "Post cannot be longer than 4000 characters.");
 		}
 		if(!Template.instance().data.announcementId) {
 			Notices.insert({
