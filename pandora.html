@@ -1454,9 +1454,15 @@
 </template>
 
 <template name="uploadStatus">
-	{{#if filesBeingUploaded}}
+	{{#if show}}
 		<div class="col-md-12">
 			<div class="well file-uploads">
+				{{#if errors}}
+					{{#each errors}}
+						<h4>{{name}}</h4>
+						<p class="text-danger">File could not be uploaded because there is a folder with the same name.</p>
+					{{/each}}
+				{{/if}}
 				{{#each filesBeingUploaded}}
 					{{#with FS.GetFile "files" this}}
 						<h4>{{this.name}}</h4>
@@ -1464,7 +1470,9 @@
 					{{/with}}
 				{{/each}}
 				{{#if finished}}
-					<button class="btn btn-primary done">Done</button>
+					{{#if errors}}
+						<button class="btn btn-primary done">Dismiss</button>
+					{{/if}}
 				{{/if}}
 			</div>
 		</div>

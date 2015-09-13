@@ -63,6 +63,11 @@ VocabQuizzes.allow({
 	update: updateQuiz
 });
 
+Rooms.before.insert(function(userId, doc) {
+	doc.schoolId = Meteor.users.findOne(userId).schoolId;
+	return doc;
+});
+
 Files.on("stored", Meteor.bindEnvironment(function(doc) {
   if(doc.category === "resource") {
 		var room = Rooms.findOne(doc.owner);
@@ -95,6 +100,9 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 		console.log(doc.path);
 		if(path === doc.path) {
 			var c = _.findWhere(b, {name: doc.name()});
+			if(c && c.type === "folder") {
+				return Files.remove(doc._id);
+			}
 			if(c) {
 				Files.remove(b[b.indexOf(c)]._id);		
 				b.splice(b.indexOf(c), 1);	

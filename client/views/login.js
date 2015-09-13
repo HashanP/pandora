@@ -480,6 +480,14 @@ var search = function(folder, searc) {
 	return results;
 };
 
+var getFiles = function() {
+	if(!Session.get("search")) {
+		return _.sortBy(Session.get("files"), "name");
+	} else {
+		return _.sortBy(search(Session.get("files"), Session.get("search")), "name");
+	}
+}
+
 Template.explorer.helpers({
 	newFolder: function() {
 		return Session.get("newFolder");
@@ -1116,6 +1124,11 @@ Template.explorer.events({
 		}
 		Session.set("newFolder", false);
 	},
+	"keyup .input-create-folder, keyup .input-rename": function(e) {
+		if(e.keyCode === 13) {
+			$(e.target).trigger("blur");
+		}
+	},
 	"blur .input-rename": function() {
 		var p = $(".input-rename").val();
 		if(p !== "") {
@@ -1140,6 +1153,12 @@ Template.uploadStatus.helpers({
 			}
 		}
 		return true;
+	},
+	errors: function() {
+		return Session.get("errors");
+	},
+	show: function() {
+		return Session.get("errors").length || Session.get("filesBeingUploaded").length;
 	}
 });
 
@@ -1224,9 +1243,11 @@ Template.explorer.onDestroyed(function() {
 
 var nameValidation = function(p) {
 	if(p.length > 255) {
-		swal("Folder name too long", "Folder name cannot be longer than 255 characters");
+		swal("Name too long", "File and folder names cannot be longer than 255 characters");
 	} else if(p.indexOf("/") !== -1) {
-		swal("Folder name contains /", "Folder names cannot contain forward slashes");
+		swal("Name contains /", "Folder names cannot contain forward slashes");
+	} else if(_.findWhere(getFiles(), {name: p})) {
+		swal("Another file or folder has the same name", "Please choose a different name");	
 	} else {
 		return true;
 	} 
@@ -1236,12 +1257,21 @@ Template.files.events({
 	"click .upload": function() {
 		$("tr.active").removeClass("active");
 		var y = Template.instance();
+		console.log(y);
 		var fileEl = document.createElement("input");
+		fileEl.multiple = true;
 		$("body").append(fileEl);
 		fileEl.type = "file";
+		Session.set("errors", []);
 		fileEl.addEventListener("change", function(e) { 
 			FS.Utility.eachFile(e, function(file) {
 				file = new FS.File(file);
+				if(_.findWhere(getFiles(), {name: file.name(), type: "folder"})) {
+					console.log("here");
+					var errors = Session.get("errors");
+					errors.push({name:file.name()});
+					return Session.set("errors", errors);
+				}
 				file.owner = y.data._id;
 				file.schoolId = y.data.schoolId;
 				file.category = "resource";
@@ -1258,6 +1288,7 @@ Template.files.events({
 	},
 	"click .done": function() {
 		Session.set("filesBeingUploaded", []);
+		Session.set("errors", []);
 	}
 }); 
 

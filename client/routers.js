@@ -115,6 +115,7 @@ Router.route("/rooms/:room/files/:path*", function() {
 		});
 	}
 	Session.set("search", this.params.query.search);
+	Session.set("files", files);
 	this.render("files", {data:{_id: room._id, files: files}});
 });
 
@@ -181,6 +182,7 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 		Session.set("search", this.params.query.search);
 		Session.set("newFolder", false);
 		Session.set("noOfActive", 0);
+		Session.set("files", files);
 		this.render("quizzes", {data:{_id: room._id, files: files}});
 	}
 });
