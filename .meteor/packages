@@ -13,7 +13,6 @@ iron:router
 reactive-var
 accounts-base
 accounts-password
-natestrauser:select2
 zimme:select2-bootstrap3-css
 tmeasday:publish-counts
 matb33:collection-hooks
@@ -31,3 +30,4 @@ codechimera:meteor-bootstrap-sweetalert
 d3js:d3
 hashanp:colorbrewer
 reywood:publish-composite
+natestrauser:select2

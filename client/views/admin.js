@@ -112,18 +112,15 @@ Template["/admin/rooms/create"].events({
 			teachers: $(".teachers").select2("val"),
 		};
 		var sep = function(err) {
-			console.log(err);
 			if(err) {
 				Session.set("error", "Another room has the same title; you must choose a different one.");
 			} else {
 				Router.go("/admin/rooms");
 			}
 		}
-		console.log(this);
 		if(this._id) {
 			Rooms.update({_id: this._id}, {$set: obj}, sep);
 		} else {
-			console.log(Meteor.user());
 			obj.schoolId = Meteor.user().schoolId;
 			Rooms.insert(obj, sep);
 		}	

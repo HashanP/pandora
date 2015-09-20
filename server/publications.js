@@ -81,7 +81,7 @@ Meteor.publishComposite("rooms", {
 		if(user.roles && user.roles.indexOf("admin") !== -1) {
 			return Rooms.find({schoolId: user.schoolId});
 		} else {
-			return Rooms.find({$or: [{students: {$in: [this.userId]}}, {teachers: {$in: [this.userId]}}]});
+			return Rooms.find({$or: [{students: {$in: [this.userId]}}, {teachers: {$in: [this.userId]}}, {type:"club"}]});
 		}
 	},
 	children: [
