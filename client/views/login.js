@@ -235,6 +235,24 @@ Template.assignment.onCreated(function() {
 	this.subscribe("fa", this.data.assignmentId);
 });
 
+Template.home.helpers({
+	joined: function(id) {
+		return Rooms.findOne(id).students.indexOf(Meteor.userId()) !== -1;
+	},
+	teacher: function(id) {
+		return Rooms.findOne(id).teachers.indexOf(Meteor.userId()) !== -1;
+	}
+});
+
+Template.home.events({
+	"click .join": function() {
+		Meteor.call("join", this._id);
+	},
+	"click .unjoin": function() {
+		Meteor.call("unjoin", this._id);
+	}
+});
+
 Template.assignment.helpers({
 	uploads: function() {
 		return Assignments.findOne(Template.instance().data.assignmentId).uploads;

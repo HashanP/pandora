@@ -98,9 +98,9 @@
 			<div class="list-group bit-g">
 				{{#if admin}}
 					{{#if eq active2 "0"}}
-						<a class="list-group-item active" href="/">All Courses</a>
+						<a class="list-group-item active" href="/">My Courses</a>
 					{{else}}
-						<a class="list-group-item" href="/">All Courses</a>	
+						<a class="list-group-item" href="/">My Courses</a>	
 					{{/if}}
 					{{else}}
 					{{#if eq active2 "0"}}
@@ -123,11 +123,28 @@
 		</div>
 		<div class="col-md-10">
 			{{#each subjects}}
-				<div class="col-md-3">
-					<a href="/rooms/{{_id}}/" style="background-image: url({{GeoPattern title}});" class="icon2">
-						<span class="title">{{title}}</span>	
-					</a>	
-				</div>
+				{{#if eq ../active2 "2"}}
+					<div class="col-md-3">
+						<a href="/rooms/{{_id}}/" style="background-image: url({{GeoPattern title}});" class="icon2 icon3">
+							<span class="title">{{title}}</span>	
+						</a>	
+						{{#if teacher _id}}
+							<button class="btn btn-sm btn-default btn-disabled" disabled>Teacher</button>
+						{{else}}
+							{{#if joined _id}}
+								<button class="btn btn-sm btn-default unjoin">Unpin</button>	
+							{{else}}
+								<button class="btn btn-sm btn-default join">Pin</button>
+							{{/if}}
+						{{/if}}
+					</div>
+				{{else}}
+					<div class="col-md-3">
+						<a href="/rooms/{{_id}}/" style="background-image: url({{GeoPattern title}});" class="icon2">
+							<span class="title">{{title}}</span>	
+						</a>	
+					</div>
+				{{/if}}
 			{{/each}}
 		</div>
 	</div>
@@ -1488,6 +1505,7 @@
 							<div class="pull-right">
 								{{#if teacher}}
 									{{> tools}}
+									<button class="btn btn-success add-link">New Link</button>
 									<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
 								{{/if}}
 								{{> search}}
@@ -1515,6 +1533,10 @@
 			</div>
 		</div>
 	</div>
+</template>
+
+<template name="newLink">
+
 </template>
 
 <template name="youtubeList">
@@ -1808,4 +1830,12 @@
 			</div>
 		</div>
 	</div>
+</template>
+
+<template name="adminOnly">
+	<div style="width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="font-size: 18pt; color: #999; text-align:center;">
+			This route is restricted to admins.
+    </div>
+  </div>
 </template>

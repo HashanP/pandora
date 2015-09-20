@@ -7,9 +7,21 @@ $navbar-default-brand-color: #fff;
 $navbar-default-border: $navbar-default-bg;
 $navbar-default-link-active-color:$navbar-default-link-color;
 $navbar-default-link-hover-color:#fff; 
+$navbar-default-toggle-bg:#ddd;
+$navbar-default-toggle-hover-bg: #fff;
+$navbar-default-toggle-border-color: #fff;
+$navbar-default-toggle-icon-bar-bg: #fff;
 @import ".meteor/local/build/programs/server/assets/packages/reywood_bootstrap3-sass/_bootstrap";
 @import "http://fonts.googleapis.com/css?family=Lobster|Titillium+Web";
 @import url(http://fonts.googleapis.com/css?family=Raleway:400,300);
+
+.navbar-toggle:not(:hover):focus {
+	background-color:transparent !important;
+}
+
+.navbar-toggle:hover .icon-bar {
+	background-color:#222 !important;
+}
 
 .row {
 	margin-left:0;
@@ -755,6 +767,10 @@ thead tr th {
 	font-size:25px;
 }
 
+.icon2.icon3 {
+	margin-bottom:10px;
+}
+
 .bit-g .active {
 	background-color:#F5AB44 !important;
 	border-color:#F5AB44 !important;
@@ -873,3 +889,4 @@ thead tr th {
 a.select2-search-choice-close {
 	background: url('packages/natestrauser_select2/lib/select2/select2.png') right top no-repeat !important;
 }
+

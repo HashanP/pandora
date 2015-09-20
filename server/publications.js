@@ -13,7 +13,7 @@ Meteor.publish("/admin/users", function(offset, limit, search) {
 	if(search) {
 		query.username = new RegExp(search, "i");
 	}
-	if(user.roles.indexOf("admin") !== -1) { 
+	if(user.roles && user.roles.indexOf("admin") !== -1) { 
 		Mongo.Collection._publishCursor(Meteor.users.find(query, {
 			skip: offset,
 			limit: limit,
@@ -29,7 +29,7 @@ Meteor.publish("/admin/users/count", function(search) {
 		return [];
 	}
 	var user = Meteor.users.findOne(this.userId);
-	if(user.roles.indexOf("admin") !== -1) {
+	if(user.roles && user.roles.indexOf("admin") !== -1) {
 		if(!search) {
 			Counts.publish(this, "users", Meteor.users.find({schoolId: user.schoolId}));
 		} else {
