@@ -104,6 +104,7 @@ Router.route("/rooms/:room/files/:path*", function() {
 	Session.set("filesBeingUploaded", []);
 	Session.set("newFolder", false);
 	Session.set("noOfActive", 0);
+	Session.set("error", "");
 	var room = Rooms.findOne(this.params.room);
 	if(!this.params.path) {
 		var files = room.files;

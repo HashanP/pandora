@@ -1123,6 +1123,10 @@ Template.explorer.events({
 			var a = document.createElement("a");
 			a.href = Files.findOne(this._id).url();
 			a.click();
+		} else if(this.type === "link") {
+			var a = document.createElement("a");
+			a.href = this.url;
+			a.click();
 		} else {
 			$("tr.active").removeClass("active");
 			Router.go("/rooms/" + Template.instance().data._id + "/" + Session.get("navActive") + (Session.get("path") === "/" ? "/" : "/" + Session.get("path") + "/") + this.name);
@@ -1308,8 +1312,25 @@ Template.files.events({
 	"click .done": function() {
 		Session.set("filesBeingUploaded", []);
 		Session.set("errors", []);
+	},
+	"click .add-link": function() {
+		Modal.show("newLink", Template.instance().data);
 	}
 }); 
+
+Template.newLink.events({
+	"click .submit": function() {
+		var url = $(".url").val();
+		if (!/^https?:\/\//i.test(url)) {
+			url = 'http://' + url;
+		}
+		Meteor.call("addLink", Template.instance().data._id, Session.get("path"), {
+			name: $(".name").val(),
+			url: url
+		});
+		Modal.hide("addLink");
+	}
+});
 
 Template.files.onCreated(function() {
 	this.subscribe("files", this.data._id);

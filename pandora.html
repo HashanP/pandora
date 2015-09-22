@@ -1505,7 +1505,7 @@
 							<div class="pull-right">
 								{{#if teacher}}
 									{{> tools}}
-									<button class="btn btn-success add-link">New Link</button>
+									<button class="btn btn-success add-link"><i class="fa fa-link"></i> New Link</button>
 									<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
 								{{/if}}
 								{{> search}}
@@ -1536,7 +1536,29 @@
 </template>
 
 <template name="newLink">
-
+	<div class="modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="form-group">
+						<label>Name</label>
+						<input class="form-control name" placeholder="Google">
+					</div>
+					<div class="form-group">
+						<label>URL</label>
+						<input class="form-control url" placeholder="www.google.com">
+					</div>
+					{{#if error}}
+						<div class="text-danger"><strong>{{error}}</strong></div>
+					{{/if}}
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary submit">Create</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <template name="youtubeList">
