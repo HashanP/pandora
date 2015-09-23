@@ -1154,7 +1154,7 @@ Template.explorer.events({
 	},
 	"blur .input-rename": function() {
 		var p = $(".input-rename").val();
-		if(p !== "") {
+		if(p !== "" && p !== Session.get("old")) {
 			if(nameValidation(p)) {
 				Meteor.call("fileRename", Template.instance().data._id, Session.get("navActive"), Session.get("path"), Session.get("old"), p);	
 			}
@@ -1225,7 +1225,11 @@ Template.breadcrumb.helpers({
 
 Template.item.helpers({
 	isFolder: function() {
-		return this.type === "folder";
+		return this.type === "folder" || this.type === "link";
+	},
+	isLink: function() {
+		console.log(this);
+		return this.type === "link";
 	},
 	isActive: function(a) {
 			console.log(a);
@@ -1318,17 +1322,31 @@ Template.files.events({
 	}
 }); 
 
+var URL_REGEX= /[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+
 Template.newLink.events({
 	"click .submit": function() {
+		var name = $(".name").val();
 		var url = $(".url").val();
 		if (!/^https?:\/\//i.test(url)) {
 			url = 'http://' + url;
 		}
+		if(!URL_REGEX.test(url)) {
+			return Session.set("error", "URL not valid.");
+		} else if(name.trim() === "") {
+			return Session.set("error", "Name cannot be empty.");
+		}
 		Meteor.call("addLink", Template.instance().data._id, Session.get("path"), {
-			name: $(".name").val(),
+			name: name,
 			url: url
 		});
 		Modal.hide("addLink");
+	}
+});
+
+Template.newLink.helpers({
+	"error": function() {
+		return Session.get("error");
 	}
 });
 

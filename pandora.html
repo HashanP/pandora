@@ -882,23 +882,33 @@
 		<tr class="folder">
 			{{#if isActive name}}
 				<td>
-					<i class="fa fa-folder-o"></i>
+					{{#if isLink}}
+						<i class="fa fa-link"></i>
+					{{else}}
+						<i class="fa fa-folder-o"></i>
+					{{/if}}
 				</td>
 				<td class="bb">
 					<input type="text"  class="form-control input-rename input-sm">
 				</td>
 			{{else}}
-						<td>
-							<i class="fa fa-folder-o"></i></td><td>
-							<span class="filename">{{name}}</span>
-						</td>
-						{{/if}}
-						{{#if isNavActive "files"}}
-						<td>--</td>
-						{{/if}}
-						</tr>
-				{{else}}
-					<tr>
+				<td>
+					{{#if isLink}}
+						<i class="fa fa-link"></i>
+					{{else}}
+						<i class="fa fa-folder-o"></i>
+					{{/if}}
+				</td>
+				<td>
+					<span class="filename">{{name}}</span>
+				</td>
+			{{/if}}
+			{{#if isNavActive "files"}}
+				<td>--</td>
+			{{/if}}
+		</tr>
+	{{else}}
+				<tr>
 							{{#if isActive name}}
 							<td>
 							{{> icon}}
@@ -928,6 +938,8 @@
 		{{else}}
 		{{#if eq noOfActive 1}}
 			<button class="btn btn-edit rename">Rename</button>
+		{{else}}
+			
 		{{/if}}
 		<button class="btn btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
 	{{/if}}
@@ -1410,7 +1422,7 @@
 			{{/if}}
 		{{/each}}
 	</ol>-->
-	<div class="path">
+	<div class="path breadcrumb-path">
 	{{#each pathSplit}}
 		{{#if active}}
 			{{name}}
@@ -1498,10 +1510,10 @@
 	<div class="circle"></div>
 	<div class="container">
 			<div class="row">
-						<div class="col-md-4">
+						<div class="col-md-3">
 							{{> breadcrumb}}
 						</div>
-						<div class="col-md-8">
+						<div class="col-md-9">
 							<div class="pull-right">
 								{{#if teacher}}
 									{{> tools}}
