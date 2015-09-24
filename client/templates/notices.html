@@ -1,0 +1,202 @@
+<template name="youtubeList">
+	{{#each withIndex youtubes}}
+		<div class="notice-embed notice-embed-plus">
+			<div class="remove-icon"><i class="fa fa-times remove-youtube"></i></div>
+			<div class="info">YouTube</div>
+			<div class="notice-link"><a href="https://youtube.com/watch?v={{id}}" target="_blank">{{title}}</a></div>
+			<img width="200px" src="https://img.youtube.com/vi/{{id}}/1.jpg">	
+		</div>
+	{{/each}}
+	<div class="modal" id="show-youtube">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">{{youtubeTitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<div class="videoContainer">
+						<iframe allowfullscreen src="http://www.youtube.com/embed/{{youtubeId}}" frameborder="0"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="imageList">
+	{{#each withIndex images}}
+		<div class="notice-embed notice-embed-plus">
+			<div class="remove-icon"><i class="fa fa-times remove-image"></i></div>
+			<div class="notice-link"><a href="" target="_blank">{{title}}</a></div>
+			<img width="200px" src="{{data}}">
+		</div>
+	{{/each}}
+	<div class="modal" id="show-image">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">{{imageTitle}}</h4>
+				</div>
+				<div class="modal-body">
+					<img src="{{imageSrc}}">
+				</div>
+			</div>
+		</div>
+	</div>	
+</template>
+
+<template name="/announcement">
+	{{> navigation}}
+	<div class="container">
+		<div class="col-md-3">
+			{{>noticeNav}}	
+		</div>
+		<div class="col-md-9">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Create Post
+					<div class="pull-right">
+						<a href="/rooms/{{_id}}">
+							<i class="fa fa-times"></i>
+						</a>
+					</div>
+				</h3>
+			</div>
+			<div class="panel-body">
+				{{#if value}}
+					<textarea class="form-control text">{{value}}</textarea>	
+				{{else}}
+					<textarea class="form-control text" rows="3" placeholder="Type post here..."></textarea>
+				{{/if}}	
+				{{> imageList images=images can=true}}
+				{{> youtubeList youtubes=youtubes can=true}}
+				{{#if error}}
+					<div class="error-msg-2 text-danger">
+						<strong>{{error}}</strong>	
+					</div>
+				{{/if}}
+			 </div>
+			<div class="panel-footer">
+				<button class="btn btn-link add-image">Add Image <i class="fa fa-image"></i></button>
+				<button class="btn btn-link" data-toggle="modal" data-target="#youtube">Add Video <i class="fa fa-youtube"></i></button>
+				<div class="pull-right">
+					<button class="btn btn-link submit">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>	
+	<div class="modal" id="youtube">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="gridSystemModalLabel">Add YouTube video</h4>
+      </div>
+      <div class="modal-body">
+				{{#if isInvalidURL}}
+					<span class="text-danger">URL is not a valid YouTube URL</span>
+				{{/if}}
+				<input class="form-control youtube-url">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary add-youtube">Submit</button>
+      </div>
+		</div>
+		</div>	
+	</div>
+	</div>
+</template>
+
+<template name="createReminder">
+	{{>navigation}}
+	<div class="container">
+		<div class="col-md-3">
+			{{>noticeNav}}
+		</div>
+		<div class="col-md-9">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Create Reminder
+					<div class="pull-right">
+						<a href="/rooms/{{_id}}"><i class="fa fa-times"></i></a>	
+					</div>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label>Event Date</label>
+					<input type="date" class="form-control eventDate" value="{{toDate obj.eventDate}}">	
+				</div>
+				<div class="form-group">
+					<label>Event Name</label>
+					<input type="text" class="form-control text" value="{{obj.text}}">
+				</div>	
+				{{#if error}}
+					<div class="error-msg">
+						<strong class="text-danger">{{error}}</strong>
+					</div>
+				{{/if}}
+				<button class="btn btn-primary submit">Submit</button>
+			</div>
+		</div>
+		</div>
+	</div>
+</template>
+
+<template name="createAssignment">
+	{{>navigation}}
+	<div class="container">
+		<div class="col-md-3">
+			{{>noticeNav}}
+		</div>
+		<div class="col-md-9">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Create Assignment
+					<div class="pull-right">
+						<a href="/rooms/{{_id}}"><i class="fa fa-times"></i></a>
+					</div>
+				</h3>
+			</div>	
+			<div class="panel-body">
+				<div class="form-group">
+					<label>Details</label>
+					<textarea class="form-control text">{{obj.text}}</textarea>
+				</div>
+				<div class="form-group">
+					<label>Due Date</label>
+					<input type="date" class="dueDate form-control" value="{{toDate obj.deadline}}">
+				</div>
+				<div class="form-group">
+					<label>Hand-in via Pandora</label> 
+					{{#if obj.uploadViaPandora}}
+						<input type="checkbox" class="uploadViaPandora" checked>	
+					{{else}}
+						<input type="checkbox" class="uploadViaPandora">
+					{{/if}}
+				</div>
+				{{#if error}}
+					<div class="error-msg">
+						<strong class="text-danger">{{error}}</strong>
+					</div>
+				{{/if}}
+				<button class="btn btn-primary submit">Submit</button>
+			</div>
+		</div>
+		</div>
+	</div>
+</template>
+
+<template name="pollOption">
+	<div class="option">
+		<div class="input-group">
+			<input type="text" class="form-control">
+			<span class="input-group-btn">
+				<button class="btn btn-default remove-option"><i class="fa fa-times"></i></button>
+			</span>
+		</div>
+		<br>
+	</div>
+</template>

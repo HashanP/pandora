@@ -1,0 +1,232 @@
+<template name="icon">
+	{{#if isImage}}
+		<i class="fa fa-file-image-o"></i>
+	{{else}}
+		{{#if isAudio}}
+			<i class="fa fa-file-sound-o"></i>
+		{{else}}
+			<i class="fa fa-file-o"></i>
+		{{/if}}
+	{{/if}}	
+</template>
+
+<template name="item">
+	{{#if isFolder}}
+		<tr class="folder">
+			{{#if isActive name}}
+				<td>
+					{{#if isLink}}
+						<i class="fa fa-link"></i>
+					{{else}}
+						<i class="fa fa-folder-o"></i>
+					{{/if}}
+				</td>
+				<td class="bb">
+					<input type="text"  class="form-control input-rename input-sm">
+				</td>
+			{{else}}
+				<td>
+					{{#if isLink}}
+						<i class="fa fa-link"></i>
+					{{else}}
+						<i class="fa fa-folder-o"></i>
+					{{/if}}
+				</td>
+				<td>
+					<span class="filename">{{name}}</span>
+				</td>
+			{{/if}}
+			{{#if isNavActive "files"}}
+				<td>--</td>
+			{{/if}}
+		</tr>
+	{{else}}
+				<tr>
+							{{#if isActive name}}
+							<td>
+							{{> icon}}
+							</td>
+							<td class="bb">
+							<input type="text" class="form-control input-sm input-rename">
+							</td>
+							{{else}}			
+								<td>
+								{{> icon}}										
+								</td>
+								<td>
+							<span class="filename">
+									{{name}}
+								</span>
+								</td>
+							{{/if}}
+								{{#with FS.GetFile "files" _id}}
+									<td><span class="filesize">{{humanFileSize this.size}}</span></td>
+								{{/with}}
+		</tr>
+	{{/if}}
+</template>
+
+<template name="tools">
+	{{#if eq noOfActive 0}}
+		{{else}}
+		{{#if eq noOfActive 1}}
+			<button class="btn btn-edit rename">Rename</button>
+		{{else}}
+			
+		{{/if}}
+		<button class="btn btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+	{{/if}}
+	<button class="btn btn-success create-folder"><i class="fa fa-folder-o"></i> New Folder</button>
+</template>
+
+<template name="breadcrumb">
+	<div class="path breadcrumb-path">
+		{{#each pathSplit}}
+			{{#if active}}
+				{{name}}
+			{{else}}
+				<a href="/rooms/{{../_id}}/{{navActive}}{{p}}">{{name}}</a>	>
+			{{/if}}
+		{{/each}}	
+	</div>
+</template>
+
+<template name="explorer">
+	<div class="col-md-12">
+		<div class="panel panel-default panel-super files">
+			<table class="table files">
+				<thead>
+					<tr>
+						<th></th>
+						<th>Name</th>
+						{{#if isNavActive "files"}}
+							<th>Size</th>
+						{{/if}}
+					</tr>
+				</thead>
+				<tbody>
+				{{#each filesF}}
+					{{>item .}}
+				{{/each}}
+					{{#if newFolder}}
+					<tr class="create-new-folder">
+						<td>
+							<i class="fa fa-folder-o"></i>
+						</td>
+						<td>
+							<input type="text" placeholder="Enter folder name" class="pull-right input-create-folder input-sm form-control">
+						</td>
+						{{#if isNavActive "files"}}
+							<td></td>
+						{{/if}}
+					</tr>
+					{{/if}}
+				</tbody>
+			</table>
+			{{#if eq filesF.length 0}}
+				<div class="panel-body panel-body-none">
+					<h2 class="text-center"><i class="fa fa-2x fa-exclamation-circle"></i></h2>
+					<p class="text-center">Nothing here</p>
+				</div>
+			{{/if}}	
+		</div>
+	</div>
+</template>
+
+<template name="search">
+	<input type="text" placeholder="Search..." value="{{search}}" class="form-control search zeplin">
+</template>
+
+<template name="uploadStatus">
+	{{#if show}}
+		<div class="col-md-12">
+			<div class="well file-uploads">
+				{{#if errors}}
+					{{#each errors}}
+						<h4>{{name}}</h4>
+						<p class="text-danger">File could not be uploaded because there is a folder with the same name.</p>
+					{{/each}}
+				{{/if}}
+				{{#each filesBeingUploaded}}
+					{{#with FS.GetFile "files" this}}
+						<h4>{{this.name}}</h4>
+						{{> FS.UploadProgressBar bootstrap=true class="progress-bar-success progress-bar-striped active" showPercent=true}}					
+					{{/with}}
+				{{/each}}
+				{{#if finished}}
+					{{#if errors}}
+						<button class="btn btn-primary done">Dismiss</button>
+					{{/if}}
+				{{/if}}
+			</div>
+		</div>
+	{{/if}}
+</template>
+
+<template name="files">
+	{{> navigation}}
+	<div class="circle"></div>
+	<div class="container">
+			<div class="row">
+						<div class="col-md-3">
+							{{> breadcrumb}}
+						</div>
+						<div class="col-md-9">
+							<div class="pull-right">
+								{{#if teacher}}
+									{{> tools}}
+									<button class="btn btn-success add-link"><i class="fa fa-link"></i> New Link</button>
+									<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
+								{{/if}}
+								{{> search}}
+							</div>
+						</div>
+			</div>
+		<div class="row">
+			{{>uploadStatus}}
+			<br>
+			{{> explorer files=files _id=_id}}
+		</div>
+	</div>
+</template>	
+
+<template name="fileSizeTooBig">
+	<div class="modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+						The file size of that image was too big. Image uploads must be smaller than 3MB.
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="newLink">
+	<div class="modal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="form-group">
+						<label>Name</label>
+						<input class="form-control name" placeholder="Google">
+					</div>
+					<div class="form-group">
+						<label>URL</label>
+						<input class="form-control url" placeholder="www.google.com">
+					</div>
+					{{#if error}}
+						<div class="text-danger"><strong>{{error}}</strong></div>
+					{{/if}}
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary submit">Create</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

@@ -1,0 +1,476 @@
+<template name="option">
+	<div class="opt">
+		<div class="input-group">
+			{{#if list}}
+				<span class="input-group-addon">
+					{{#if active}}
+						<input name="inly" class="active" type="radio" checked>
+					{{else}}
+						<input name="inly" class="active" type="radio">
+					{{/if}}
+				</span>
+			{{/if}}
+			{{#if checkboxes}}
+				<span class="input-group-addon">
+					{{#if active}}
+						<input name="inly" class="active" type="checkbox" checked>
+					{{else}}
+						<input name="inly" class="active" type="checkbox">
+					{{/if}}	
+				</span>
+			{{/if}}
+			<input class="form-control option" type="{{type}}" value="{{value}}">	
+			<span class="input-group-btn">
+				<button type="button" class="btn btn-default remove"><i class="fa fa-times"></i></button>
+			</span>
+		</div>
+		<br>
+	</div>
+</template>
+
+<template name="vocabQuestion">
+	<tr class="vocab-unit">
+		<td>
+			<input type="text" value="{{question}}" class="vocab-question" placeholder="Write question here...">
+		</td>
+		<td>
+			<input type="text" value="{{answer}}" class="vocab-answer" placeholder="Write answer here...">
+		</td>
+		<td>
+			<button class="btn btn-default btn-xs del"><i class="fa fa-times"></i></button>
+			<button class="btn btn-default btn-xs move"><i class="fa fa-navicon"></i></button>
+		</td>
+	</tr>
+</template>
+
+<template name="createVocabQuiz">
+	{{>navigation}}
+	<div class="container-small">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<table class="table table-bordered table-condensed vocab-questions">
+						<thead>
+							<tr>
+								<th>Question</th>
+								<th>Answer</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							{{#if quizId}}
+								{{#each questions}}
+									{{>vocabQuestion}}	
+								{{/each}}
+							{{else}}
+								{{>vocabQuestion}}
+							{{/if}}
+						</tbody>	
+					</table>
+					<button class="btn btn-default add-question">Add Row</button>
+					<button class="btn btn-default add-rows-10">Add 10 Rows</button>
+					<div class="pull-right">
+						<button class="btn btn-primary submit">Submit</button>	
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+</template>
+
+<template name="vocabQuiz">
+	{{>navigation}}
+	<div class="container-small">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="pull-right">
+						<button type="button" class="btn btn-sm btn-default reset">Reset</button>
+						<a href="/rooms/{{_id}}/quizzes/{{path}}/edit" type="button" class="btn btn-sm btn-default edit">Edit</a>
+						<button type="button" class="btn btn-sm btn-primary reveal-answers">Reveal Answers</button>	
+					</div>
+					<br><br>
+					<div class="row vocab-quiz">
+						{{#each questions}}
+							<div class="col-xs-6 col-sm-6 col-md-3 col-lg-2">
+								{{question}}
+							</div>
+							<input type="text" class="answer col-xs-6 col-sm-6 col-md-3 col-lg-2" data-answer="{{answer}}">
+						{{/each}}
+					</div>
+				</div>	
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="create_quiz">
+	{{>navigation}}
+	<div class="container-small">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-body questions">
+					<div class="question-list {{inProgress}}">
+					{{#each withIndex questions}}
+						<div class="question {{active}}" data-index="{{index}}">
+						{{#if isActive index}}
+							<form class="form-horizontal">
+								<div class="form-group">
+									<label class="col-sm-2">Question Title</label>
+									<div class="col-sm-10">
+										<input type="text" value="{{title}}" class="form-control question-title">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2">Help Text (optional)</label>
+									<div class="col-sm-10">
+										<input type="text" value="{{help_text}}" class="form-control help-text">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2">Question Type</label>
+									<div class="col-sm-10">
+										<select class="form-control type" value="{{type}}">
+											{{#if eq activeType "text"}}
+												<option value="text" selected>Text</option>
+											{{else}}
+												<option value="text">Text</option>
+											{{/if}}
+											{{#if eq activeType "fill_in_the_blanks"}}
+												<option value="fill_in_the_blanks" selected>Fill in the Gaps</option>
+											{{else}}
+												<option value="fill_in_the_blanks">Fill in the Gaps</option>
+											{{/if}}
+											{{#if eq activeType "number"}}
+												<option value="number" selected>Number</option>
+											{{else}}
+												<option value="number">Number</option>
+											{{/if}}
+											{{#if eq activeType "list"}}
+												<option value="list" selected>Select from list</option>
+											{{else}}
+												<option value="list">Select from list</option>
+											{{/if}}
+											{{#if eq activeType "checkboxes"}}
+												<option value="checkboxes" selected>Checkboxes</option>
+											{{else}}
+												<option value="checkboxes">Checkboxes</option>
+											{{/if}}
+										</select>
+									</div>
+								</div> 
+								{{#if eq activeType "text"}}
+									<div class="form-group">
+										<label class="col-sm-2">Correct Answer(s)</label>
+										<div class="col-sm-10">
+											{{#each possibleTextAnswers}}
+												{{>option type="text" value=.}}
+											{{/each}}	
+											<div class="add-option-container">
+												<input class="form-control add-option" placeholder="Add valid answer" disabled>
+											</div>
+										</div>
+									</div>
+								{{/if}}
+								{{#if eq activeType "number"}}
+									<div class="form-group">
+										<label class="col-sm-2">Correct Answer(s)</label>
+										<div class="col-sm-10">
+											{{#each possibleNumberAnswers}}
+												{{>option type="number" value=.}}
+											{{/each}}	
+											<div class="add-option-container">
+												<input class="form-control add-option" placeholder="Add valid answer" disabled>
+											</div>
+										</div>
+									</div>
+								{{/if}}
+								{{#if eq activeType "list"}}
+									<div class="form-group">
+										<label class="col-sm-2">Options</label>
+										<div class="col-sm-10">
+											{{#each options}}
+												{{>option type="text" value=value list=true active=active}}
+											{{/each}}
+											<div class="add-option-container">
+												<input class="form-control add-option" placeholder="Add option" disabled>
+											</div>
+										</div>
+									</div>
+								{{/if}}
+								{{#if eq activeType "checkboxes"}}
+									<div class="form-group">
+										<label class="col-sm-2">Options</label>
+										<div class="col-sm-10">
+											{{#each options}}
+												{{>option type="text" value=value checkboxes=true active=active}}
+											{{/each}}
+											<div class="add-option-container">
+												<input class="form-control add-option" placeholder="Add option" disabled>
+											</div>
+										</div>
+									</div>
+								{{/if}}
+								{{#if eq activeType "fill_in_the_blanks"}}
+									<div class="form-group">
+										<div class="col-md-12">
+											<div class="text-info error-msg">To make a word have to be filled in, put the word in square brackets e.g. to make students have to fill in Roman, write [Roman].</div>
+											<div contenteditable="true" class="form-control fill-in-the-blanks">{{text}}</div>
+										</div>
+									</div>
+								{{/if}}
+								{{#if error}}
+									<p><strong><span class="text-danger">{{error}}</span></strong></p>
+								{{/if}}
+								<button class="btn btn-primary done" type="button">Done</button>
+								<button class="cancel btn btn-default" type="button">Cancel</button>
+							 </form>
+						{{else}}
+								<div class="row">
+									<div class="col-md-10">
+										<strong>{{title}}</strong>
+										<p>{{help_text}}</p>
+										{{#if eq type "text"}}
+											<input type="text" disabled class="form-control">
+										{{/if}}
+										{{#if eq type "number"}}
+											<input type="number" disabled class="form-control">
+										{{/if}}
+										{{#if eq type "list"}}
+											{{#each options}}
+												<input type="radio" disabled>
+												{{value}}
+												<br>
+											{{/each}}
+										{{/if}}	
+										{{#if eq type "checkboxes"}}
+											{{#each options}}
+												<input type="checkbox" disabled>
+												{{value}}
+												<br>
+											{{/each}}
+										{{/if}}
+										{{#if eq type "fill_in_the_blanks"}}
+											{{{fillInTheBlanks text}}}
+										{{/if}}
+									</div>
+									<div class="col-md-2">
+										<div class="pull-right">
+											<button class="btn btn-default btn-sm edit"><i class="fa fa-pencil"></i></button>
+											<button class="btn btn-default btn-sm del"><i class="fa fa-times"></i></button>
+										</div>	
+									</div>
+								</div>
+						{{/if}}	
+						</div>
+					{{/each}}
+					</div>
+					{{#if bigError}}
+						<div class="col-md-12">
+							<div class="text-danger error-msg">
+								<strong>{{bigError}}</strong>
+							</div>
+						</div>
+					{{/if}}
+					<div class="form-bottom">
+						<button class="btn btn-default add-question">Add Question</button>
+						<button class="btn btn-primary submit pull-right">Save</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="quizFilename">
+	<div class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Enter quiz name</h4>
+				</div>
+				<div class="modal-body">
+					<input type="text" class="form-control quiz-title">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary submit">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="quizBarGraph">
+	{{> navigation}}
+	<div class="container-small">
+		<div class="panel panel-default panel-super">
+			<div class="panel-body">
+					<div class="col-md-12">
+				<div class="pull-right">
+				<select class="form-control criterion">
+					<option value="first" selected>First Attempt</option>
+					<option value="best">Best Attempt</option>
+					<option value="last">Last Attempt</option>
+					<option value="average">Average Score</option>
+				</select>
+				</div>
+				</div>
+				<h2 class="text-center">{{name}}</h2>
+				{{#if results}}
+					<div class="svg"></div>
+				{{else}}
+					<div class="text-center">There are no results.</div>
+				{{/if}}
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="quizIntro">
+	{{> navigation}}
+	<div class="container-small">
+		<div class="panel panel-default panel-super">
+			<div class="panel-body">
+				<div class="col-md-12">
+				<div class="pull-right">
+					<a href="/rooms/{{_id}}/quizzes/{{path}}/edit" class="btn btn-default">Edit</a>
+					<a href="/rooms/{{_id}}/quizzes/{{path}}/results" class="btn btn-default">Results</a>
+				</div>
+			</div>
+				<div class="">
+					<h2 class="text-center">
+						{{name}}
+					</h2>	
+					{{#if previousAttempts}}
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Date</th>
+									<th>Score</th>
+								</tr>
+							</thead>
+							<tbody>
+								{{#each previousAttempts}}
+									<tr>
+										<td><a href="/rooms/{{../_id}}/quizzes/{{path}}/attempts/{{_id}}">{{localDate date}}</a></td>
+										<td>{{score}}/{{max}}</td>
+									</tr>	
+								{{/each}}
+							</tbody>	
+						</table>
+					{{else}}
+						<div class="text-center">
+							No previous attempts.<br><br>
+						</div>
+					{{/if}}
+					<div class="text-center">
+						<a href="/rooms/{{_id}}/quizzes/{{path}}/attempt" class="btn btn-primary">Attempt Quiz</a>	
+					</div>
+				</div>
+			</div>	
+		</div>
+	</div>
+</template>
+
+<template name="quiz">
+	{{> navigation}}
+	<div class="container-small">
+		<div class="panel panel-default panel-super">
+			<div class="panel-body">
+			<div class="col-md-12">
+			<h2 class="text-center">
+				{{name}}
+			</h2>
+			<form>
+				{{#each withIndex questions}}
+					<div class="form-group question">
+						<label>{{title}}</label>	
+						{{#if eq type "text"}}
+							<input type="text" name="question{{index}}" class="form-control">
+						{{/if}}
+						{{#if eq type "number"}}
+							<input type="number" name="question{{index}}" class="form-control">
+						{{/if}}
+						{{#if eq type "list"}}
+							{{#each options}}
+								<input type="radio" name="question{{index}}" value="{{value}}">{{value}}<br>
+							{{/each}}	
+						{{/if}}
+						{{#if eq type "checkboxes"}} 
+							{{#each options}}
+								<input type="checkbox" name="question{{index}}" value="{{value}}">{{value}}<br>
+							{{/each}}
+						{{/if}}
+						{{#if eq type "fill_in_the_blanks"}}
+							<br>
+							{{{fillInTheBlanks text true}}}
+						{{/if}}		
+					</div>
+				{{/each}}
+				<button type="button" class="btn btn-primary submit">Submit</button>
+			</form>
+			</div>
+		</div>
+	</div>
+	</div>
+</template>
+
+<template name="quizResult">
+	{{>navigation}}
+	<div class="container-small">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<h2 class="text-center">
+					{{name}}
+				</h2>
+				{{#each questions}}
+					{{#if eq type "fill_in_the_blanks"}}
+						<br>
+						{{{fillInTheBlanks text false}}}
+					{{else}}
+						<div class="form-group {{correct}}">
+							<strong>{{title}}</strong>
+							<input type="text" value="{{textAnswer}}" class="form-control" disabled>
+						</div>
+					{{/if}}
+				{{/each}}
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="quizzes">
+	{{> navigation}}
+	<div class="circle"></div>
+	<div class="container">
+		<div class="row">
+				<div class="col-md-4">
+					{{> breadcrumb}}		
+				</div>
+				<div class="col-md-8">
+				<div class="pull-right">
+				{{#if teacher}}
+				{{> tools}}
+				<div class="btn-group">
+					<button type="button" class="btn btn-default btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Create Quiz <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="?create=quiz">Standard Quiz</a></li>
+						<li><a href="?create=vocab_quiz">Vocabulary Quiz</a></li>
+						<li><a href="?create=crossword">Crossword</a></li>
+						<li><a href="?create=wordsearch">Wordsearch</a></li>
+					</ul>
+				</div>
+				{{/if}}
+				{{> search}}
+				</div>
+			</div>
+		</div>
+		<br>
+		{{> explorer files=files _id=_id}}
+	</div>
+</template>
+
+

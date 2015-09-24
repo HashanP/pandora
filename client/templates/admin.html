@@ -1,0 +1,208 @@
+<template name="adminNav">
+	<div class="bit-g list-group">
+		{{#if eq adminActive "users"}}
+			<a class="list-group-item active" href="/admin/users">Users</a>
+		{{else}}
+			<a class="list-group-item" href="/admin/users">Users</a>
+		{{/if}}
+		{{#if eq adminActive "rooms"}}
+			<a class="list-group-item active" href="/admin/rooms">Rooms</a>
+		{{else}}
+			<a class="list-group-item" href="/admin/rooms">Rooms</a>
+		{{/if}}
+	</div>
+</template>
+
+<template name="/admin/users">
+	{{>navbar}}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-2">
+				{{>adminNav}}
+			</div>
+	<div class="col-md-10">
+		<div class="col-md-4 col-lg-3">
+			<input type="text" class="form-control search" placeholder="Search...">
+		</div>
+		<div class="col-md-8 col-lg-9">
+			<div class="pull-right">
+				<a href="/admin/users/create" class="btn btn-success"><i class="fa fa-plus"></i> Add</a>
+				<a href="/admin/users/massUserCreation" class="btn btn-success"><i class="fa fa-users"></i> Mass User Creation</a>	
+			</div>
+		</div>
+		<br><br><br>
+		<div class="col-md-12">	
+			<div class="panel panel-default users">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<span class="panel-sup">Users</span>
+						<div class="pull-right">
+							<a class="btn btn-link active">All Users ({{count}})</a>
+							<a class="btn btn-link">Disabled Users (3)</a>
+							<a class="btn btn-link">Recently Deleted (0)</a>
+						</div>
+					</h3>
+				</div>
+				<ul class="list-group">
+					{{#each users}}
+						<li class="list-group-item">
+							{{username}}
+							{{#if isAdmin}}
+								<span class="label label-info">Admin</span>
+							{{/if}}
+							<div class="pull-right">
+								<a href="/admin/users/{{_id}}/edit" class="btn btn-edit btn-xs"><i class="fa fa-pencil"></i> Edit</a>
+								{{#if ne currentUser.username username}}
+									<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+								{{/if}}
+							</div>
+						</li>
+					{{/each}}	
+				</ul>
+			</div>
+			{{> pagination route="users"}}
+		</div>
+	</div>
+	</div>
+	</div>
+</template>
+
+<template name="/admin/users/create">
+	{{>navbar}}
+	<div class="container">
+	<div class="row">
+		<div class="col-md-2">
+			{{>adminNav}}
+		</div>
+		<div class="col-md-10">
+			<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						{{#if _id}}Edit{{else}}Create{{/if}} User
+						<div class="pull-right">
+							<a href="/admin/users"><i class="fa fa-times"></i></a>
+						</div>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<form>
+						<div class="form-group">
+							<label>Username</label>
+							<input type="text" value="{{username}}" class="username form-control">
+						</div>
+						{{#if not _id}}
+							<div class="form-group">
+								<label>Initial Password</label>
+								<div class="radio">
+									<label>
+										<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="username" checked>
+										Same as username
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="dateOfBirth">
+										Date of birth (DD/MM/YYYY)
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="howToChoosePassword" class="howToChoosePassword" value="custom">
+										Custom
+									</label>
+								</div>
+							</div>	
+							{{#if eq howToChoosePassword "dateOfBirth"}}
+								<div class="form-group">	
+									<label>Date of birth</label>
+									<input type="date" class="dataOfBirth form-control">
+								</div>
+							{{/if}}	
+							{{#if eq howToChoosePassword "custom"}}
+								<div class="form-group">
+									<label>Custom Password</label>
+									<input type="text" class="password form-control">
+								</div>
+							{{/if}}
+						{{/if}}
+						<div class="form-group">
+							<label>Rooms with read access</label>
+							<input type="hidden" class="subjects-read form-control">
+						</div>
+						<div class="form-group">
+							<label>Rooms with write access</label>
+							<input type="hidden" class="subjects-write form-control">
+						</div>
+						{{#if error}}
+							<div class="text-danger error-msg">
+								<strong>
+									{{error}}
+								</strong>	
+							</div>	
+						{{/if}}
+						<button type="button" class="btn btn-success create">Submit</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	</div>
+</template>
+
+<template name="/admin/rooms/create">
+	{{>navbar}}
+	<div class="container">
+	<div class="row">
+		<div class="col-md-2">
+			{{>adminNav}}
+		</div>
+		<div class="col-md-10">
+			<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						{{#if _id}}Edit{{else}}Create{{/if}} Room
+						<div class="pull-right">
+							<a href="/admin/rooms"><i class="fa fa-times"></i></a>
+						</div>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<form>
+						<div class="form-group">
+							<label>Title</label>
+							<input type="text" value="{{title}}" class="form-control title">
+						</div>
+						<div class="form-group">
+							<label>Type</label>
+							<select class="type form-control">
+								<option value="subject" selected>Subject</option>
+								<option value="club">Club</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Students</label>
+							<input type="hidden" class="students form-control">
+						</div>
+						<div class="form-group">
+							<label>Teachers</label>
+							<input type="hidden" class="teachers form-control">
+						</div>
+						{{#if error}}
+							<div class="text-danger error-msg">
+								<strong>{{error}}</strong>
+							</div>
+						{{/if}}
+						<button type="submit" class="btn btn-primary">Submit</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	</div>
+</template>
+
+

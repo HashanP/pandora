@@ -1,20 +1,20 @@
-Handlebars.registerHelper("admin", function() {
+UI.registerHelper("admin", function() {
 	return Meteor.user().roles && Meteor.user().roles.indexOf("admin") !== -1;
 });
 
-Handlebars.registerHelper("eq", function(a, b) { 
+UI.registerHelper("eq", function(a, b) { 
 	return a === b;
 });
 
-Handlebars.registerHelper("not", function(a) {
+UI.registerHelper("not", function(a) {
 	return !a;
 });
 
-Handlebars.registerHelper("ne", function(a, b) {
+UI.registerHelper("ne", function(a, b) {
 	return a !== b;
 });
 
-Handlebars.registerHelper("contain", function(a, b) {
+UI.registerHelper("contain", function(a, b) {
 	return a.indexOf(b) !== -1;
 });
 
@@ -27,7 +27,7 @@ UI.registerHelper("today", function() {
 	return x.getFullYear() + "-" + (x.getMonth()+1) + "-" + x.getDate();
 });
 
-Handlebars.registerHelper("formatArray", function(a) {
+UI.registerHelper("formatArray", function(a) {
 	return JSON.stringify(a);
 });
 
@@ -67,8 +67,7 @@ UI.registerHelper("username2", function(userId) {
 	return Meteor.users.findOne(userId).username;
 });
 
-UI.registerHelper('withIndex', function(x) {
-	console.log(x);
+UI.registerHelper("withIndex", function(x) {
 	return x.map(function(y, i) {
 		return _.extend(y, {index: i});
 	}); 
@@ -83,4 +82,8 @@ UI.registerHelper("toDate", function(x) {
 		x = new Date(Date.now());
 	}
 	return x.toISOString().substring(0, 10); 
+});
+
+UI.registerHelper("error", function() {
+	return Session.get("error");
 });
