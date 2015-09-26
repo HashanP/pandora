@@ -4,7 +4,6 @@
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
 
-meteor-platform
 aldeed:collection2
 fourseven:scss
 reywood:bootstrap3-sass
@@ -31,3 +30,17 @@ d3js:d3
 hashanp:colorbrewer
 reywood:publish-composite
 natestrauser:select2
+standard-minifiers
+meteor-base
+mobile-experience
+mongo
+blaze-html-templates
+session
+jquery
+tracker
+logging
+reload
+random
+ejson
+spacebars
+check

@@ -29,12 +29,22 @@ var updateQuiz = function(userId, doc) {
 	}
 }
 
-[Notices, Reminders, Assignments].forEach(function(model) {
-	model.allow({
-		insert: updateQuiz,
-		update: updateQuiz,
-		remove: updateQuiz
-	});
+Notices.allow({
+	insert: updateQuiz,
+	update: updateQuiz,
+	remove: updateQuiz
+});
+
+Reminders.allow({
+	insert: updateQuiz,
+	update: updateQuiz,
+	remove: updateQuiz
+});
+
+Assignments.allow({
+	insert: updateQuiz,
+	update: updateQuiz,
+	remove: updateQuiz
 });
 
 Polls.allow({
