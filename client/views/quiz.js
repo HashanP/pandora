@@ -462,8 +462,6 @@ Template.quizBarGraph.onRendered(function() {
 				attemptsObj[attempt.userId].average.push(attempt);
 			}
 		});
-		console.log(attempts);
-		console.log(attemptsObj);
 		var attempts2 = [];
 		for(var key in attemptsObj) {
 			if(Session.equals("criterion", "first")) {
@@ -476,11 +474,10 @@ Template.quizBarGraph.onRendered(function() {
 				attempts2.push({user: Meteor.users.findOne(key).username, score: attemptsObj[key].best.score, max: attemptsObj[key].best.max, _id: attemptsObj[key].best._id});
 			}
 		}
-		console.log(attempts2);
 		 var HEIGHT = attempts2.length * 30;
 			
 		$(".svg svg").remove();
- var canvas = d3.select($(".svg").get(0))
+		 var canvas = d3.select($(".svg").get(0))
       .append('svg')
       .attr({viewBox:"0 0 907 " + (HEIGHT + 70)});
 
@@ -512,36 +509,36 @@ var formatPercent = d3.format(".0%");
       .tickFormat(formatPercent);
       //.tickValues([0].concat(quiz.questions.map(function(d,i){return i +1})));
 
-      var x_xis = canvas.append('g')
+      var x_xis = canvas.append("g")
       .attr("transform", "translate(149,"+ (HEIGHT + 16) +")")
-      .attr('id','xaxis')
+      .attr("id","xaxis")
       .call(xAxis);
 
-      var y_xis = canvas.append('g')
+      var y_xis = canvas.append("g")
       .attr("transform", "translate(149,16)")
-      .attr('id','yaxis')
+      .attr("id","yaxis")
       .call(yAxis);
 
       y_xis.selectAll("text").attr("dy", "1.25em");
 
-      var chart = canvas.append('g')
+      var chart = canvas.append("g")
       .attr("transform", "translate(149.7,0)")
-      .attr('id','bars')
-      .selectAll('rect')
+      .attr("id","bars")
+      .selectAll("rect")
       .data(attempts2)
       .enter()
-      .append('rect')
-      .attr('height',19)
-      .on('mouseover', function(d){
+      .append("rect")
+      .attr("height",19)
+      .on("mouseover", function(d){
         d3.select(this).style({fill:d3.rgb(color(d.score/d.max)).darker(0.35)})
       })
-      .on('mouseout', function(d){
+      .on("mouseout", function(d){
         d3.select(this).style({fill:color(d.score/d.max)})
       })
-      .on('click', function(d) {
+      .on("click", function(d) {
         Router.go("/rooms/" + c._id + "/quizzes/" + Session.get("path") + "/attempts/" + d._id)
       }.bind(this))
-      .attr({'x':0,'y':function(d,i){ return yscale(i)+19; }})
+      .attr({"x":-1,"y":function(d,i){ return yscale(i)+19; }})
       .style('fill',function(d,i){ return color(d.score/d.max); })
       .attr('width',function(d){ return xscale(d.score/d.max); });
 	});

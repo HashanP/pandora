@@ -164,12 +164,10 @@ Template["/admin/users/create"].onRendered(function() {
 	Template.instance().$(".subjects-write").select2(opts).select2("val", this.data ? _.pluck(this.data.teachers, "_id") : []);
 
 	Template.instance().$(".subjects-read").on("change", function(e) {
-		console.log(e);
 		$(".subjects-write").select2("val", _.without.apply(_, [$(".subjects-write").select2("val")].concat(e.val)));
 	});
 
 	Template.instance().$(".subjects-write").on("change", function(e) {
-		console.log(e);
 		$(".subjects-read").select2("val", _.without.apply(_, [$(".subjects-read").select2("val")].concat(e.val)));
 	});
 
@@ -199,7 +197,6 @@ Template["/admin/rooms/create"].onRendered(function() {
 			var ids = $(el).val().split(",");
 			var results = [];
 			var count = 0;
-			console.log(ids);
 			ids.forEach(function(id) {
 				Meteor.call("findUser", id, function(err, user) {
 					results.push({id: id, text: user.username});

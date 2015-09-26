@@ -48,7 +48,6 @@ Template.tools.events({
 		function(isConfirm){
 			if(isConfirm) {
 				n.forEach(function(b) {
-					console.log(b);
 					Meteor.call("delFolder", y.data._id, Session.get("navActive"), Session.get("path"), b);
 				});
 			}
@@ -76,10 +75,7 @@ Template.explorer.events({
 			var sep = $(e.target).closest("tr");
 			var pre = $(e.target).closest("tr").prevAll(".active");
 			var nex = $(e.target).closest("tr").nextAll(".active");
-			console.log(sep.prevAll(".active"));
-			console.log(sep.nextAll(".active"));
 			if(!(pre.length === 0 && nex.length === 0)) {
-				console.log("here");
 				if(pre.length !== 0 && nex.length !== 0) {
 					if((sep.index() - pre.index()) >= (nex.index() - sep.index())) {
 						sep.nextUntil(nex).addClass("active");
@@ -229,12 +225,10 @@ Template.item.helpers({
 		return this.type === "folder" || this.type === "link";
 	},
 	isLink: function() {
-		console.log(this);
 		return this.type === "link";
 	},
 	isActive: function(a) {
-			console.log(a);
-			return Session.equals("active", a);
+		return Session.equals("active", a);
 	}
 });
 
@@ -285,7 +279,6 @@ Template.files.events({
 	"click .upload": function() {
 		$("tr.active").removeClass("active");
 		var y = Template.instance();
-		console.log(y);
 		var fileEl = document.createElement("input");
 		fileEl.multiple = true;
 		$("body").append(fileEl);
@@ -295,7 +288,6 @@ Template.files.events({
 			FS.Utility.eachFile(e, function(file) {
 				file = new FS.File(file);
 				if(_.findWhere(getFiles(), {name: file.name(), type: "folder"})) {
-					console.log("here");
 					var errors = Session.get("errors");
 					errors.push({name:file.name()});
 					return Session.set("errors", errors);
@@ -356,7 +348,11 @@ Template.files.onCreated(function() {
 });
 
 Template.notices.onCreated(function() {
-	this.subscribe("noticeFiles", this.data._id);
+	this.autorun(function() {
+		if(this.data) {
+			this.subscribe("noticeFiles", this.data._id);
+		}
+	});
 });
 
 var search = function(folder, searc) {

@@ -217,14 +217,13 @@ Template["/announcement"].events({
 });
 
 Template["/announcement"].helpers({
-	"images": function() {
+	images: function() {
 		return images.list();
 	},
 	youtubes: function() {
 		return youtubes.list();
 	},
 	value: function() {
-		console.log(Notices.findOne(Template.instance().data.announcementId));
 		if(Template.instance().data.announcementId) {
 			return Notices.findOne(Template.instance().data.announcementId).text;
 		}	
@@ -362,7 +361,6 @@ Template.notices.events({
 		Session.set("activeNotice", undefined);
 	},
 	"click .del-reply": function(e) {
-		console.log(e.target.dataset);
 		Meteor.call("delComment", e.target.dataset.id, e.target.dataset.type, this.commentId);
 	},
 	"click .edit-reply": function(e) {
@@ -382,16 +380,16 @@ Template.notices.events({
 		$("body").append(fileEl);
 		fileEl.type = "file";
 		fileEl.addEventListener("change", function(e) { 
-		FS.Utility.eachFile(e, function(file) {
-			file = new FS.File(file);
-			file.owner = y.data._id;
-			file.schoolId = y.data.schoolId;
-			file.category = "upload";
-			file.userId = Meteor.userId();
-			file.assignmentId = c._id;
-			Files.insert(file, function(err, fileObj) {
-				var files = Session.get("filesBeingUploaded");
-				files.push(fileObj._id);
+			FS.Utility.eachFile(e, function(file) {
+				file = new FS.File(file);
+				file.owner = y.data._id;
+				file.schoolId = y.data.schoolId;
+				file.category = "upload";
+				file.userId = Meteor.userId();
+				file.assignmentId = c._id;
+				Files.insert(file, function(err, fileObj) {
+					var files = Session.get("filesBeingUploaded");
+					files.push(fileObj._id);
 					Session.set("filesBeingUploaded", files);
 				});
 			});
@@ -405,7 +403,6 @@ Template.notices.events({
 		Session.set("activeComment", "");
 	},
 	"click .poll-submit": function(e) {
-		console.log(this);
 		var x = $(e.target).closest(".poll").find("input:checked");
 		if(x.length === 0) {
 			swal("You must select an option.");

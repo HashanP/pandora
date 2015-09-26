@@ -189,48 +189,42 @@
 <template name="/admin/rooms">
 	{{>navbar}}
 	<div class="container">
-<div class="row">
-	<div class="col-md-2">
-		{{>adminNav}}
-	</div>
-	<div class="col-md-10">
-		<div class="col-md-4 col-lg-3">
-			<input type="text" class="form-control search" placeholder="Search...">
-		</div>
-		<div class="col-md-8 col-lg-9">
-			<div class="pull-right">
-				<a class="btn btn-success" href="/admin/rooms/create"><i class="fa fa-plus"></i> Add</a>
-			</div>	
-		</div>
-	<br>
-	<br><br>
-		<div class="col-md-12">
-			<div class="panel panel-default users">
-				<div class="panel-heading">
-					<h3 class="panel-title">
-						<span class="panel-sup">Rooms</span>
-						<div class="pull-right">
-							<a href="#" class="btn btn-link active">All Rooms ({{count}})</a>
-							<a href="#" class="btn btn-link">Disabled Rooms (3)</a>
-							<a href="#" class="btn btn-link">Recently Deleted (0)</a>
-						</div>
-					</h3>
-				</div>
-				<ul class="list-group">
-					{{#each rooms}}
-						<li class="list-group-item">
-							{{title}}
-							<div class="pull-right">
-								<a class="btn btn-xs btn-edit" href="/admin/rooms/{{_id}}/edit"><i class="fa fa-pencil"></i> Edit</a>
-								<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
-							</div>
-						</li>
-					{{/each}}
-				</ul>
+		<div class="row">
+			<div class="col-md-2">
+				{{>adminNav}}
 			</div>
-			{{> pagination route="rooms"}}
+			<div class="col-md-10">
+				<div class="col-md-4 col-lg-3">
+					<input type="text" class="form-control search" placeholder="Search...">
+				</div>
+				<div class="col-md-8 col-lg-9">
+					<div class="pull-right">
+						<a class="btn btn-success" href="/admin/rooms/create"><i class="fa fa-plus"></i> Add</a>
+					</div>	
+				</div>
+				<br><br><br>
+				<div class="col-md-12">
+					<div class="panel panel-default users">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								<span class="panel-sup">Rooms ({{count}})</span>
+							</h3>
+						</div>
+						<ul class="list-group">
+						{{#each rooms}}
+							<li class="list-group-item">
+								{{title}}
+								<div class="pull-right">
+									<a class="btn btn-xs btn-edit" href="/admin/rooms/{{_id}}/edit"><i class="fa fa-pencil"></i> Edit</a>
+									<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+								</div>
+							</li>
+						{{/each}}
+					</ul>
+				</div>
+				{{> pagination route="rooms"}}
+			</div>
 		</div>
-	</div>
 	</div>
 </div>
 </template>

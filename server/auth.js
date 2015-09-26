@@ -1,11 +1,4 @@
-Meteor.users.allow({ 
-	remove: function() { 
-		return true; 
-	} 
-}); 
-
-var isAdmin = function(userId, doc) {
-	console.log("here");
+var isAdmin2 = function(userId, doc) {
 	if(!userId) {
 		return false;
 	} else {
@@ -14,12 +7,16 @@ var isAdmin = function(userId, doc) {
 	}
 }
 
+Meteor.users.allow({ 
+	remove: function(userId, doc) { 
+		return isAdmin2(userId, doc) && doc._id !== userId;
+	} 
+}); 
+
 Rooms.allow({
-	insert: isAdmin,
-	update: isAdmin, 
-	remove: function() {
-		return true;
-	}
+	insert: isAdmin2,
+	update: isAdmin2, 
+	remove: isAdmin2
 }); 
 
 var updateQuiz = function(userId, doc) {
@@ -32,26 +29,16 @@ var updateQuiz = function(userId, doc) {
 	}
 }
 
-Notices.allow({
-	insert: updateQuiz,
-	update: updateQuiz,
-	remove: updateQuiz
+[Notices, Reminders, Assignments].forEach(function(model) {
+	model.allow({
+		insert: updateQuiz,
+		update: updateQuiz,
+		remove: updateQuiz
+	});
 });
 
 Polls.allow({
 	insert: updateQuiz,
-	remove: updateQuiz
-});
-
-Reminders.allow({
-	insert: updateQuiz,
-	update: updateQuiz,
-	remove: updateQuiz
-});
-
-Assignments.allow({
-	insert: updateQuiz,
-	update: updateQuiz,
 	remove: updateQuiz
 });
 
@@ -71,7 +58,6 @@ Rooms.before.insert(function(userId, doc) {
 Files.on("stored", Meteor.bindEnvironment(function(doc) {
   if(doc.category === "resource") {
 		var room = Rooms.findOne(doc.owner);
-		console.log(room.files);
 		if(!room.files) {
 			room.files = [];
 		}
@@ -84,7 +70,6 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 		}
 		while(path !== doc.path) {
 			var n = doc.path.slice(path.length + 1).split("/")[0];
-			console.log(n);
 			if(_.findWhere(b, {name: n})) {
 				path += "/" + n;
 				b = _.findWhere(b, {name: n});
@@ -96,8 +81,6 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 				break;
 			}	
 		}
-		console.log(path);
-		console.log(doc.path);
 		if(path === doc.path) {
 			var c = _.findWhere(b, {name: doc.name()});
 			if(c && c.type === "folder") {
@@ -110,7 +93,6 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 			b.push({type: "file", _id: doc._id, name: doc.name()});
 			Rooms.update(doc.owner, {$set: {files: room.files}});
 		} else {
-			console.log("hell");
 			Files.remove(doc._id);
 		}
   } else if(doc.category === "upload") {
@@ -146,8 +128,12 @@ Files.on("removed", function(doc) {
 });
 
 var isAdmin = function(userId) {
-	var user = Meteor.users.findOne(userId);
-	return user.roles.indexOf("admin") !== -1;
+	if(!userId) {
+		return false;
+	} else {
+		var user = Meteor.users.findOne(userId);
+		return user.roles && user.roles.indexOf("admin") !== -1;
+	}
 }
 
 var isTeacher = function(userId, doc) {
@@ -161,8 +147,8 @@ var isStudent = function(userId, doc) {
 }
 
 Files.allow({
-	insert: function() {
-		return true;
+	insert: function(userId, doc) {
+		return isTeacher(userId, doc.owner);
 	},
 	remove: function(userId, doc) {
 		if(doc.category === "resource") {
@@ -172,7 +158,11 @@ Files.allow({
 		}
 	},
 	download: function(userId, doc) {
-		return isStudent(userId, doc.owner);
+		if(doc.category === "resource") {
+			return isStudent(userId, doc.owner);
+		} else if(doc.category === "upload") {
+			return isTeacher(userId, doc.owner) || doc.userId === doc.owner;
+		}
 	}
 });
 
