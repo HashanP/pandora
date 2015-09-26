@@ -135,9 +135,6 @@ Template.settings.events({
 });
 
 Template.settings.helpers({
-	error: function() {
-		return Session.get("error");
-	},
 	success: function() {
 		return Session.get("success");
 	}

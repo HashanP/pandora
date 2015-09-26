@@ -44,12 +44,6 @@ Template.createPoll.events({
 	}
 });
 
-Template.createPoll.helpers({
-	error: function() {
-		return Session.get("error");
-	}
-});
-
 Template.createReminder.events({
 	"click .submit": function() {
 		if($(".text").val() === "") {
@@ -82,18 +76,12 @@ Template.createReminder.events({
 });
 
 Template.createAssignment.helpers({
-	error: function() {
-		return Session.get("error");
-	},
 	obj: function() {
 		return Assignments.findOne(Template.instance().data.assignmentId);
 	}
 });
 
 Template.createReminder.helpers({
-	error: function() {
-		return Session.get("error");
-	},
 	obj: function() {
 		if(Template.instance().data.reminderId) {
 			return Reminders.findOne(Template.instance().data.reminderId);
@@ -234,9 +222,6 @@ Template["/announcement"].helpers({
 	},
 	youtubes: function() {
 		return youtubes.list();
-	},
-	error: function() {
-		return Session.get("error");
 	},
 	value: function() {
 		console.log(Notices.findOne(Template.instance().data.announcementId));

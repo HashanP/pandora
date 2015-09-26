@@ -310,9 +310,6 @@ Template.create_quiz.helpers({
 	activeType: function() {
 		return Session.get("activeType");
 	},
-	error: function() {
-		return Session.get("error");
-	},
 	active: function() {
 		return Session.equals("active", this.index) ? "active": "";
 	},

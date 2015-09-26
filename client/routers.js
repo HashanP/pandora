@@ -25,7 +25,8 @@ Router.onAfterAction(function() {
 
 Router.route("/", function() {
 	Session.set("navbarActive", "home");
-	this.render("home", {data: {subjects:Rooms.find({$or: [{students: {$in: [Meteor.userId()]}}, {teachers: {$in: [Meteor.userId()]}}]}, {sort: ["title"]}).fetch(), active2: "0"}});
+	var query = Rooms.find({$or: [{students: {$in: [Meteor.userId()]}}, {teachers: {$in: [Meteor.userId()]}}]}, {sort: ["title"]}).fetch(); 
+	this.render("home", {data: {subjects: query, active2: "0"}});
 });
 
 Router.route("/subjects", function() {	
