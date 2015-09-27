@@ -48,7 +48,7 @@ Template.tools.events({
 		function(isConfirm){
 			if(isConfirm) {
 				n.forEach(function(b) {
-					Meteor.call("delFolder", y.data._id, Session.get("navActive"), Session.get("path"), b);
+					Meteor.call("del", y.data._id, Session.get("navActive"), Session.get("path"), b);
 				});
 			}
 		});
@@ -62,7 +62,7 @@ Template.tools.events({
 });
 
 Template.explorer.events({
-	"click tbody tr": function(e) {
+	"click tbody tr td:not(.bb-rename)": function(e) {
 		if($(e.target).is("input")) {
 			return true;
 		}
@@ -130,6 +130,9 @@ Template.explorer.events({
 		}
 	},
 	"mousedown tr": function(e) {
+		if($(e.target).is("input")) {
+			return true;
+		}
 		e.preventDefault();
 	},
 	"click .cancel-create": function() {
@@ -153,7 +156,7 @@ Template.explorer.events({
 		var p = $(".input-rename").val();
 		if(p !== "" && p !== Session.get("old")) {
 			if(nameValidation(p)) {
-				Meteor.call("fileRename", Template.instance().data._id, Session.get("navActive"), Session.get("path"), Session.get("old"), p);	
+				Meteor.call("rename", Template.instance().data._id, Session.get("navActive"), Session.get("path"), Session.get("old"), p);	
 			}
 		}
 		Session.set("active", undefined);
@@ -232,7 +235,7 @@ Template.item.helpers({
 	}
 });
 
-var c = function() {
+var c = function(e) {
 	$("tr.active").removeClass("active");
 	Session.set("noOfActive", 0);
 };
