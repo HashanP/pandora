@@ -12,6 +12,7 @@ Router.onBeforeAction(function() {
 			this.layout("base");
 			this.next();
 			Session.set("navbarActive", "");
+			Session.set("error", "");
 		}
 	}
 });
@@ -40,7 +41,6 @@ Router.route("/clubs", function() {
 });
 
 Router.route("/settings", function() {
-	Session.set("error", "");
 	Session.set("success", "");
 	this.render("settings");
 });
@@ -61,7 +61,6 @@ Router.route("/rooms/:room/notices/assignments/:assignment", function() {
 
 Router.route("/rooms/:room/notices/announcement", function() {
 	var room = Rooms.findOne(this.params.room);
-	Session.set("error", "");
 	this.render("/announcement", {data: room});
 });
 
@@ -81,7 +80,6 @@ Router.route("/rooms/:room/notices/assignments/:assignment/edit", function() {
 });
 
 Router.route("/rooms/:room/notices/reminder", function() {
-	Session.set("error", "");
 	var room = Rooms.findOne(this.params.room);
 	this.render("createReminder", {data: room});
 });
@@ -91,7 +89,6 @@ Router.route("/rooms/:room/notices/poll", function() {
 });
 
 Router.route("/rooms/:room/notices/assignment", function() {
-	Session.set("error", "");
 	this.render("createAssignment", {data: Rooms.findOne(this.params.room)});
 });
 
@@ -105,7 +102,6 @@ Router.route("/rooms/:room/files/:path*", function() {
 	Session.set("filesBeingUploaded", []);
 	Session.set("newFolder", false);
 	Session.set("noOfActive", 0);
-	Session.set("error", "");
 	var room = Rooms.findOne(this.params.room);
 	if(!this.params.path) {
 		var files = room.files;
@@ -210,7 +206,6 @@ Router.route("/admin/users/create", function() {
 	}
 	Session.set("adminActive", "users");
 	Session.set("howToChoosePassword", "username");
-	Session.set("error", "");
 	this.render("/admin/users/create");
 });
 
@@ -218,7 +213,6 @@ Router.route("/admin/users/:user/edit", function() {
 	if(!Meteor.user().roles || Meteor.user().roles.indexOf("admin") === -1) {
 		return this.render("adminOnly");
 	}
-	Session.set("error", "");
 	Session.set("adminActive", "users");
 	Meteor.call("findUser", this.params.user, function(err, user) {
 		Meteor.call("findRoomsByUser", this.params.user, function(err, data) {
@@ -244,7 +238,6 @@ Router.route("/admin/rooms/create", function() {
 	if(!Meteor.user().roles || Meteor.user().roles.indexOf("admin") === -1) {
 		return this.render("adminOnly");
 	}
-	Session.set("error", "");	
 	Session.set("adminActive", "rooms");
 	this.render("/admin/rooms/create");
 });
@@ -253,7 +246,6 @@ Router.route("/admin/rooms/:room/edit", function() {
 	if(!Meteor.user().roles || Meteor.user().roles.indexOf("admin") === -1) {
 		return this.render("adminOnly");
 	}
-	Session.set("error", "");	
 	Session.set("adminActive", "rooms");
 	Meteor.call("findRoom", this.params.room, function(err, data) {
 		this.render("/admin/rooms/create", {data: data});

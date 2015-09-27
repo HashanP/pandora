@@ -25,13 +25,10 @@
 </template>
 
 <template name="tools">
-	{{#if eq noOfActive 0}}
-		{{else}}
-		{{#if eq noOfActive 1}}
-			<button class="btn btn-edit rename">Rename</button>
-		{{else}}
-			
-		{{/if}}
+	{{#if eq noOfActive 1}}
+		<button class="btn btn-edit rename">Rename</button>
+	{{/if}}
+	{{#if ne noOfActive 0}}
 		<button class="btn btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
 	{{/if}}
 	<button class="btn btn-success create-folder"><i class="fa fa-folder-o"></i> New Folder</button>
@@ -92,7 +89,7 @@
 </template>
 
 <template name="search">
-	<input type="text" placeholder="Search..." value="{{search}}" class="form-control search zeplin">
+	<input placeholder="Search..." value="{{search}}" class="form-control search zeplin">
 </template>
 
 <template name="uploadStatus">
@@ -125,21 +122,21 @@
 	{{> navigation}}
 	<div class="circle"></div>
 	<div class="container">
-			<div class="row">
-						<div class="col-md-3">
-							{{> breadcrumb}}
-						</div>
-						<div class="col-md-9">
-							<div class="pull-right">
-								{{#if teacher}}
-									{{> tools}}
-									<button class="btn btn-success add-link"><i class="fa fa-link"></i> New Link</button>
-									<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
-								{{/if}}
-								{{> search}}
-							</div>
-						</div>
+		<div class="row">
+			<div class="col-md-3">
+				{{> breadcrumb}}
 			</div>
+			<div class="col-md-9">
+				<div class="pull-right">
+					{{#if teacher}}
+						{{> tools}}
+						<button class="btn btn-success add-link"><i class="fa fa-link"></i> New Link</button>
+						<button class="btn btn-success upload"><i class="fa fa-upload"></i> Upload</button>
+					{{/if}}
+					{{> search}}
+				</div>
+			</div>
+		</div>
 		<div class="row">
 			{{>uploadStatus}}
 			<br>

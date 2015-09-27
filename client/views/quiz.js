@@ -342,19 +342,6 @@ Template.createVocabQuiz.helpers({
 	}
 });
 
-Template.explorer.helpers({
-	newFolder: function() {
-		return Session.get("newFolder");
-	},
-	filesF: function() {
-		if(!Session.get("search")) {
-			return _.sortBy(Template.instance().data.files, "name");
-		} else {
-			return _.sortBy(search(Template.instance().data.files, Session.get("search")), "name");
-		}
-	}
-});
-
 
 Template.quiz.onCreated(function() {
 	this.subscribe("quizzes", this.data.quizId);

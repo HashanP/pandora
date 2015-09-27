@@ -410,3 +410,17 @@ var getFiles = function() {
 		return _.sortBy(search(Session.get("files"), Session.get("search")), "name");
 	}
 };
+
+Template.explorer.helpers({
+	newFolder: function() {
+		return Session.get("newFolder");
+	},
+	filesF: function() {
+		if(!Session.get("search")) {
+			return _.sortBy(Template.instance().data.files, "name");
+		} else {
+			return _.sortBy(search(Template.instance().data.files, Session.get("search")), "name");
+		}
+	}
+});
+
