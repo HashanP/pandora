@@ -1,13 +1,5 @@
 <template name="icon">
-	{{#if isImage}}
-		<i class="fa fa-file-image-o"></i>
-	{{else}}
-		{{#if isAudio}}
-			<i class="fa fa-file-sound-o"></i>
-		{{else}}
-			<i class="fa fa-file-o"></i>
-		{{/if}}
-	{{/if}}	
+	<i class="fa {{iconClass}}"></i>
 </template>
 
 <template name="item">

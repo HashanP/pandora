@@ -29,7 +29,7 @@ Template.tools.events({
 		window.setTimeout(function() {
 			$(".input-rename").val(x).focus();
 			$(".input-rename").get(0).selectionStart = 0;
-			$(".input-rename").get(0).selectionEnd = x.length;
+			$(".input-rename").get(0).selectionEnd = x.split(".")[0].length;
 		}, 0);
 	},
 	"click .del": function(e) {
@@ -232,6 +232,39 @@ Template.item.helpers({
 	},
 	isActive: function(a) {
 		return Session.equals("active", a);
+	}
+});
+
+function endsWith(str, suffix) {
+	return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+var codeExtensions = "java c cpp py js json yaml cs vb html css swift rb hs erl".split(" ");
+
+Template.icon.helpers({
+	iconClass: function() {
+		var t = _.last(this.name.split("."));
+		if(this.isAudio()) {
+			return "fa-file-audio-o";
+		} else if(this.isImage()) {
+			return "fa-file-image-o";
+		} else if(this.isVideo()) {
+			return "fa-file-video-o";
+		} else if(codeExtensions.indexOf(t) !== -1) {
+			return "fa-file-code-o";
+		} else if("doc docx odt fodt".split(" ").indexOf(t) !== -1) {
+			return "fa-file-word-o";
+		} else if("xls xlsx ods fods".split(" ").indexOf(t) !== -1) {
+			return "fa-file-excel-o";
+		} else if("ppt pptx odp fodp".split(" ").indexOf(t) !== -1) {
+			return "fa-file-powerpoint-o";
+		} else if(t === "pdf") {
+			return "fa-file-pdf-o";
+		} else if(t === "txt") {
+			return "fa-file-text-o";
+   	} else {
+			return "fa-file-o";
+		}
 	}
 });
 
