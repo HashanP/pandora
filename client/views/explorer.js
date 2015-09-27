@@ -232,23 +232,18 @@ Template.item.helpers({
 	},
 	isActive: function(a) {
 		return Session.equals("active", a);
-	}
-});
-
-function endsWith(str, suffix) {
-	return str.indexOf(suffix, str.length - suffix.length) !== -1;
-}
-
-var codeExtensions = "java c cpp py js json yaml cs vb html css swift rb hs erl".split(" ");
-
-Template.icon.helpers({
+	},
 	iconClass: function() {
 		var t = _.last(this.name.split("."));
-		if(this.isAudio()) {
+		if(this.type === "folder") {
+			return "fa-folder-o";
+		} else if(this.type === "link") {
+			return "fa-link";
+		} else if(Files.findOne(this._id).isAudio()) {
 			return "fa-file-audio-o";
-		} else if(this.isImage()) {
+		} else if(Files.findOne(this._id).isImage()) {
 			return "fa-file-image-o";
-		} else if(this.isVideo()) {
+		} else if(Files.findOne(this._id).isVideo()) {
 			return "fa-file-video-o";
 		} else if(codeExtensions.indexOf(t) !== -1) {
 			return "fa-file-code-o";
@@ -267,6 +262,8 @@ Template.icon.helpers({
 		}
 	}
 });
+
+var codeExtensions = "java c cpp py js json yaml cs vb html css swift rb hs erl".split(" ");
 
 var c = function(e) {
 	$("tr.active").removeClass("active");

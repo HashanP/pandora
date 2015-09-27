@@ -1,61 +1,27 @@
-<template name="icon">
-	<i class="fa {{iconClass}}"></i>
-</template>
-
 <template name="item">
-	{{#if isFolder}}
-		<tr class="folder">
-			{{#if isActive name}}
-				<td>
-					{{#if isLink}}
-						<i class="fa fa-link"></i>
-					{{else}}
-						<i class="fa fa-folder-o"></i>
-					{{/if}}
-				</td>
-				<td class="bb bb-rename">
-					<input type="text"  class="form-control input-rename input-sm">
-				</td>
-			{{else}}
-				<td>
-					{{#if isLink}}
-						<i class="fa fa-link"></i>
-					{{else}}
-						<i class="fa fa-folder-o"></i>
-					{{/if}}
-				</td>
-				<td>
-					<span class="filename">{{name}}</span>
-				</td>
-			{{/if}}
+	<tr class="{{type}}">
+		<td>
+			<i class="fa {{iconClass}}"></i>
+		</td>
+		{{#if isActive name}}
+			<td class="bb bb-rename">
+				<input type="text" class="form-control input-rename input-sm">
+			</td>
+		{{else}}
+			<td>
+				<span class="filename">{{name}}</span>
+			</td>
+		{{/if}}
+		{{#if isFolder}}
 			{{#if isNavActive "files"}}
 				<td>--</td>
 			{{/if}}
-		</tr>
-	{{else}}
-				<tr>
-							{{#if isActive name}}
-							<td>
-							{{> icon}}
-							</td>
-							<td class="bb bb-rename">
-							<input type="text" class="form-control input-sm input-rename">
-							</td>
-							{{else}}			
-								<td>
-								{{> icon}}										
-								</td>
-								<td>
-							<span class="filename">
-									{{name}}
-								</span>
-								</td>
-							{{/if}}
-								{{#with FS.GetFile "files" _id}}
-									<td><span class="filesize">{{humanFileSize this.size}}</span></td>
-								{{/with}}
-		</tr>
-	{{/if}}
+		{{else}}
+			{{#with FS.GetFile "files" _id}}
+				<td><span class="filesize">{{humanFileSize this.size}}</span></td>
+			{{/with}}
+		{{/if}}
+	</tr>
 </template>
 
 <template name="tools">
