@@ -61,12 +61,12 @@ Router.route("/rooms/:room/notices/assignments/:assignment", function() {
 
 Router.route("/rooms/:room/notices/announcement", function() {
 	var room = Rooms.findOne(this.params.room);
-	this.render("/announcement", {data: room});
+	this.render("createAnnouncement", {data: room});
 });
 
 Router.route("/rooms/:room/notices/announcements/:announcement/edit", function() {	
 	var room = Rooms.findOne(this.params.room)
-	this.render("/announcement", {data: {_id: room._id, announcementId: this.params.announcement}});
+	this.render("createAnnouncement", {data: {_id: room._id, announcementId: this.params.announcement}});
 });
 
 Router.route("/rooms/:room/notices/reminders/:reminder/edit", function() {	
@@ -142,9 +142,12 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 			} else if(x.type === "vocabQuiz" && p === "edit") {
 				c = 5;
 			} else {
-				files = _.findWhere(x.files, {name: p});
+				x = _.findWhere(x.files, {name: p});
 			}
 		});
+		if(x.type === "folder") {
+			files = x.files;
+		}
 	}
 	if(this.params.query.create === "quiz") {
 		window.questions = new ReactiveArray();

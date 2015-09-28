@@ -47,7 +47,7 @@
 	</div>	
 </template>
 
-<template name="/announcement">
+<template name="createAnnouncement">
 	{{> navigation}}
 	<div class="container">
 		<div class="col-md-3">
@@ -162,8 +162,12 @@
 			</div>	
 			<div class="panel-body">
 				<div class="form-group">
-					<label>Details</label>
-					<textarea class="form-control text">{{obj.text}}</textarea>
+					<label>Title</label>
+					<input class="title form-control" value="{{obj.title}}">
+				</div>
+				<div class="form-group">
+					<label>Details (optional)</label>
+					<textarea rows="1" class="form-control text">{{obj.text}}</textarea>
 				</div>
 				<div class="form-group">
 					<label>Due Date</label>

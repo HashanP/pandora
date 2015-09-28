@@ -239,6 +239,8 @@ Template.item.helpers({
 			return "fa-folder-o";
 		} else if(this.type === "link") {
 			return "fa-link";
+		} else if(this.type === "quiz") {
+			return "fa-pencil-square-o";	
 		} else if(Files.findOne(this._id).isAudio()) {
 			return "fa-file-audio-o";
 		} else if(Files.findOne(this._id).isImage()) {

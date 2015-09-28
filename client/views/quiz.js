@@ -51,6 +51,7 @@ Template.create_quiz.events({
 			type: "text",
 			possibleTextAnswers: [""]
 		});
+		Session.set("originalType", "text");
 		Session.set("activeType", "text");
 		Session.set("active", questions.length -1);
 		Session.set("activeAnswer", questions.list()[Session.get("active")]);
@@ -58,10 +59,12 @@ Template.create_quiz.events({
 	},
 	"click .done": function() {
 		var p = {
-			title: $(".question-title").val(),
 			help_text: $(".help-text").val(),
 			type: $(".type").val(),
 		};
+		if(p.type !== "fill_in_the_blanks") {
+			p.title = $(".question-title").val();
+		}
 		if(Session.equals("activeType", "fill_in_the_blanks")) {
 			p.text = $(".fill-in-the-blanks").text();
 		} else if(Session.equals("activeType", "text")) {
@@ -81,7 +84,7 @@ Template.create_quiz.events({
 				}
 			});
 		}
-		if(p.title === "") {
+		if(p.type !== "fill_in_the_blanks" && p.title === "") {
 			return Session.set("error", "Question title cannot be blank.");
 		} else if((p.options && p.options.length === 0) || (p.possibleTextAnswers && p.possibleTextAnswers.length === 0) || 
 			(p.possibleNumberAnswers && p.possibleNumberAnswers.length === 0)) {
@@ -89,7 +92,7 @@ Template.create_quiz.events({
 		} else if((p.options && p.options.length > 20) || (p.possibleTextAnswers && p.possibleTextAnswers.length > 20) || 
 			(p.possibleNumberAnswers && p.possibleNumberAnswers.length > 20)) {
 			return Session.set("error", "There cannot be more than 20 correct answers.");	
-		} else if(p.title.length > 200) {
+		} else if(p.type !== "fill_in_the_blanks" && p.title.length > 200) {
 			return Session.set("error", "Title cannot be longer than 200 characters.");
 		}
 		if(p.type === "text") {
@@ -125,6 +128,7 @@ Template.create_quiz.events({
 	"click .edit": function() {
 		Session.set("active", this.index);
 		Session.set("activeType", window.questions.list()[this.index].type);
+		Session.set("originalType", Session.get("activeType"));
 		if(Session.equals("activeType", "fill_in_the_blanks")) {
 			window.setTimeout(function() {
 				$(".fill-in-the-blanks").trigger("keyup");
@@ -157,23 +161,14 @@ Template.create_quiz.events({
 	},
 	"change .type": function(e) {
 		Session.set("activeType", e.target.value);	
-		/*if(e.target.type === "text") {
-			Session.set("options", [""]);
-		} else if(e.target.type === "number") {
-			Session.set("options", [0]);
-		} else if(e.target.type === "list") {
-			Session.set("options", [{
-				value: "",
-				active: true	
-			}]);
-		} else if(e.target.type === "checkboxes") {
-			Session.set("options", [{
-				value: ""
-			}]);
-		}*/
-/*		window.setTimeout(function() {
-			$(".add-option").trigger("click");
-		}, 0);*/
+		if(!Session.equals("originalType", Session.get("activeType"))) {
+			window.setTimeout(function() {
+				if(["checkboxes", "list"].indexOf(Session.get("activeType")) !== -1) {
+					$(".add-option").click();
+				}
+				$(".add-option").click();
+			}, 0);
+		}
 	},
 	"keyup .fill-in-the-blanks": function(e) {
 		try {

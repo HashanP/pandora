@@ -124,7 +124,7 @@ Template.createAssignment.events({
 	}
 });
 
-Template["/announcement"].onCreated(function() {
+Template.createAnnouncement.onCreated(function() {
 	window.images = new ReactiveArray();	
 	window.youtubes = new ReactiveArray();
 	var data = this.data;
@@ -143,11 +143,11 @@ Template["/announcement"].onCreated(function() {
 	}
 });
 
-Template["/announcement"].onRendered(function() {
+Template.createAnnouncement.onRendered(function() {
 	Template.instance().$(".text").autosize();
 });
 
-Template["/announcement"].events({
+Template.createAnnouncement.events({
 	"click .add-image": function(e) {
 		console.log(e.target);
 		$(e.target).blur();
@@ -216,7 +216,11 @@ Template["/announcement"].events({
 	}
 });
 
-Template["/announcement"].helpers({
+Template.createAssignment.onRendered(function() {
+	$(".text").autosize();
+});
+
+Template.createAnnouncement.helpers({
 	images: function() {
 		return images.list();
 	},
