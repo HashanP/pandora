@@ -363,7 +363,7 @@ Template.quiz.events({
 					return $(i).val();
 				});
 			} else {
-				y.answer = _.map($(el).find("input"), function(d) {
+				y.fitbAnswer = _.map($(el).find("input"), function(d) {
 					return $(d).val();
 				});
 			}	
@@ -526,12 +526,22 @@ var formatPercent = d3.format(".0%");
 	});
 });
 
-UI.registerHelper("fillInTheBlanks", function(y, c) {
+UI.registerHelper("fillInTheBlanks", function(y, c, b) {
+	var i = 0;
+	console.log(c, b);
 	return "<span class=\"just-text\">" + y.replace(/\[[a-zA-Z,\s\."'\d]+\]/g, function(match) {
 		if(c) {
 			return "</span><input type=\"text\" class=\"form-control fill-me\"><span class=\"just-text\">";
 		} else {
-			return "</span><input type=\"text\" class=\"form-control fill-me\" disabled><span class=\"just-text\">";
+			if(b) {
+				if(match.substring(1, match.length-1) === b[i]) {
+					return "</span><div class=\"has-success y\"><input type=\"text\" class=\"form-control fill-me\" disabled value=\"" + b[i++] + "\"></div><span class=\"just-text\">";
+				} else {
+					return "</span><div class=\"has-error y\"><input type=\"text\" class=\"form-control fill-me\" disabled value=\"" + b[i++] + "\"></div><span class=\"just-text\">";
+				}
+			} else {
+				return "</span><input type=\"text\" class=\"form-control fill-me\" disabled><span class=\"just-text\">";
+			}
 		}
 	}) + "</span>";
 });
