@@ -796,3 +796,7 @@ a.select2-search-choice-close {
 .y {
 	display:inline-block;
 }
+
+[disabled].disabled-p {
+	cursor:default;
+}

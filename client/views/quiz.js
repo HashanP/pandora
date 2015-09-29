@@ -385,7 +385,7 @@ Template.quizResult.helpers({
 		return QuizResults.findOne(Template.instance().data.attemptId).questions;
 	},
 	correct: function() {
-		return this.correct ? "has-success" : "has-danger";
+		return this.correct ? "has-success" : "has-error";
 	}
 });
 
