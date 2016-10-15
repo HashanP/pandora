@@ -66,17 +66,53 @@ if (window.getSelection && document.createRange) {
 	};
 }
 
+Template.login.onCreated(() => {
+	Session.set("loginError", false);
+	Session.set("lockedError", false);
+});
+
+var loginHandler = function() {
+	Meteor.loginWithPassword(Template.instance().find(".username").value, Template.instance().find(".password").value, function(err) {
+		console.log(err);
+		if(err !== null) {
+			if(err.error === 403) {
+				Session.set("loginError", true);
+				Session.set("lockedError", false);
+			} else if(err.error === 407) {
+				Session.set("loginError", false);
+				Session.set("lockedError", true);
+			}
+		}
+	});
+};
+
 Template.login.events({
-	"click .login-button": function(e) {
-		Meteor.loginWithPassword(Template.instance().find(".username").value, Template.instance().find(".password").value, function(err) {
-			console.log(err);
-		});
-	 } 
-}); 
+	"click .login-button": loginHandler,
+	"click .about": () => {
+		Modal.show("about");
+	},
+	"keyup form": (e) => {
+		if(e.keyCode === 13) {
+			loginHandler();
+		}
+	}
+});
+
+Template.login.helpers({
+	loginError() {
+		return Session.get("loginError");
+	},
+	lockedError() {
+		return Session.get("lockedError");
+	},
+	schoolName() {
+		return school.get().name;
+	}
+});
 
 Template.base.onRendered(function() {
 	var tmp = Template.instance();
-	Tracker.autorun(function() {
+	Tracker.autorun(() => {
 		tmp.$(".sidebar li").removeClass("active");
 		tmp.$(".sidebar li").each(function(index, li) {
 			if(wnd.get().pathname.indexOf($(li).find("a").attr("href")) === 0) {
@@ -87,16 +123,16 @@ Template.base.onRendered(function() {
 });
 
 Template.base.helpers({
-	subjects: function() {
+	subjects: () => {
 		return Rooms.find({type: "subject"}).fetch();
 	}
 });
 
 Template.navbar.helpers({
-	username: function() {
+	username() {
 		return Meteor.user().username;
 	},
-	navbarActive: function() {
+	navbarActive() {
 		return Session.get("navbarActive");
 	}
 });
@@ -108,7 +144,7 @@ Template.navbar.events({
 });
 
 Template.adminNav.helpers({
-	adminActive: function() {
+	adminActive() {
 		return Session.get("adminActive");
 	}
 });
@@ -118,7 +154,7 @@ Template.settings.events({
 		if($(".new-password").val() === "") {
 			Session.set("error", "New password cannot be blank.");
 		} else if($(".new-password").val() !== $(".confirm-password").val()) {
-			Session.set("error", "New password and confirm new password are not the same.");	
+			Session.set("error", "New password and confirm new password are not the same.");
 		} else {
 			Accounts.changePassword($(".current-password").val(), $(".confirm-password").val(), function(err) {
 				if(err) {
@@ -135,7 +171,7 @@ Template.settings.events({
 });
 
 Template.settings.helpers({
-	success: function() {
+	success() {
 		return Session.get("success");
 	}
 });
@@ -145,10 +181,10 @@ Template.navigation.onCreated(function() {
 });
 
 Template.home.helpers({
-	joined: function(id) {
+	joined(id) {
 		return Rooms.findOne(id).students.indexOf(Meteor.userId()) !== -1;
 	},
-	teacher: function(id) {
+	teacher(id) {
 		return Rooms.findOne(id).teachers.indexOf(Meteor.userId()) !== -1;
 	}
 });
@@ -163,7 +199,7 @@ Template.home.events({
 });
 
 Template.noticeNav.helpers({
-	events: function() {
+	events() {
 		return _.sortBy(Reminders.find({roomId: Template.currentData()._id}).fetch().concat(Assignments.find({roomId: Template.currentData()._id}).fetch()), function(x) {
 			return x.type === "reminder" ? x.eventDate : x.deadline;
 		});

@@ -22,7 +22,7 @@ Template["/admin/rooms"].helpers({
 	},
 	"count": function() {
 		return Counts.get("rooms");
-	}	
+	}
 });
 
 Template.pagination.helpers({
@@ -33,7 +33,7 @@ Template.pagination.helpers({
 		return Session.get("page") - 1;
 	},
 	"isPage": function(n) {
-		return Session.equals("page", n);	
+		return Session.equals("page", n);
 	},
 	"pages": function() {
 		return _.range(1, Math.ceil(Session.get("count")/10)+1);
@@ -41,7 +41,7 @@ Template.pagination.helpers({
 	"firstPage": function() {
 		return Session.get("offset") === 0;
 	},
-	"lastPage": function() { 
+	"lastPage": function() {
 		return Session.get("offset") >= Session.get("count") - 10;
 	}
 });
@@ -84,7 +84,7 @@ Template["/admin/rooms"].events({
 
 Template["/admin/users"].onCreated(function() {
 	Tracker.autorun(function() {
-		this.subscribe("/admin/users", Session.get("offset"), Session.get("limit"), Session.get("search"));	
+		this.subscribe("/admin/users", Session.get("offset"), Session.get("limit"), Session.get("search"));
 		this.subscribe("/admin/users/count", Session.get("search"));
 	}.bind(this));
 });
@@ -103,15 +103,16 @@ Template["/admin/rooms/create"].events({
 		if(title === "") {
 			return Session.set("error", "Title cannot be empty.");
 		} else if(title.length > 20) {
-			return Session.set("error", "Title cannot exceed 20 characters.");		
+			return Session.set("error", "Title cannot exceed 20 characters.");
 		}
 		var obj = {
 			title: title,
 			type: Template.instance().$(".type").val(),
 			students: $(".students").select2("val"),
-			teachers: $(".teachers").select2("val"),
+			teachers: $(".teachers").select2("val")
 		};
 		var sep = function(err) {
+            console.log(err);
 			if(err) {
 				Session.set("error", "Another room has the same title; you must choose a different one.");
 			} else {
@@ -123,7 +124,7 @@ Template["/admin/rooms/create"].events({
 		} else {
 			obj.schoolId = Meteor.user().schoolId;
 			Rooms.insert(obj, sep);
-		}	
+		}
 	}
 });
 
@@ -156,7 +157,7 @@ Template["/admin/users/create"].onRendered(function() {
 						cb(results);
 					}
 				});
-			});	
+			});
 		}.bind(this)
 	};
 
@@ -205,7 +206,7 @@ Template["/admin/rooms/create"].onRendered(function() {
 						cb(results);
 					}
 				});
-			});	
+			});
 		}
 	};
 
@@ -223,7 +224,7 @@ Template["/admin/rooms/create"].onRendered(function() {
 	Template.instance().$(".students, .teachers").on("select2-close", function() {
 		$(".select2-focused").blur();
 	});
-});	
+});
 
 var formatDate = function(date) {
 	var month = '' + (d.getMonth() + 1),
@@ -242,6 +243,7 @@ Template["/admin/users/create"].events({
 	},
 	"click .create": function() {
 		var username = Template.instance().$(".username").val();
+		var locked = Template.instance().$(".locked").is(":checked");
 		if(username === "") {
 			return Session.set("error", "Username cannot be empty.");
 		} else if(username.length > 20) {
@@ -256,7 +258,7 @@ Template["/admin/users/create"].events({
 		}
 		var readSubjects = $(".subjects-read").select2("val");
 		var writeSubjects = $(".subjects-write").select2("val");
-		Meteor.call("createUser2", username, password, readSubjects, writeSubjects, Template.instance().data ? Template.instance().data._id : undefined, function(y, b) {
+		Meteor.call("createUser2", username, password, readSubjects, writeSubjects, Template.instance().data ? Template.instance().data._id : undefined, locked, function(y, b) {
 			if(y) {
 				Session.set("error", "Username already exists.");
 			} else {
@@ -272,6 +274,9 @@ Template["/admin/users/create"].helpers({
 	},
 	"error": function() {
 		return Session.get("error");
+	},
+	"isAdmin": function() {
+		return Template.currentData().roles && Template.currentData().roles.indexOf("admin") !== -1;
 	}
 });
 

@@ -1,0 +1,351 @@
+<template name="createPoll">
+	{{>navigation}}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				{{>noticeNav}}
+			</div>
+			<div class="col-md-9">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							Create Poll
+							<div class="pull-right">
+								<a href="/rooms/{{_id}}"><i class="fa fa-times"></i></a>
+							</div>
+						</h3>
+					</div>
+					<div class="panel-body">
+						<form>
+							<div class="form-group">
+								<label>Title</label>
+								<input type="text" class="form-control text">
+							</div>
+							<div class="form-group">
+								<label>Options</label>
+								<br>
+								{{>pollOption}}
+								{{>pollOption}}
+								<div class="add-option">
+									<input type="text" class="form-control" placeholder="Add option" disabled>
+								</div>
+							</div>
+							{{#if error}}
+								<div class="error-msg text-danger">
+									<strong>{{error}}</strong>
+								</div>
+							{{/if}}
+							<button type="button" class="btn btn-primary submit">Submit</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="notices">
+	{{> navigation}}
+	<div class="container">
+		<div class="col-md-3">
+			{{>noticeNav}}
+		</div>
+		<div class="col-md-9">
+		<div class="super">
+		<div class="col-md-12">
+				{{#if teacher}}
+				<div class="topbit">
+					<a href="/rooms/{{_id}}/notices/announcement" class="btn btn-default">Announcement</a>
+					<a href="/rooms/{{_id}}/notices/poll" class="btn btn-default">Poll</a>
+					<a href="/rooms/{{_id}}/notices/reminder" class="btn btn-default">Reminder</a>
+					<a href="/rooms/{{_id}}/notices/assignment" class="btn btn-default">Assignment</a>
+				</div>
+				{{/if}}
+				</div>
+				</div>
+		{{#if eq notices.length 0}}
+			<div class="col-md-12">
+			<div class="jumbotron">
+				<h2 class="text-center"><i class="fa fa-exclamation-circle fa-2x"></i></h2>
+				<p class="text-center">Nothing here</p>
+				<ul>
+					<li>Announcements let you post information</li>
+					<li>Polls let you gather class feedback</li>
+					<li>Reminders let you put up important dates which is put in the students' online calendars</li>
+					<li>Assignments let you set homework which is put in students' online planners</li>
+					<li>Assignments can also be used to let students upload work onto Pandora for marking and grading</li>
+					<li>Files let you upload resources for pupils to download</li>
+					<li>Quizzes let you test students on single answer, multiple choice, checkbox and fill-in-the-gap questions</li>
+					<li>Vocabulary Quizzes let students practice vocabulary</li>
+				</ul>
+			</div>
+			</div>
+		{{/if}}
+		{{#each notices}}
+			<div class="col-md-12">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						{{#if eq type "notice"}}
+							<div class="first">
+							<img class="icon" src='{{GeoPattern "Mr Davey"}}'>
+							</div>
+							<div class="after">
+								<b>{{username userId}}</b>
+								{{#if text}}
+									<br>
+									{{text}}
+								{{/if}}
+								{{#if images}}
+									<br>
+									<div class="images">
+									{{#each images}}
+										<div class="notice-image">
+										<div class="notice-link">{{title}}<!--&#9662;--></div>
+										<img src="{{data}}" class="notice-image" width="200px">
+										<div class="info">4KB, JPEG, 2000x3000</div>
+										</div>
+									{{/each}}
+									</div>
+								{{/if}}
+								{{#if youtubes}}
+									<br>
+									{{#each youtubes}}
+									<div class="notice-embed">
+										<div class="info">YouTube</div>
+										<div class="notice-link"><a href="youtube.com/watch?v={{id}}">{{title}}</a></div>
+										<img src="https://img.youtube.com/vi/{{id}}/0.jpg" width="300px">
+									</div>
+									{{/each}}
+								{{/if}}
+							</div>
+						{{/if}}
+						{{#if eq type "poll"}}
+							<div class="poll">
+							<b>Poll</b>
+							<br>
+							{{text}}
+							<br>
+							{{#if admin}}
+								{{#if eq voted.length 0}}
+									<div class="info">Nobody has submitted this poll yet.</div>
+								{{else}}
+									<br>
+									{{#each pollOptions}}
+										{{title}}
+										<div class="progress progress-info active">
+											<div class="progress-bar" style="width: {{percent votes ../voted.length}}%;"></div>
+										</div>
+									{{/each}}
+								{{/if}}
+							{{else}}
+							{{#if contain voted currentUser._id}}
+								{{#each pollOptions}}
+									<input type="radio" name="{{../_id}}" disabled value="{{title}}">
+									{{title}}
+									<br>
+								{{/each}}
+								<button class="btn btn-default btn-sm poll-submit" disabled>Submit</button>
+								<div class="info">Poll already submitted.</div>
+							{{else}}
+								{{#each pollOptions}}
+									<input type="radio" name="{{../_id}}" value="{{title}}">
+									{{title}}
+									<br>
+								{{/each}}
+								<button class="btn btn-default btn-sm poll-submit">Submit</button>
+							{{/if}}
+							{{/if}}
+							</div>
+						{{/if}}
+						{{#if eq type "reminder"}}
+							<b>Reminder</b>
+							<br>
+							{{text}}
+							<br>
+							<span class="info">{{fullDate eventDate}}</span>
+						{{/if}}
+						{{#if eq type "assignment"}}
+							<b>Assignment</b>
+							<br>
+							{{text}}
+							<br>
+							<span class="info">Due on {{fullDate deadline}}</span>
+							<br>
+							{{#if uploadViaPandora}}
+								{{#if teacher}}
+									<div class="stat">
+										<div class="stat-number">
+											{{uploads.length}}
+										</div>
+										<div class="stat-title">
+											Submitted
+										</div>
+									</div>
+									<div class="stat">
+										<div class="stat-number">
+											{{notDone}}
+										</div>
+										<div class="stat-title">
+											Not Submitted
+										</div>
+									</div>
+									<br>
+									<a href="/rooms/{{../_id}}/notices/assignments/{{_id}}">See All</a>
+								{{else}}
+									{{#if eq fff.files.length 0}}
+										<button class="btn btn-sm btn-default hand-in">Hand in</button>
+									{{else}}
+										<br>
+										<table class="table table-bordered">
+											<thead>
+												<tr>
+													<th>Filename</th>
+												</tr>
+											</thead>
+											<tbody>
+												{{#each fff.files}}
+													{{#with FS.GetFile "files" .}}
+														<tr>
+															<td>
+																{{this.name}}
+																{{> FS.DeleteButton class="btn btn-danger btn-xs pull-right"}}
+															</td>
+														</tr>
+													{{/with}}
+												{{/each}}
+											</tbody>
+										</table>
+										{{#if ne fff.files.length 4}}
+											<button class="btn btn-sm btn-default hand-in">Upload More Files</button>
+										{{/if}}
+										{{#if fff.grade}}
+											<br>
+										{{else}}
+											{{#if fff.comment}}
+											<br>
+											{{/if}}
+										{{/if}}
+										{{#if fff.grade}}
+											<br>
+											<div>
+												<strong>Grade</strong><br>
+												{{fff.grade}}
+											</div>
+										{{/if}}
+										{{#if fff.comment}}
+											<br>
+											<div>
+												<strong>Comment</strong><br>
+												{{fff.comment}}
+											</div>
+										{{/if}}
+									{{/if}}
+								{{/if}}
+							{{/if}}
+						{{/if}}
+					</div>
+					{{#if tooManyComments}}
+						<div class="panel-body panel-reply-plus-plus panel-reply-plus panel-reply">
+							<button class="btn btn-link show-all">
+							{{#if showAll}}
+								Hide Comments
+							{{else}}
+								Show More Comments
+							{{/if}}
+							</button>
+						</div>
+					{{/if}}
+					{{#each commentsF}}
+						<div class="panel-body panel-reply-plus panel-reply">
+							<div class="first">
+								<img class="icon" src='{{GeoPattern "HeyHeyYouYou"}}'>
+							</div>
+							<div class="after">
+								<b>{{username userId}}</b> <span class="info">said {{fullDate date}}</span>
+								{{#if activeComment ../type ../_id commentId}}
+									<textarea class="form-control edit-reply-field">{{text}}</textarea>
+								{{else}}
+									{{#if eq currentUser._id userId}}
+										<div class="pull-right">
+											<div class="bit-d edit-reply" data-id="{{../_id}}" data-type="{{../type}}">Edit</div>
+											<div class="bit-d del-reply" data-id="{{../_id}}" data-type="{{../type}}">Delete</div>
+										</div>
+									{{/if}}
+									<br>
+									{{text}}
+								{{/if}}
+							</div>
+						</div>
+					{{/each}}
+					{{#if eq activeNotice _id}}
+						<div class="panel-body panel-reply">
+							<div class="input-group">
+								<textarea class="form-control reply-text" rows="1"></textarea>
+								<span class="input-group-addon btn btn-primary submit-reply">Submit</span>
+								<span class="input-group-addon btn btn-default cancel-reply"><i class="fa fa-times"></i></span>
+							</div>
+						</div>
+					{{/if}}
+					<div class="panel-footer">
+						<button class="btn btn-link reply">Reply</button>
+						{{#if teacher}}
+							{{#if ne type "poll"}}
+								{{#if eq type "notice"}}
+									<a href="/rooms/{{../_id}}/notices/announcements/{{_id}}/edit" class="btn btn-link">Edit</a>
+								{{/if}}
+								{{#if eq type "reminder"}}
+									<a href="/rooms/{{../_id}}/notices/reminders/{{_id}}/edit" class="btn btn-link">Edit</a>
+								{{/if}}
+								{{#if eq type "assignment"}}
+									<a href="/rooms/{{../_id}}/notices/assignments/{{_id}}/edit" class="btn btn-link">Edit</a>
+								{{/if}}
+							{{/if}}
+							<button class="btn btn-link del">Delete</button>
+						{{/if}}
+						<div class="pull-right">
+							{{fullDate date}}
+						</div>
+					</div>
+				</div>
+			</div>
+		{{/each}}
+		</div>
+	</div>
+</template>
+
+
+<template name="navigation">
+	{{>navbar}}
+	<div class="cover-image">
+		<div class="cover-image-container">
+			<div class="cover-info">
+				<div class="cover-title">{{title}}</div>
+			</div>
+		</div>
+	</div>
+	<div class="topbar">
+		<div class="row">
+			<div class="col-md-12">
+				<nav class="text-center">
+						<ul>
+							{{#if isNavActive "notices"}}
+								<li class="active"><a href="/rooms/{{_id}}/">Notices</a></li>
+							{{else}}
+								<li><a href="/rooms/{{_id}}/">Notices</a></li>
+							{{/if}}
+							{{#if isNavActive "files"}}
+								<li class="active"><a href="/rooms/{{_id}}/files">Files</a></li>
+							{{else}}
+								<li><a href="/rooms/{{_id}}/files">Files</a></li>
+							{{/if}}
+							{{#if isNavActive "quizzes"}}
+								<li class="active"><a href="/rooms/{{_id}}/quizzes">Quizzes</a></li>
+							{{else}}
+								<li><a href="/rooms/{{_id}}/quizzes">Quizzes</a></li>
+							{{/if}}
+						</ul>
+					</nav>
+			</div>
+		</div>
+	</div>
+</template>

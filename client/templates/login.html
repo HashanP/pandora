@@ -1,0 +1,75 @@
+<template name="login">
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Pandora</a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#" class="about">About</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div class="row">
+		<div class="col-md-4 col-sm-12 col-md-push-4">
+			<div class="well login-container">
+        <h2 class="text-center school-title">{{schoolName}}</h2>
+        <p class="text-center login-info">
+          Enter your <b>username</b> and <b>password</b>.
+        </p>
+        <br>
+				<form>
+          {{#if loginError}}
+            <p class="text-danger">
+              <strong>
+                Incorrect username of password.
+              </strong>
+            </p>
+					{{else}}
+						{{#if lockedError}}
+						<p class="text-danger">
+							<strong>
+								Account is locked.
+							</strong>
+						</p>
+						{{/if}}
+					{{/if}}
+					<div class="form-group {{#if loginError}}has-error{{/if}}">
+						<input type="text" placeholder="Username" class="username form-control input-lg">
+					</div>
+					<div class="form-group {{#if loginError}}has-error{{/if}}">
+						<input type="password" placeholder="Password" class="password form-control input-lg">
+					</div>
+					<button type="button" class="btn btn-success btn-block btn-lg login-button">
+            <i class="fa fa-lock"></i>
+            Login
+          </button>
+				</form>
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="about">
+	<div class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">About</h4>
+				</div>
+				<div class="modal-body">
+            Pandora is a Virtual Learning Environment (VLE), created by Hashan Punchihewa.
+            It was made to demonstate how technology can be used to empower teachers and students.
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

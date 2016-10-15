@@ -7,17 +7,17 @@ var isAdmin2 = function(userId, doc) {
 	}
 }
 
-Meteor.users.allow({ 
-	remove: function(userId, doc) { 
+Meteor.users.allow({
+	remove: function(userId, doc) {
 		return isAdmin2(userId, doc) && doc._id !== userId;
-	} 
-}); 
+	}
+});
 
 Rooms.allow({
 	insert: isAdmin2,
-	update: isAdmin2, 
+	update: isAdmin2,
 	remove: isAdmin2
-}); 
+});
 
 var updateQuiz = function(userId, doc) {
 	if(!userId) {
@@ -89,7 +89,7 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 				b = b.files
 			} else {
 				break;
-			}	
+			}
 		}
 		if(path === doc.path) {
 			var c = _.findWhere(b, {name: doc.name()});
@@ -97,8 +97,8 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 				return Files.remove(doc._id);
 			}
 			if(c) {
-				Files.remove(b[b.indexOf(c)]._id);		
-				b.splice(b.indexOf(c), 1);	
+				Files.remove(b[b.indexOf(c)]._id);
+				b.splice(b.indexOf(c), 1);
 			}
 			b.push({type: "file", _id: doc._id, name: doc.name()});
 			Rooms.update(doc.owner, {$set: {files: room.files}});
@@ -115,7 +115,7 @@ Files.on("stored", Meteor.bindEnvironment(function(doc) {
 		}
 		Assignments.update({_id: assignment._id, "uploads.userId": doc.userId}, {$push: {"uploads.$.files": doc._id}});
 		Assignments.update({_id: assignment._id, "uploads": {$not: {$elemMatch: {userId: doc.userId}}}}, {$push: {uploads: {userId: doc.userId, files: [doc._id]}}});
-	} 
+	}
 }));
 
 Files.on("removed", function(doc) {
@@ -191,8 +191,18 @@ Meteor.users.before.remove(function(userId, doc) {
 Quizzes.after.remove(function(userId, doc) {
 	QuizResults.remove({quizId: doc._id});
 });
-					
-Accounts.onCreateUser(function(options, user) { 
-	user.schoolId = options.profile.schoolId; 
-	return user; 
-}); 
+
+Accounts.onCreateUser(function(options, user) {
+	user.schoolId = options.profile.schoolId;
+	return user;
+});
+
+Accounts.validateLoginAttempt(function(loginInfo) {
+  if(!loginInfo.allowed) {
+    return loginInfo.allowed;
+  }
+	if(loginInfo.user.locked) {
+		throw new Meteor.Error(407, "Account locked.");
+	}
+  return true;
+});

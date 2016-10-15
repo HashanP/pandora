@@ -11,7 +11,9 @@ $navbar-default-toggle-bg:#ddd;
 $navbar-default-toggle-hover-bg: #fff;
 $navbar-default-toggle-border-color: #fff;
 $navbar-default-toggle-icon-bar-bg: #fff;
-@import ".meteor/local/build/programs/server/assets/packages/reywood_bootstrap3-sass/_bootstrap";
+//@import ".meteor/local/build/programs/server/assets/packages/reywood_bootstrap3-sass/_bootstrap";
+//@import '{reywood:bootstrap3-sass}/bootstrap';
+@import "/Users/hashanp/.meteor/packages/reywood_bootstrap3-sass/3.3.5_1/os/packages/reywood_bootstrap3-sass/_bootstrap";
 @import "http://fonts.googleapis.com/css?family=Lobster|Titillium+Web";
 @import url(http://fonts.googleapis.com/css?family=Raleway:400,300);
 

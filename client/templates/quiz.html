@@ -404,12 +404,14 @@
 						{{/if}}
 						{{#if eq type "list"}}
 							{{#each options}}
-								<input type="radio" name="question{{index}}" value="{{value}}">{{value}}<br>
+                                <br>
+                                <input type="radio" name="question{{index}}" value="{{value}}"> {{value}}
 							{{/each}}	
 						{{/if}}
 						{{#if eq type "checkboxes"}} 
 							{{#each options}}
-								<input type="checkbox" name="question{{index}}" value="{{value}}">{{value}}<br>
+                                <br>
+                                <input type="checkbox" name="question{{index}}" value="{{value}}"> {{value}}
 							{{/each}}
 						{{/if}}
 						{{#if eq type "fill_in_the_blanks"}}

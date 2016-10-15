@@ -1,0 +1,35 @@
+<template name="settings">
+	{{>navbar}}
+	<div class="container">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Change Password</h3>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label>Current Password</label>
+					<input type="password" class="form-control current-password">
+				</div>
+				<div class="form-group">
+					<label>New Password</label>
+					<input type="password" class="form-control new-password">
+				</div>
+				<div class="form-group">
+					<label>Confirm New Password</label>
+					<input type="password" class="form-control confirm-password">
+				</div>
+				{{#if error}}
+					<div class="error-msg">
+						<strong class="text-danger">{{error}}</strong>
+					</div>
+				{{/if}}
+				{{#if success}}
+					<div class="error-msg">
+						<strong class="text-success">{{success}}</strong>
+					</div>
+				{{/if}}
+				<button class="btn btn-primary change-password">Update Password</button>
+			</div>
+		</div>
+	</div>
+</template>
