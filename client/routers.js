@@ -18,24 +18,24 @@ Router.onBeforeAction(function() {
 });
 
 Router.onAfterAction(function() {
-	window.setTimeout(function() { 
+	window.setTimeout(function() {
 		console.log(window.location);
-		wnd.set(window.location);	
+		wnd.set(window.location);
 	}, 0);
 });
 
 Router.route("/", function() {
 	Session.set("navbarActive", "home");
-	var query = Rooms.find({$or: [{students: {$in: [Meteor.userId()]}}, {teachers: {$in: [Meteor.userId()]}}]}, {sort: ["title"]}).fetch(); 
+	var query = Rooms.find({$or: [{students: {$in: [Meteor.userId()]}}, {teachers: {$in: [Meteor.userId()]}}]}, {sort: ["title"]}).fetch();
 	this.render("home", {data: {subjects: query, active2: "0"}});
 });
 
-Router.route("/subjects", function() {	
+Router.route("/subjects", function() {
 	Session.set("navbarActive", "home");
 	this.render("home", {data: {subjects: Rooms.find({type: "subject"}, {sort: ["title"]}).fetch(), active2: "1"}});
-}); 
+});
 
-Router.route("/clubs", function() {	
+Router.route("/clubs", function() {
 	Session.set("navbarActive", "home");
 	this.render("home", {data: {subjects: Rooms.find({type: "club"}, {sort: ["title"]}).fetch(), active2:"2"}});
 });
@@ -54,7 +54,7 @@ Router.route("/rooms/:room", function() {
 	this.render("notices", {data: room});
 });
 
-Router.route("/rooms/:room/notices/assignments/:assignment", function() {	
+Router.route("/rooms/:room/notices/assignments/:assignment", function() {
 	var room = Rooms.findOne(this.params.room);
 	this.render("assignment", {data: {_id: room._id, assignmentId: this.params.assignment}});
 });
@@ -64,12 +64,12 @@ Router.route("/rooms/:room/notices/announcement", function() {
 	this.render("createAnnouncement", {data: room});
 });
 
-Router.route("/rooms/:room/notices/announcements/:announcement/edit", function() {	
-	var room = Rooms.findOne(this.params.room)
+Router.route("/rooms/:room/notices/announcements/:announcement/edit", function() {
+	var room = Rooms.findOne(this.params.room);
 	this.render("createAnnouncement", {data: {_id: room._id, announcementId: this.params.announcement}});
 });
 
-Router.route("/rooms/:room/notices/reminders/:reminder/edit", function() {	
+Router.route("/rooms/:room/notices/reminders/:reminder/edit", function() {
 	var room = Rooms.findOne(this.params.room)
 	this.render("createReminder", {data: {_id: room._id, reminderId: this.params.reminder}});
 });
@@ -151,7 +151,7 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 	}
 	if(this.params.query.create === "quiz") {
 		window.questions = new ReactiveArray();
-		this.render("create_quiz", {data: {files: files, _id: room._id}});	
+		this.render("create_quiz", {data: {files: files, _id: room._id}});
 	} else if(this.params.query.create === "vocab_quiz") {
 		window.questions = new ReactiveArray();
 		this.render("createVocabQuiz", {data: {files: files, _id: room._id}});
@@ -161,21 +161,21 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 			this.render("quiz", {data: {_id: room._id, name: x.name, quizId: x.quizId}});
 		} else if(c === 2) {
 			this.render("quizResult", {data: {_id: room._id, quizId: x.quizId, name: x.name, attemptId: attemptId}});
-		} else if(c ===3) {			
+		} else if(c ===3) {
 			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
 			Session.set("criterion", "best");
-			this.render("quizBarGraph", {data: {_id: room._id, quizId: x.quizId, name: x.name}});	
-		} else if(c === 4) {	
+			this.render("quizBarGraph", {data: {_id: room._id, quizId: x.quizId, name: x.name}});
+		} else if(c === 4) {
 			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
 			window.questions = new ReactiveArray();
 			this.render("create_quiz", {data: {files: files, _id: room._id, quizId: x.quizId}});
-		} else { 
+		} else {
 			this.render("quizIntro", {data: {_id: room._id, name: x.name, path: pathSplit.join("/"), quizId: x.quizId}});
 		}
 	} else if(x && x.type === "vocabQuiz") {
 		if(c === 5) {
 			Session.set("path", this.params.path.split("/").slice(0, this.params.path.split("/").length-1).join("/"));
-			this.render("createVocabQuiz", {data: {files: files, _id: room._id, quizId: x.quizId}});	
+			this.render("createVocabQuiz", {data: {files: files, _id: room._id, quizId: x.quizId}});
 		} else {
 			this.render("vocabQuiz", {data: {_id: room._id, quizId: x.quizId, title: x.name}});
 		}
@@ -188,7 +188,7 @@ Router.route("/rooms/:room/quizzes/:path*", function() {
 	}
 });
 
-Router.route("/admin/users", function() {	
+Router.route("/admin/users", function() {
 	if(!Meteor.user().roles || Meteor.user().roles.indexOf("admin") === -1) {
 		return this.render("adminOnly");
 	}
@@ -200,10 +200,10 @@ Router.route("/admin/users", function() {
 	Session.set("count", Counts.get("users"));
 	Session.set("page", this.params.query.page ? parseInt(this.params.query.page) : 1);
 	Session.set("search", this.params.query.search ? this.params.query.search : "");
-	this.render("/admin/users");
+	this.render("/admin/users", {data: {search: Session.get("search")}});
 });
 
-Router.route("/admin/users/create", function() {	
+Router.route("/admin/users/create", function() {
 	if(!Meteor.user().roles || Meteor.user().roles.indexOf("admin") === -1) {
 		return this.render("adminOnly");
 	}
@@ -234,7 +234,7 @@ Router.route("/admin/rooms", function() {
 	Session.set("offset", (this.params.query.page ? parseInt(this.params.query.page, 10)  - 1 : 0) * 10);
 	Session.set("page", this.params.query.page ? parseInt(this.params.query.page) : 1);
 	Session.set("search", this.params.query.search ? this.params.query.search : "");
-	this.render("/admin/rooms");
+	this.render("/admin/rooms", {data: {search: Session.get("search")}});
 });
 
 Router.route("/admin/rooms/create", function() {
@@ -253,4 +253,4 @@ Router.route("/admin/rooms/:room/edit", function() {
 	Meteor.call("findRoom", this.params.room, function(err, data) {
 		this.render("/admin/rooms/create", {data: data});
 	}.bind(this));
-});	
+});

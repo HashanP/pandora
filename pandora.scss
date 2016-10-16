@@ -6,7 +6,7 @@ $navbar-default-link-active-bg:rgba(255,255,255,0.33);
 $navbar-default-brand-color: #fff;
 $navbar-default-border: $navbar-default-bg;
 $navbar-default-link-active-color:$navbar-default-link-color;
-$navbar-default-link-hover-color:#fff; 
+$navbar-default-link-hover-color:#fff;
 $navbar-default-toggle-bg:#ddd;
 $navbar-default-toggle-hover-bg: #fff;
 $navbar-default-toggle-border-color: #fff;
@@ -193,7 +193,7 @@ textarea {
 .container-notices {
 	max-width:760px;
 	margin-left:auto;
-	margin-right:auto;	
+	margin-right:auto;
 }
 
 .space {
@@ -204,7 +204,7 @@ textarea {
 .topbar {
 	width:100%;
 	height:52px;
-	background-color:#7B6260;	
+	background-color:#7B6260;
 	border:none;
 	box-shadow:0px -3px 4px 0px rgba(0,0,0,0.50);
 	position:relative;
@@ -299,6 +299,7 @@ textarea {
 .icon {
 	height:100%;
 	width:100%;
+	border-radius:5px;
 }
 
 .first {
@@ -442,7 +443,7 @@ button {
 
 .question:not(:hover) .btn.edit, .question:not(:hover) .btn.del,
 .question-list.in-progress .question .btn.edit, .question-list.in-progress .question .btn.del {
-	display:none;	
+	display:none;
 }
 
 .question .btn.edit, .question .btn.del {
@@ -509,7 +510,7 @@ button {
 }
 
 .vocab-quiz div:nth-child(3n-2) {
-	border-left: 1px solid black;	
+	border-left: 1px solid black;
 }
 
 .vocab-quiz input:nth-child(3n) {
@@ -581,7 +582,7 @@ thead tr th {
 
 .files tbody tr {
 	height:40px;
-} 
+}
 
 .files tbody tr td:first-child, .files thead tr th:first-child {
 	width:40px;
@@ -623,7 +624,7 @@ thead tr th {
   text-align: center;
 }
 
-@media screen and (min-width: 768px) { 
+@media screen and (min-width: 768px) {
   .modal:before {
     display: inline-block;
     vertical-align: middle;
@@ -643,7 +644,7 @@ thead tr th {
 	width: 100%;
 	padding-bottom: 100%;
 	height: 0;
-	position: relative;	
+	position: relative;
 	text-align:center;
 	text-decoration:none !important;
 	margin-bottom:30px;
@@ -686,7 +687,7 @@ thead tr th {
 	margin-bottom: 15px;
 	font-size: 21px;
 	font-weight: 200;
-}	
+}
 
 .poll-submit {
 	margin-top:5px;
@@ -737,7 +738,7 @@ thead tr th {
 .bit-d {
 	@extend a;
 	display:inline;
-	cursor:pointer;	
+	cursor:pointer;
 	margin-left:5px;
 }
 
@@ -801,4 +802,8 @@ a.select2-search-choice-close {
 
 [disabled].disabled-p {
 	cursor:default;
+}
+
+.cancel-reply {
+	border-left:0;
 }

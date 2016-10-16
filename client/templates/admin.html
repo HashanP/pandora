@@ -22,15 +22,15 @@
 			</div>
 	<div class="col-md-10">
 		<div class="col-md-4 col-lg-3">
-			<input type="text" class="form-control search" placeholder="Search...">
+			<input type="text" value="{{search}}" class="form-control search" placeholder="Search...">
 		</div>
 		<div class="col-md-8 col-lg-9">
 			<div class="pull-right">
-				<a href="/admin/users/create" class="btn btn-success"><i class="fa fa-plus"></i> Add</a>
-				<a href="/admin/users/massUserCreation" class="btn btn-success"><i class="fa fa-users"></i> Mass User Creation</a>
+				<a href="/admin/users/create" class="btn btn-success"><i class="fa fa-plus"></i> Create User</a>
 			</div>
 		</div>
 		<br><br><br>
+		{{#if Template.subscriptionsReady}}
 		<div class="col-md-12">
 			<div class="panel panel-default users">
 				<div class="panel-heading">
@@ -38,25 +38,36 @@
 						<span class="panel-sup">Users ({{count}})</span>
 					</h3>
 				</div>
-				<ul class="list-group">
-					{{#each users}}
-						<li class="list-group-item">
-							{{username}}
-							{{#if isAdmin}}
-								<span class="label label-info">Admin</span>
-							{{/if}}
-							<div class="pull-right">
-								<a href="/admin/users/{{_id}}/edit" class="btn btn-edit btn-xs"><i class="fa fa-pencil"></i> Edit</a>
-								{{#if ne currentUser.username username}}
-									<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+					{{#if eq count 0}}
+					<div class="panel-body panel-body-none">
+						<h2 class="text-center"><i class="fa fa-exclamation-circle fa-2x"></i></h2>
+						<p class="text-center">No users found matching criteria</p>
+					</div>
+					{{else}}
+					<ul class="list-group">
+						{{#each users}}
+							<li class="list-group-item">
+								{{username}}
+								{{#if isAdmin}}
+									<span class="label label-info">Admin</span>
 								{{/if}}
-							</div>
-						</li>
-					{{/each}}
-				</ul>
+								{{#if locked}}
+									<span class="label label-warning">Locked</span>
+								{{/if}}
+								<div class="pull-right">
+									<a href="/admin/users/{{_id}}/edit" class="btn btn-edit btn-xs"><i class="fa fa-pencil"></i> Edit</a>
+									{{#if ne currentUser.username username}}
+										<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+									{{/if}}
+								</div>
+							</li>
+						{{/each}}
+					</ul>
+					{{/if}}
 			</div>
 			{{> pagination route="users"}}
 		</div>
+		{{/if}}
 	</div>
 	</div>
 	</div>
@@ -219,7 +230,7 @@
 			</div>
 			<div class="col-md-10">
 				<div class="col-md-4 col-lg-3">
-					<input type="text" class="form-control search" placeholder="Search...">
+					<input type="text" class="form-control search" value="{{search}}" placeholder="Search...">
 				</div>
 				<div class="col-md-8 col-lg-9">
 					<div class="pull-right">
@@ -227,6 +238,7 @@
 					</div>
 				</div>
 				<br><br><br>
+				{{#if Template.subscriptionsReady}}
 				<div class="col-md-12">
 					<div class="panel panel-default users">
 						<div class="panel-heading">
@@ -234,20 +246,28 @@
 								<span class="panel-sup">Rooms ({{count}})</span>
 							</h3>
 						</div>
-						<ul class="list-group">
-						{{#each rooms}}
-							<li class="list-group-item">
-								{{title}}
-								<div class="pull-right">
-									<a class="btn btn-xs btn-edit" href="/admin/rooms/{{_id}}/edit"><i class="fa fa-pencil"></i> Edit</a>
-									<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
-								</div>
-							</li>
-						{{/each}}
-					</ul>
-				</div>
+							{{#if eq count 0}}
+							<div class="panel-body panel-body-none">
+								<h2 class="text-center"><i class="fa fa-exclamation-circle fa-2x"></i></h2>
+								<p class="text-center">No users found matching criteria</p>
+							</div>
+							{{else}}
+							<ul class="list-group">
+							{{#each rooms}}
+								<li class="list-group-item">
+									{{title}}
+									<div class="pull-right">
+										<a class="btn btn-xs btn-edit" href="/admin/rooms/{{_id}}/edit"><i class="fa fa-pencil"></i> Edit</a>
+										<button class="btn btn-xs btn-danger del"><i class="fa fa-trash-o"></i> Delete</button>
+									</div>
+								</li>
+							{{/each}}
+							</ul>
+							{{/if}}
+					</div>
 				{{> pagination route="rooms"}}
 			</div>
+			{{/if}}
 		</div>
 	</div>
 </div>
@@ -287,4 +307,26 @@
 			{{/if}}
 		</ul>
 	</nav>
+</template>
+
+<template name="shortcuts-users">
+	<div class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Shortcuts</h4>
+				</div>
+				<div class="modal-body">
+            <ul>
+							<li>c, Create User</li>
+							<li>n, Next Page</li>
+							<li>p, Previous Page</li>
+							<li>s, Focus on Search Bar</li>
+							<li>?, List of Shortucts</li>
+						</ul>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>

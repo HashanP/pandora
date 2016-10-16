@@ -16,10 +16,10 @@
 						<input name="inly" class="active" type="checkbox" checked>
 					{{else}}
 						<input name="inly" class="active" type="checkbox">
-					{{/if}}	
+					{{/if}}
 				</span>
 			{{/if}}
-			<input class="form-control option" type="{{type}}" value="{{value}}">	
+			<input class="form-control option" type="{{type}}" value="{{value}}">
 			<span class="input-group-btn">
 				<button type="button" class="btn btn-default remove"><i class="fa fa-times"></i></button>
 			</span>
@@ -60,22 +60,22 @@
 						<tbody>
 							{{#if quizId}}
 								{{#each questions}}
-									{{>vocabQuestion}}	
+									{{>vocabQuestion}}
 								{{/each}}
 							{{else}}
 								{{>vocabQuestion}}
 							{{/if}}
-						</tbody>	
+						</tbody>
 					</table>
 					<button class="btn btn-default add-question">Add Row</button>
 					<button class="btn btn-default add-rows-10">Add 10 Rows</button>
 					<div class="pull-right">
-						<button class="btn btn-primary submit">Submit</button>	
+						<button class="btn btn-primary submit">Submit</button>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>	
+	</div>
 </template>
 
 <template name="vocabQuiz">
@@ -87,7 +87,7 @@
 					<div class="pull-right">
 						<button type="button" class="btn btn-sm btn-default reset">Reset</button>
 						<a href="/rooms/{{_id}}/quizzes/{{path}}/edit" type="button" class="btn btn-sm btn-default edit">Edit</a>
-						<button type="button" class="btn btn-sm btn-primary reveal-answers">Reveal Answers</button>	
+						<button type="button" class="btn btn-sm btn-primary reveal-answers">Reveal Answers</button>
 					</div>
 					<br><br>
 					<div class="row vocab-quiz">
@@ -98,7 +98,7 @@
 							<input type="text" class="answer col-xs-6 col-sm-6 col-md-3 col-lg-2" data-answer="{{answer}}">
 						{{/each}}
 					</div>
-				</div>	
+				</div>
 			</div>
 		</div>
 	</div>
@@ -146,7 +146,7 @@
 											{{/if}}
 										</select>
 									</div>
-								</div> 
+								</div>
 								{{#if ne activeType "fill_in_the_blanks"}}
 									<div class="form-group">
 										<label class="col-sm-2">Question Title</label>
@@ -167,7 +167,7 @@
 										<div class="col-sm-10">
 											{{#each possibleTextAnswers}}
 												{{>option type="text" value=.}}
-											{{/each}}	
+											{{/each}}
 											<div class="add-option-container">
 												<input class="form-control add-option" placeholder="Add valid answer" disabled>
 											</div>
@@ -180,7 +180,7 @@
 										<div class="col-sm-10">
 											{{#each possibleNumberAnswers}}
 												{{>option type="number" value=.}}
-											{{/each}}	
+											{{/each}}
 											<div class="add-option-container">
 												<input class="form-control add-option" placeholder="Add valid answer" disabled>
 											</div>
@@ -248,7 +248,7 @@
 												{{value}}
 												<br>
 											{{/each}}
-										{{/if}}	
+										{{/if}}
 										{{#if eq type "checkboxes"}}
 											{{#each options}}
 												<input type="checkbox" disabled>
@@ -264,10 +264,10 @@
 										<div class="pull-right">
 											<button class="btn btn-default btn-sm edit"><i class="fa fa-pencil"></i></button>
 											<button class="btn btn-default btn-sm del"><i class="fa fa-times"></i></button>
-										</div>	
+										</div>
 									</div>
 								</div>
-						{{/if}}	
+						{{/if}}
 						</div>
 					{{/each}}
 					</div>
@@ -347,7 +347,7 @@
 				<div class="">
 					<h2 class="text-center">
 						{{name}}
-					</h2>	
+					</h2>
 					{{#if previousAttempts}}
 						<table class="table">
 							<thead>
@@ -361,9 +361,9 @@
 									<tr>
 										<td><a href="/rooms/{{../_id}}/quizzes/{{path}}/attempts/{{_id}}">{{localDate date}}</a></td>
 										<td>{{score}}/{{max}}</td>
-									</tr>	
+									</tr>
 								{{/each}}
-							</tbody>	
+							</tbody>
 						</table>
 					{{else}}
 						<div class="text-center">
@@ -371,10 +371,10 @@
 						</div>
 					{{/if}}
 					<div class="text-center">
-						<a href="/rooms/{{_id}}/quizzes/{{path}}/attempt" class="btn btn-primary">Attempt Quiz</a>	
+						<a href="/rooms/{{_id}}/quizzes/{{path}}/attempt" class="btn btn-primary">Attempt Quiz</a>
 					</div>
 				</div>
-			</div>	
+			</div>
 		</div>
 	</div>
 </template>
@@ -394,7 +394,7 @@
 						{{#if eq type "fill_in_the_blanks"}}
 							<label>Fill in the Gaps</label>
 						{{else}}
-							<label>{{title}}</label>	
+							<label>{{title}}</label>
 						{{/if}}
 						{{#if eq type "text"}}
 							<input type="text" name="question{{index}}" class="form-control">
@@ -406,9 +406,9 @@
 							{{#each options}}
                                 <br>
                                 <input type="radio" name="question{{index}}" value="{{value}}"> {{value}}
-							{{/each}}	
+							{{/each}}
 						{{/if}}
-						{{#if eq type "checkboxes"}} 
+						{{#if eq type "checkboxes"}}
 							{{#each options}}
                                 <br>
                                 <input type="checkbox" name="question{{index}}" value="{{value}}"> {{value}}
@@ -417,7 +417,7 @@
 						{{#if eq type "fill_in_the_blanks"}}
 							<br>
 							{{{fillInTheBlanks text true}}}
-						{{/if}}		
+						{{/if}}
 					</div>
 				{{/each}}
 				<button type="button" class="btn btn-primary submit">Submit</button>
@@ -458,7 +458,7 @@
 	<div class="container">
 		<div class="row">
 				<div class="col-md-4">
-					{{> breadcrumb}}		
+					{{> breadcrumb}}
 				</div>
 				<div class="col-md-8">
 				<div class="pull-right">
@@ -471,8 +471,6 @@
 					<ul class="dropdown-menu">
 						<li><a href="?create=quiz">Standard Quiz</a></li>
 						<li><a href="?create=vocab_quiz">Vocabulary Quiz</a></li>
-						<li><a href="?create=crossword">Crossword</a></li>
-						<li><a href="?create=wordsearch">Wordsearch</a></li>
 					</ul>
 				</div>
 				{{/if}}
@@ -484,5 +482,3 @@
 		{{> explorer files=files _id=_id}}
 	</div>
 </template>
-
-

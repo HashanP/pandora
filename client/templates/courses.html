@@ -87,7 +87,7 @@
 					<div class="panel-body">
 						{{#if eq type "notice"}}
 							<div class="first">
-							<img class="icon" src='{{GeoPattern "Mr Davey"}}'>
+							<img class="icon" src='{{GeoPattern userId}}'>
 							</div>
 							<div class="after">
 								<b>{{username userId}}</b>
@@ -125,7 +125,7 @@
 							<br>
 							{{text}}
 							<br>
-							{{#if admin}}
+							{{#if teacher}}
 								{{#if eq voted.length 0}}
 									<div class="info">Nobody has submitted this poll yet.</div>
 								{{else}}
@@ -136,6 +136,11 @@
 											<div class="progress-bar" style="width: {{percent votes ../voted.length}}%;"></div>
 										</div>
 									{{/each}}
+									{{#if eq voted.length 1}}
+										<div class="info">1 person has voted.</div>
+									{{else}}
+										<div class="info">{{voted.length}} people have voted.</div>
+									{{/if}}
 								{{/if}}
 							{{else}}
 							{{#if contain voted currentUser._id}}
@@ -258,7 +263,7 @@
 					{{#each commentsF}}
 						<div class="panel-body panel-reply-plus panel-reply">
 							<div class="first">
-								<img class="icon" src='{{GeoPattern "HeyHeyYouYou"}}'>
+								<img class="icon" src='{{GeoPattern userId}}'>
 							</div>
 							<div class="after">
 								<b>{{username userId}}</b> <span class="info">said {{fullDate date}}</span>
@@ -270,6 +275,12 @@
 											<div class="bit-d edit-reply" data-id="{{../_id}}" data-type="{{../type}}">Edit</div>
 											<div class="bit-d del-reply" data-id="{{../_id}}" data-type="{{../type}}">Delete</div>
 										</div>
+									{{else}}
+										{{#if teacher}}
+											<div class="pull-right">
+												<div class="bit-d del-reply" data-id="{{../_id}}" data-type="{{../type}}">Delete</div>
+											</div>
+										{{/if}}
 									{{/if}}
 									<br>
 									{{text}}
@@ -281,8 +292,10 @@
 						<div class="panel-body panel-reply">
 							<div class="input-group">
 								<textarea class="form-control reply-text" rows="1"></textarea>
-								<span class="input-group-addon btn btn-primary submit-reply">Submit</span>
-								<span class="input-group-addon btn btn-default cancel-reply"><i class="fa fa-times"></i></span>
+								<div class="input-group-btn">
+									<button class="btn btn-primary submit-reply">Submit</button>
+									<button class="btn btn-default cancel-reply"><i class="fa fa-times"></i></button>
+								</div>
 							</div>
 						</div>
 					{{/if}}
@@ -319,7 +332,7 @@
 	<div class="cover-image">
 		<div class="cover-image-container">
 			<div class="cover-info">
-				<div class="cover-title">{{title}}</div>
+				<div class="cover-title">{{getTitle _id}}</div>
 			</div>
 		</div>
 	</div>

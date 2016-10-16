@@ -46,6 +46,38 @@ Template.pagination.helpers({
 	}
 });
 
+var usersShortcuts = function(e) {
+	console.log("here");
+	console.log(e);
+	if($(e.target).is("input")) {
+		return;
+	}
+	if(e.keyCode === 99) {
+		Router.go("/admin/users/create");
+	} else if(e.keyCode === 112) {
+		if(Session.get("offset") !== 0) {
+			Router.go("/admin/users?page=" + (Session.get("page") - 1));
+		}
+	} else if(e.keyCode === 110) {
+		if(!(Session.get("offset") >= Session.get("count") - 10)) {
+			Router.go("/admin/users?page=" + (Session.get("page") + 1));
+		}
+	} else if(e.keyCode === 63) {
+		Modal.show("shortcuts-users");
+	} else if(e.keyCode === 115) {
+		e.preventDefault();
+		$(".search").focus();
+	}
+};
+
+Template["/admin/users"].onCreated(() => {
+	$("body").on("keypress", usersShortcuts);
+});
+
+Template["/admin/users"].onDestroyed(() => {
+	$("body").off("keypress", usersShortcuts);
+});
+
 Template["/admin/users"].events({
 	"click .del": function() {
 		Meteor.users.remove(this._id);

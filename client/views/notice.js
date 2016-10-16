@@ -1,6 +1,6 @@
 Template.createPoll.events({
 	"click .add-option": function(e) {
-		Blaze.render(Template.pollOption, e.target.parentNode.parentNode, e.target.parentNode, Template.instance()); 
+		Blaze.render(Template.pollOption, e.target.parentNode.parentNode, e.target.parentNode, Template.instance());
 	},
 	"click .remove-option": function(e) {
 		$(e.target).closest(".option").remove();
@@ -39,7 +39,7 @@ Template.createPoll.events({
 			roomId: Template.instance().data._id,
 			userId: Meteor.userId(),
 			voted: []
-		});		
+		});
 		Router.go("/rooms/" + Template.instance().data._id);
 	}
 });
@@ -61,7 +61,7 @@ Template.createReminder.events({
 				comments: [],
 				allowComments: true,
 				roomId: Template.instance().data._id,
-				userId: Meteor.userId()	
+				userId: Meteor.userId()
 			});
 		} else {
 			Reminders.update(Template.instance().data.reminderId, {
@@ -94,7 +94,7 @@ Template.createAssignment.events({
 		if($(".text").val() === "") {
 			return Session.set("error", "Details cannot be empty.");
 		} else if($(".text").val().length > 4000) {
-			return Session.set("error", "Details cannot be longer than 4000 characters.");		
+			return Session.set("error", "Details cannot be longer than 4000 characters.");
 		} else if($(".dueDate").val() === "") {
 			return Session.set("error", "Due date cannot be empty.");
 		}
@@ -109,7 +109,7 @@ Template.createAssignment.events({
 				date: new Date(Date.now()),
 				uploads: [],
 				uploadViaPandora: $(".uploadViaPandora").is(":checked")
-			});		
+			});
 		} else {
 			var obj = {
 				text: $(".text").val(),
@@ -125,7 +125,7 @@ Template.createAssignment.events({
 });
 
 Template.createAnnouncement.onCreated(function() {
-	window.images = new ReactiveArray();	
+	window.images = new ReactiveArray();
 	window.youtubes = new ReactiveArray();
 	var data = this.data;
 	if(data.announcementId) {
@@ -155,19 +155,19 @@ Template.createAnnouncement.events({
     fileEl.type = "file";
 		fileEl.accept = "image/*";
     fileEl.addEventListener("change", function() {
-			if(fileEl.files[0].size < 3 * 1024 * 1024) {	
+			if(fileEl.files[0].size < 3 * 1024 * 1024) {
 				var reader = new FileReader();
 				reader.addEventListener("load", function(e) {
 					images.push({
 						data: e.target.result,
 						title: fileEl.files[0].name
-					}); 
+					});
 				}.bind(this));
 				reader.readAsDataURL(fileEl.files[0]);
 			} else {
 				Modal.show("fileSizeTooBig");
 			}
-		}.bind(this)); 
+		}.bind(this));
 		fileEl.click();
 	},
 	"click .add-youtube": function(e) {
@@ -230,14 +230,14 @@ Template.createAnnouncement.helpers({
 	value: function() {
 		if(Template.instance().data.announcementId) {
 			return Notices.findOne(Template.instance().data.announcementId).text;
-		}	
+		}
 	}
 });
 
 Template.youtubeList.helpers({
 	youtubeId: function() {
 		return Session.get("youtubeId");
-	}, 
+	},
 	youtubeTitle: function() {
 		return Session.get("youtubeTitle");
 	}
@@ -365,7 +365,7 @@ Template.notices.events({
 		Session.set("activeNotice", undefined);
 	},
 	"click .del-reply": function(e) {
-		Meteor.call("delComment", e.target.dataset.id, e.target.dataset.type, this.commentId);
+		Meteor.call("delComment", e.target.dataset.id, e.target.dataset.type, this.commentId, Template.instance().data._id);
 	},
 	"click .edit-reply": function(e) {
 		Session.set("activeComment", {
@@ -383,7 +383,7 @@ Template.notices.events({
 		var fileEl = document.createElement("input");
 		$("body").append(fileEl);
 		fileEl.type = "file";
-		fileEl.addEventListener("change", function(e) { 
+		fileEl.addEventListener("change", function(e) {
 			FS.Utility.eachFile(e, function(file) {
 				file = new FS.File(file);
 				file.owner = y.data._id;
@@ -398,7 +398,7 @@ Template.notices.events({
 				});
 			});
 			$(fileEl).remove();
-		});	
+		});
 		fileEl.click();
 	},
 	"blur .edit-reply-field": function() {
@@ -419,4 +419,3 @@ Template.notices.events({
 Template.assignment.onCreated(function() {
 	this.subscribe("fa", this.data.assignmentId);
 });
-

@@ -2,7 +2,7 @@ Meteor.publish("users", function() {
 	if(this.userId) {
 		return Meteor.users.find(this.userId, {fields: {username: 1, roles: 1, schoolId: 1}});
 	}
-});	
+});
 
 Meteor.publish("/admin/users", function(offset, limit, search) {
 	if(!this.userId) {
@@ -13,15 +13,15 @@ Meteor.publish("/admin/users", function(offset, limit, search) {
 	if(search) {
 		query.username = new RegExp(search, "i");
 	}
-	if(user.roles && user.roles.indexOf("admin") !== -1) { 
+	if(user.roles && user.roles.indexOf("admin") !== -1) {
 		Mongo.Collection._publishCursor(Meteor.users.find(query, {
 			skip: offset,
 			limit: limit,
 			sort: ["username"]
 		}), this, "/admin/users");
-	
+
 		this.ready();
-	}	
+	}
 });
 
 Meteor.publish("/admin/users/count", function(search) {
@@ -41,7 +41,7 @@ Meteor.publish("/admin/users/count", function(search) {
 Meteor.publish("/admin/rooms/count", function(search) {
 	if(!this.userId) {
 		return [];
-	} 
+	}
 	var user = Meteor.users.findOne(this.userId);
 	var query = {schoolId: user.schoolId};
 	if(search) {
@@ -67,7 +67,7 @@ Meteor.publish("/admin/rooms", function(offset, limit, search) {
 			limit: limit,
 			sort: ["title"]
 		}), this, "/admin/rooms");
-		
+
 		this.ready();
 	}
 });
@@ -87,7 +87,7 @@ Meteor.publishComposite("rooms", {
 	children: [
 		{
 			find: function(doc) {
-				return Meteor.users.find({$or: [{_id: {$in: doc.students}}, {roles: {$in: ["admin"]}}], schoolId: doc.schoolId}, {fields: {username: 1}});	
+				return Meteor.users.find({$or: [{_id: {$in: doc.students}}, {roles: {$in: ["admin"]}}, {_id: {$in: doc.teachers}}], schoolId: doc.schoolId}, {fields: {username: 1}});
 			}
 		}
 	]
@@ -135,7 +135,7 @@ Meteor.publish("quizzes", function(id) {
 });
 
 Meteor.publish("quizResults", function(id) {
-	return QuizResults.find({quizId: id, userId: this.userId});	
+	return QuizResults.find({quizId: id, userId: this.userId});
 });
 
 Meteor.publish("fa", function(id) {
@@ -143,7 +143,7 @@ Meteor.publish("fa", function(id) {
 });
 
 Meteor.publish("notices", function(id) {
-	return [Notices.find({roomId: id}), 
+	return [Notices.find({roomId: id}),
 		Polls.find({roomId: id}),
 		Reminders.find({roomId: id}),
 		Assignments.find({roomId: id})

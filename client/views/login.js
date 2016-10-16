@@ -180,6 +180,12 @@ Template.navigation.onCreated(function() {
 	this.subscribe("notices", this.data._id);
 });
 
+Template.navigation.helpers({
+	getTitle(id) {
+		return Rooms.findOne(id).title;
+	}
+});
+
 Template.home.helpers({
 	joined(id) {
 		return Rooms.findOne(id).students.indexOf(Meteor.userId()) !== -1;
